@@ -4,14 +4,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.database.contant.MyContants;
 import com.example.database.domain.*;
 import com.example.database.entity.*;
+import com.example.database.fanyumeta.client.HardwareControlClient;
+import com.example.database.fanyumeta.client.HardwareControlProperties;
 import com.example.database.service.*;
 import com.example.database.mapper.InstructionSetMapper;
 import com.example.database.utils.ArabicNumeralsUtil;
 import com.example.database.utils.GeneratrixUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,9 +41,15 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
     @Autowired
     private TransformerService transformerService;
 
+    @Resource
+    private HardwareControlClient hardwareControlClient;
 
     public String getEnv() {
         return this.env.getProperty("interlocutionUrl");
+    }
+
+    public String getLargeModelUrl() {
+        return this.env.getProperty("lager-model-url");
     }
 
     @Override
@@ -51,6 +61,13 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
         //运行指令
         if (MyContants.YX_ZL.equals(directiveType)) {
             returnVo.setResults(MyContants.YX_ZL_ANS);
+
+            String hardwareCommandResult = hardwareControlClient.sendMessage(ilResult.getTips());
+            if (StringUtils.isNotBlank(hardwareCommandResult)) {
+                returnVo.setResults(hardwareCommandResult);
+            } else {
+                returnVo.setResults(MyContants.SEND_HARDWARE_COMMAND_ERROR);
+            }
         }
         //处理图片信息
         this.haveJpgPath(ilResult, returnVo);

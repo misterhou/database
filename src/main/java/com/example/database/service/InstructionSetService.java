@@ -13,4 +13,5 @@ import com.example.database.entity.ReturnVo;
 public interface InstructionSetService extends IService<InstructionSet> {
    public void haveReturnVo(InterlocutionResult ilResult,ReturnVo returnVo);
    public String getEnv();
+   public String getLargeModelUrl();
 }

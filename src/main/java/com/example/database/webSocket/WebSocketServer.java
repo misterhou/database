@@ -101,45 +101,10 @@ public class WebSocketServer {
      *
      * @param message
      */
-//    @OnMessage
-//    public void onMessage(String message) {
-//        InterlocutionResult ilr = httpHaveInterlocutionResult(message);
-//        //log.info("返回的数据:{}" + ilr);
-//        Integer sjInt = ZenzeUtils.haveSj();
-//        ReturnVo returnVo = new ReturnVo();
-//        returnVo.setId("无");
-//        returnVo.setJpgPath("无");
-//        if (sjInt%2 == 0) {
-//            returnVo.setResults(MyContants.RESULT_FAIL1);
-//        } else {
-//            returnVo.setResults(MyContants.RESULT_FAIL2);
-//        }
-//        returnVo.setTabData("无");
-//        if (ilr != null){
-//            if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
-//                returnVo.setResults(MyContants.NOT_HAVE_ID);
-//            }else {
-//                 instructionSetService.haveReturnVo(ilr, returnVo);
-//            }
-//        }
-//
-//        //创建 ObjectMapper 对象
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        // 将对象转换为 JSON 字符串
-//        String jsonString = null;
-//        try {
-//            jsonString = objectMapper.writeValueAsString(returnVo);
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        sendOneMessage(userId, jsonString);
-//    }
-
     @OnMessage
     public void onMessage(String message) {
-        InterlocutionResultV2 ilr = httpHaveInterlocutionResultV2(message);
-        log.info("返回的数据:{}", ilr);
+        log.info("【接收到天工】的消息:{}", message);
+        InterlocutionResult ilr = httpHaveInterlocutionResult(message);
         Integer sjInt = ZenzeUtils.haveSj();
         ReturnVo returnVo = new ReturnVo();
         returnVo.setId("无");
@@ -151,13 +116,16 @@ public class WebSocketServer {
         }
         returnVo.setTabData("无");
         if (ilr != null){
-//            if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
-//                returnVo.setResults(MyContants.NOT_HAVE_ID);
-//            }else {
-//                 instructionSetService.haveReturnVo(ilr, returnVo);
-//            }
-            returnVo.setResults(ilr.getResult());
-
+            if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
+                returnVo.setResults(MyContants.NOT_HAVE_ID);
+                InterlocutionResultV2 largeModelResponse = httpHaveInterlocutionResultV2(message);
+                String largeModelResponseResult = largeModelResponse.getResult();
+                if (StringUtils.isNotBlank(largeModelResponseResult)) {
+                    returnVo.setResults(largeModelResponseResult);
+                }
+            }else {
+                 instructionSetService.haveReturnVo(ilr, returnVo);
+            }
         }
 
         //创建 ObjectMapper 对象
@@ -173,12 +141,58 @@ public class WebSocketServer {
         sendOneMessage(userId, jsonString);
     }
 
+//    @OnMessage
+//    public void onMessage(String message) {
+//        InterlocutionResultV2 ilr = httpHaveInterlocutionResultV2(message);
+//        log.info("返回的数据:{}", ilr);
+//        Integer sjInt = ZenzeUtils.haveSj();
+//        ReturnVo returnVo = new ReturnVo();
+//        returnVo.setId("无");
+//        returnVo.setJpgPath("无");
+//        if (sjInt%2 == 0) {
+//            returnVo.setResults(MyContants.RESULT_FAIL1);
+//        } else {
+//            returnVo.setResults(MyContants.RESULT_FAIL2);
+//        }
+//        returnVo.setTabData("无");
+//        if (ilr != null){
+////            if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
+////                returnVo.setResults(MyContants.NOT_HAVE_ID);
+////            }else {
+////                 instructionSetService.haveReturnVo(ilr, returnVo);
+////            }
+//            returnVo.setResults(ilr.getResult());
+//
+//        }
+//
+//        //创建 ObjectMapper 对象
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        // 将对象转换为 JSON 字符串
+//        String jsonString = null;
+//        try {
+//            jsonString = objectMapper.writeValueAsString(returnVo);
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        sendOneMessage(userId, jsonString);
+//    }
+
     private InterlocutionResult httpHaveInterlocutionResult(String message) {
         Map<String, String> map = new HashMap<>();
         map.put("text", message);
         Class<InterlocutionResult> c = InterlocutionResult.class;
         String url = instructionSetService.getEnv();
-        return HttpClientUtil.postFormForObject(url, map, c);
+        log.info("【发送给 8017】的消息：{}", map);
+        InterlocutionResult ilr = HttpClientUtil.postFormForObject(url, map, c);
+//        InterlocutionResult ilr = new InterlocutionResult();
+//        ilr.setId("2");
+//        ilr.setDirective("2023年5月25日");
+//        ilr.setDirectiveType("运行指令");
+//        ilr.setQuestion("负荷");
+//        ilr.setTips("大屏前空调1号大屏前西侧空调打开空调");
+        log.info("【接收到 8017】的消息：{}", ilr);
+        return ilr;
     }
 
     /**
@@ -189,7 +203,7 @@ public class WebSocketServer {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("用户错误,原因:" + error.getMessage());
+        log.error("用户错误", error);
         error.printStackTrace();
     }
 
@@ -211,10 +225,11 @@ public class WebSocketServer {
     // 此为单点消息
     public void sendOneMessage(String userId, String message) {
         Session session = sessionPool.get(userId);
-        log.info("【sessionPool】:{}" + userId);
+        log.info("【sessionPool】:{}", userId);
         if (session != null && session.isOpen()) {
             try {
-                log.info("【websocket消息】单点消息:" + message);
+//                log.info("【websocket消息】单点消息:" + message);
+                log.info("【发送给天工】 的消息：{}", message);
                 session.getAsyncRemote().sendText(message);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -253,11 +268,12 @@ public class WebSocketServer {
     private InterlocutionResultV2 httpHaveInterlocutionResultV2(String message) {
 //        Map<String, String> map = new HashMap<>();
 //        map.put("text", message);
-        log.info("接收到调用端穿过来的数据：{}", message);
         String data = "{\"messages\":[{\"role\":\"user\",\"content\":\"" + message + "\"}]}";
-        log.info("发给模型的数据：{}", data);
-        String url = instructionSetService.getEnv();
+        log.info("【发给大模型】的消息：{}", data);
+        String url = instructionSetService.getLargeModelUrl();
 //        return HttpClientUtil.postFormForObject(url, map, InterlocutionResultV2.class);
-        return HttpClientUtil.postJsonForObject(url, data, InterlocutionResultV2.class);
+        InterlocutionResultV2 ivr = HttpClientUtil.postJsonForObject(url, data, InterlocutionResultV2.class);
+        log.info("【接收到大模型】的消息：{}", data);
+        return ivr;
     }
 }

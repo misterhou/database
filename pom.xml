@@ -15,6 +15,9 @@
     <description>database</description>
     <properties>
         <java.version>1.8</java.version>
+        <netty.version>4.1.100.Final</netty.version>
+        <poi.version>4.1.2</poi.version>
+        <okhttp.version>4.9.3</okhttp.version>
     </properties>
     <dependencies>
         <dependency>
@@ -123,6 +126,36 @@
             <artifactId>spring-websocket</artifactId>
             <version>5.3.20</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-all</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>

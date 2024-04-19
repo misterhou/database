@@ -9,4 +9,6 @@ public class MyContants {
 
     public static final String RESULT_FAIL1 = "对不起，我不大清楚您的问题";
     public static final String RESULT_FAIL2 = "对不起，数据库没有查询到相关答案";
+
+    public static final String SEND_HARDWARE_COMMAND_ERROR = "对不起，中控指令下发失败";
 }

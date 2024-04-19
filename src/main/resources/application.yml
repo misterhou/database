@@ -2,6 +2,8 @@ server:
   port: 7879
 #问答接口
 interlocutionUrl: http://192.168.1.14:8017/add
+# 大模型接口
+lager-model-url: http://10.122.66.165:10025
 
 spring:
   datasource:
@@ -17,4 +19,15 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
-  path: e:/logs/database
+  path: logs/database
+  level:
+    io.netty.handler.logging: debug
+
+fan-yu:
+  hardware-control:
+    enabled: true
+    host: 127.0.0.1
+    port: 8080
+    timeout: 15
+    request-command-config-file: E:/monkey/product/config/RequestCommandCache
+    receive-command-config-file: E:/monkey/product/config/ReceiveCommandCache
