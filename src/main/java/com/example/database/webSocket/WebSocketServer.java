@@ -124,7 +124,7 @@ public class WebSocketServer {
                     returnVo.setResults(largeModelResponseResult);
                 }
             }else {
-                 instructionSetService.haveReturnVo(ilr, returnVo);
+                 instructionSetService.haveReturnVo(ilr, returnVo, message);
             }
         }
 

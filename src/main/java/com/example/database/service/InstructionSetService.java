@@ -11,7 +11,14 @@ import com.example.database.entity.ReturnVo;
 * @createDate 2023-09-20 09:56:26
 */
 public interface InstructionSetService extends IService<InstructionSet> {
-   public void haveReturnVo(InterlocutionResult ilResult,ReturnVo returnVo);
+
+   /**
+    * 8017 响应数据处理
+    * @param ilResult 8017 响应数据
+    * @param returnVo 处理结果
+    * @param message 接收到的中控指令信息
+    */
+   public void haveReturnVo(InterlocutionResult ilResult,ReturnVo returnVo, String message);
    public String getEnv();
    public String getLargeModelUrl();
 }

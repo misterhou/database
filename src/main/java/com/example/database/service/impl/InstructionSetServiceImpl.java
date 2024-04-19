@@ -53,7 +53,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
     }
 
     @Override
-    public void haveReturnVo(InterlocutionResult ilResult, ReturnVo returnVo) {
+    public void haveReturnVo(InterlocutionResult ilResult, ReturnVo returnVo, String message) {
         int serialNum = Integer.valueOf(ilResult.getId());
         String directive = ilResult.getDirective();
         String directiveType = ilResult.getDirectiveType();
@@ -62,7 +62,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
         if (MyContants.YX_ZL.equals(directiveType)) {
             returnVo.setResults(MyContants.YX_ZL_ANS);
 
-            String hardwareCommandResult = hardwareControlClient.sendMessage(ilResult.getTips());
+            String hardwareCommandResult = hardwareControlClient.sendMessage(message);
             if (StringUtils.isNotBlank(hardwareCommandResult)) {
                 returnVo.setResults(hardwareCommandResult);
             } else {
