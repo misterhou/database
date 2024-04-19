@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.database.mapper.LineEndpointMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.database.domain.LineEndpoint">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="lineEndName" column="line_end_name" jdbcType="VARCHAR"/>
+            <result property="stationId" column="station_id" jdbcType="VARCHAR"/>
+            <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+            <result property="line" column="line" jdbcType="VARCHAR"/>
+            <result property="activeValue" column="active_value" jdbcType="DOUBLE"/>
+            <result property="reactivePowerValue" column="reactive_power_value" jdbcType="DOUBLE"/>
+            <result property="current" column="current" jdbcType="DOUBLE"/>
+            <result property="powerFactor" column="power_factor" jdbcType="DOUBLE"/>
+            <result property="currentLoadRate" column="current_load_rate" jdbcType="DOUBLE"/>
+            <result property="apparentPower" column="apparent_power" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,line_end_name,station_id,
+        voltage_level,line,active_value,
+        reactive_power_value,current,power_factor,
+        current_load_rate,apparent_power
+    </sql>
+</mapper>

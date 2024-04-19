@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.database.mapper.TransformerMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.database.domain.Transformer">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="equipmentName" column="equipment_name" jdbcType="VARCHAR"/>
+            <result property="factoryStation" column="factory_station" jdbcType="VARCHAR"/>
+            <result property="capacity" column="capacity" jdbcType="DOUBLE"/>
+            <result property="maxVoltage" column="max_voltage" jdbcType="VARCHAR"/>
+            <result property="windingType" column="winding_type" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,equipment_name,factory_station,
+        capacity,max_voltage,winding_type
+    </sql>
+</mapper>

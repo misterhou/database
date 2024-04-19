@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.database.mapper.AnnualElectricityConsumptionMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.database.domain.AnnualElectricityConsumption">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="time" column="time" jdbcType="TIMESTAMP"/>
+            <result property="quantityOfElectricity" column="quantity_of_electricity" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,time,quantity_of_electricity
+    </sql>
+    <select id="getMaxTime" resultType="AnnualElectricityConsumption">
+        select id,quantity_of_electricity,time from annual_electricity_consumption where (YEAR (time)) like CONCAT ("%",#{data},"%")
+    </select>
+</mapper>

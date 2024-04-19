@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.database.mapper.LineMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.database.domain.Line">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="lineName" column="line_name" jdbcType="VARCHAR"/>
+            <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+            <result property="startingStation" column="starting_station" jdbcType="VARCHAR"/>
+            <result property="startInterval" column="interval" jdbcType="VARCHAR"/>
+            <result property="terminalStation" column="terminal_station" jdbcType="VARCHAR"/>
+            <result property="powerLimit" column="power_limit" jdbcType="DOUBLE"/>
+            <result property="lineLength" column="line_length" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,line_name,voltage_level,
+        starting_station,start_interval,terminal_station,
+        power_limit,line_length
+    </sql>
+</mapper>

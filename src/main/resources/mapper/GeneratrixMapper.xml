@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.database.mapper.GeneratrixMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.database.domain.Generatrix">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="affiliatedStation" column="affiliated_station" jdbcType="VARCHAR"/>
+            <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+            <result property="upperVoltageLimit" column="upper_voltage_limit" jdbcType="DOUBLE"/>
+            <result property="lowerVoltageLimit" column="lower_voltage_limit" jdbcType="DOUBLE"/>
+            <result property="warningUpperLimit" column="warning_upper_limit" jdbcType="DOUBLE"/>
+            <result property="warningLowerLimit" column="warning_lower_limit" jdbcType="DOUBLE"/>
+            <result property="lineVoltage" column="line_voltage" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,affiliated_station,
+        voltage_level,upper_voltage_limit,lower_voltage_limit,
+        warning_upper_limit,warning_lower_limit,line_voltage
+    </sql>
+</mapper>

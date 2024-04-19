@@ -1,0 +1,20 @@
+server:
+  port: 7879
+#问答接口
+interlocutionUrl: http://192.168.1.14:8017/add
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #url: jdbc:mysql://192.168.1.4:3306/real_time_database?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/real_time_database?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: ami
+    password: ami
+
+mybatis-plus:
+  type-aliases-package: com.example.database.domain
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  path: e:/logs/database

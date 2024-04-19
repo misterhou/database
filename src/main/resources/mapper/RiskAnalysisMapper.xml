@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.database.mapper.RiskAnalysisMapper">
+
+    <resultMap id="BaseResultMap" type="com.example.database.domain.RiskAnalysis">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="stationName" column="station_name" jdbcType="VARCHAR"/>
+            <result property="voltageLevel" column="voltage_level" jdbcType="VARCHAR"/>
+            <result property="riskyDevices" column="risky_devices" jdbcType="VARCHAR"/>
+            <result property="lossLoad" column="loss_load" jdbcType="VARCHAR"/>
+            <result property="riskLevel" column="risk_level" jdbcType="INTEGER"/>
+            <result property="plantStationGraphics" column="plant_station_graphics" jdbcType="VARCHAR"/>
+            <result property="riskType" column="risk_type" jdbcType="INTEGER"/>
+            <result property="lossGeneration" column="loss_generation" jdbcType="DOUBLE"/>
+            <result property="riskEquipment" column="risk_equipment" jdbcType="VARCHAR"/>
+            <result property="levelCorrespondingClause" column="level_corresponding_clause" jdbcType="VARCHAR"/>
+            <result property="suspiciousRisk" column="suspicious_risk" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,station_name,voltage_level,
+        risky_devices,loss_load,risk_level,
+        plant_station_graphics,risk_type,loss_generation,
+        risk_equipment,level_corresponding_clause,suspicious_risk
+    </sql>
+</mapper>
