@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.CharsetUtil;
+import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,6 +19,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TCPClient {
+
+    /**
+     * 接收数据超时消息
+     */
+    public static final String REQUEST_TIMEOUT_MESSAGE = "-200";
 
     private Channel channel;
 
@@ -38,6 +44,10 @@ public class TCPClient {
                         }
                     }).connect(host, port).sync();
             this.channel = channelFuture.channel();
+            this.channel.closeFuture().addListener((ChannelFutureListener) future -> {
+                worker.shutdownGracefully();
+                log.info("tcp 连接已断开");
+            });
             log.info("tcp 连接已建立");
         } catch (InterruptedException e) {
             throw new SocketException("TCP 连接建立异常",e);
@@ -47,11 +57,24 @@ public class TCPClient {
     /**
      * 发送消息
      * @param message 消息内容
+     * @param timeout 超时时间（秒）
+     * @param timeoutPromise 超时回调
      */
-    public void sendMessage(Object message) {
+    public void sendMessage(Object message, Long timeout, Promise<String> timeoutPromise) {
         ByteBuf byteBuf = ByteBufAllocator.DEFAULT.buffer();
         byteBuf.writeBytes(message.toString().getBytes(CharsetUtil.UTF_8));
         this.channel.writeAndFlush(byteBuf);
+        this.worker.submit(() -> {
+            try {
+                Thread.sleep(timeout * 1000);
+            } catch (InterruptedException e) {
+                log.error("等待 TCP 响应数据出错", e);
+            }
+            if (!timeoutPromise.isDone()) {
+                log.info("等待 TCP 响应数据超时：{}", timeoutPromise);
+                timeoutPromise.setSuccess(REQUEST_TIMEOUT_MESSAGE);
+            }
+        });
     }
 
     /**
@@ -60,12 +83,6 @@ public class TCPClient {
     public void close() {
         if (null != this.channel) {
             this.channel.close();
-            this.channel.closeFuture().addListener((ChannelFutureListener) future -> {
-                worker.shutdownGracefully();
-                if (log.isDebugEnabled()) {
-                    log.info("tcp 连接已断开");
-                }
-            });
         }
     }
 }

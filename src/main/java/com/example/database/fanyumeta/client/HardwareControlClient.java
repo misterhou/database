@@ -4,6 +4,10 @@ import com.example.database.contant.MyContants;
 import com.example.database.fanyumeta.handler.HardwareHandler;
 import com.example.database.fanyumeta.socket.TCPClient;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.util.concurrent.DefaultPromise;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.Promise;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,18 +29,6 @@ public class HardwareControlClient {
     public HardwareControlClient(HardwareControlProperties hardwareControlProperties) {
         this.hardwareControlProperties = hardwareControlProperties;
     }
-
-//    /**
-//     * 发送消息给中控服务
-//     *
-//     * @param message 消息内容
-//     */
-//    public void sendMessage(String message) {
-//        List<String> commandList = getHardwareCommand(message);
-//        for (String command : commandList) {
-//            this.sendCommand(command);
-//        }
-//    }
 
     /**
      * 发送消息给中控服务
@@ -63,19 +55,20 @@ public class HardwareControlClient {
     @Deprecated
     public String sendCommand(String command) {
         try {
-            HardwareHandler hardwareHandler = new HardwareHandler();
+            NioEventLoopGroup handlerEventLoopGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("tcp-res-msg"));
+            Promise<String> promise = new DefaultPromise<>(handlerEventLoopGroup.next());
+            HardwareHandler hardwareHandler = new HardwareHandler(promise);
             TCPClient client = new TCPClient(this.hardwareControlProperties.getHost(),
                     this.hardwareControlProperties.getPort(), hardwareHandler);
-            client.sendMessage(command);
+            client.sendMessage(command, this.hardwareControlProperties.getTimeout(), promise);
             log.info("【发送给中控】的消息：{}", command);
-            Thread.sleep(this.hardwareControlProperties.getTimeout() * 1000);
+            String responseMessage = promise.get();
             client.close();
-            return HardwareControlCommandUtil.getReceiveCommandDescription(hardwareHandler.getMessage());
+            return HardwareControlCommandUtil.getReceiveCommandDescription(responseMessage);
         } catch (Exception e) {
             String errMsg = "发送指令到中控系统出错";
             log.error(errMsg, e);
             return null;
-//            throw new RuntimeException(errMsg);
         }
     }
 
