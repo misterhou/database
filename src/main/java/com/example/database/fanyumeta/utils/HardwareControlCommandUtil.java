@@ -34,7 +34,7 @@ public class HardwareControlCommandUtil {
      * 需要忽略的描述
      */
     private static final List<String> IGNORE_DESCRIPTION = Arrays.asList("大屏前空调", "1号", "2号", "参观台1区空调", "参观台2区空调",
-            "合二为一");
+            "合二为一", "东侧灯带", "西侧灯带");
 
     private static final Map<String, String> REPLACE_DESCRIPTION = new HashMap<>();
 
@@ -113,6 +113,24 @@ public class HardwareControlCommandUtil {
             List<String> description = command.getDescription();
             String commandKey = getCommandKey(description);
             cache.put(commandKey, value);
+        }
+        writeObject2File(cache, commandCacheFile);
+    }
+
+    public static void generateRequestReceiveCommandCacheFile(String excelFile, String commandCacheFile) throws IOException {
+        int sheetIndex = 0;
+        String targetColumnData = "与小鸟对接口号";
+        int commandDescriptionColumnOffset = 1;
+        int maxCommandDescriptionColumnLength = 1;
+        boolean isContainCurrentColumn = false;
+
+        List<Command> data = getCommandInfo(excelFile, sheetIndex, targetColumnData, commandDescriptionColumnOffset,
+                maxCommandDescriptionColumnLength, isContainCurrentColumn, false);
+        Map<String, String> cache = new HashMap<>();
+        for (Command command : data) {
+            String value = command.getValue();
+            List<String> description = command.getDescription();
+            cache.put(value, description.get(0));
         }
         writeObject2File(cache, commandCacheFile);
     }
@@ -215,8 +233,7 @@ public class HardwareControlCommandUtil {
                         }
                         int commandValueColumnIndex = commandColumn.getColumnIndex();
                         String command = getColumnValue(sheet, i, commandValueColumnIndex, i);
-                        // 去除小数
-                        command = command.replaceFirst("\\.\\d*", "");
+
                         List<String> commandDescription = getCommandDescription(commandColumn, sheet,
                                 commandDesColumnOffset, commandDesColumnLength, isContainCurrentColumn, isReplace);
                         data.add(new Command(command, commandDescription));
@@ -318,6 +335,8 @@ public class HardwareControlCommandUtil {
         Row row = sheet.getRow(rowIndex);
         Cell cell = row.getCell(columnIndex);
         String cellValue = cell.toString();
+        // 去除小数
+        cellValue = cellValue.replaceFirst("\\.\\d*", "");
         if (IGNORE_DESCRIPTION.contains(cellValue)) {
             cellValue = "";
         } else if (!StringUtils.hasText(cellValue) && rowIndex > minRowIndex) {
