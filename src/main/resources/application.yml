@@ -1,7 +1,7 @@
 server:
   port: 7879
 #问答接口
-interlocutionUrl: http://192.168.1.14:8017/add
+interlocutionUrl: http://192.168.1.7:8017/add
 # 大模型接口
 lager-model-url: http://10.122.66.165:10025
 
@@ -24,6 +24,9 @@ logging:
     io.netty.handler.logging: debug
 
 fan-yu:
+  # 调用异常提示信息
+  error-message: 对不起，指令执行出错，请重试
+  # 中控系统配置
   hardware-control:
     enabled: true
     host: 127.0.0.1

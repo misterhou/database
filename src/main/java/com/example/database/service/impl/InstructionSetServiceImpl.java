@@ -12,6 +12,7 @@ import com.example.database.utils.ArabicNumeralsUtil;
 import com.example.database.utils.GeneratrixUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -44,6 +45,9 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
     @Resource
     private HardwareControlClient hardwareControlClient;
 
+    @Value("${fan-yu.error-message}")
+    private String errorMessage;
+
     public String getEnv() {
         return this.env.getProperty("interlocutionUrl");
     }
@@ -66,7 +70,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             if (StringUtils.isNotBlank(hardwareCommandResult)) {
                 returnVo.setResults(hardwareCommandResult);
             } else {
-                returnVo.setResults(MyContants.SEND_HARDWARE_COMMAND_ERROR);
+                returnVo.setResults(errorMessage);
             }
         }
         //处理图片信息

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
@@ -48,6 +49,13 @@ public class WebSocketServer {
     private static ConcurrentHashMap<String, Session> sessionPool = new ConcurrentHashMap<>();
 
     private static InstructionSetService instructionSetService;
+
+    private static String errorMessage = "";
+
+    @Value("${fan-yu.error-message}")
+    public void setErrorMessage(String errorMessage) {
+        WebSocketServer.errorMessage = errorMessage;
+    }
 
     @Autowired
     public void setInstructionSetService(InstructionSetService instructionSetService) {
@@ -119,13 +127,21 @@ public class WebSocketServer {
             if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
                 returnVo.setResults(MyContants.NOT_HAVE_ID);
                 InterlocutionResultV2 largeModelResponse = httpHaveInterlocutionResultV2(message);
-                String largeModelResponseResult = largeModelResponse.getResult();
-                if (StringUtils.isNotBlank(largeModelResponseResult)) {
-                    returnVo.setResults(largeModelResponseResult);
+                if (largeModelResponse != null) {
+                    String largeModelResponseResult = largeModelResponse.getResult();
+                    if (StringUtils.isNotBlank(largeModelResponseResult)) {
+                        returnVo.setResults(largeModelResponseResult);
+                    } else {
+                        returnVo.setResults(WebSocketServer.errorMessage);
+                    }
+                } else {
+                    returnVo.setResults(WebSocketServer.errorMessage);
                 }
             }else {
                  instructionSetService.haveReturnVo(ilr, returnVo, message);
             }
+        } else {
+            returnVo.setResults(WebSocketServer.errorMessage);
         }
 
         //创建 ObjectMapper 对象
@@ -273,7 +289,7 @@ public class WebSocketServer {
         String url = instructionSetService.getLargeModelUrl();
 //        return HttpClientUtil.postFormForObject(url, map, InterlocutionResultV2.class);
         InterlocutionResultV2 ivr = HttpClientUtil.postJsonForObject(url, data, InterlocutionResultV2.class);
-        log.info("【接收到大模型】的消息：{}", data);
+        log.info("【接收到大模型】的消息：{}", ivr);
         return ivr;
     }
 }
