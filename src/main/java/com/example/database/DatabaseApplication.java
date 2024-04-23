@@ -7,8 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
-import java.io.IOException;
-
 @MapperScan("com.example.database.mapper")
 @SpringBootApplication
 public class DatabaseApplication {
@@ -26,6 +24,13 @@ public class DatabaseApplication {
 //                "RequestCommandCache");
 //        HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
 //                "ReceiveCommandCache");
+//        HardwareControlCommandUtil.generateRequestReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
+//                "RequestReceiveCommandCache");
+//        Pattern pattern = Pattern.compile("(28|二十八)度参观台东侧空调|参观台东侧空调(28|二十八)度");
+//        Pattern pattern = Pattern.compile("(18|(十八))度参观台东侧空调|参观台东侧空调(18|十八)度");
+//        if (pattern.matcher("二十八度参观台东侧空调").matches()) {
+//            System.out.println("ok");
+//        }
 //    }
 
 }
