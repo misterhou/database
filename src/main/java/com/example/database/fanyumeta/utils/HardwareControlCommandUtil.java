@@ -75,7 +75,8 @@ public class HardwareControlCommandUtil {
         List<String> command = new CopyOnWriteArrayList<>();
         for (String regStr : REQUEST_COMMAND_CACHE.keySet()) {
             Pattern pattern = Pattern.compile(regStr);
-            if (pattern.matcher(message).find()) {
+//            if (pattern.matcher(message).find()) {
+            if (pattern.matcher(message).matches()) {
                 command.add(REQUEST_COMMAND_CACHE.get(regStr));
             }
         }
