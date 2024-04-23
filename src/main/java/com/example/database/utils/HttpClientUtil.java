@@ -327,7 +327,7 @@ public class HttpClientUtil {
     public static <T> T postFormForObject(String url, Map<String, String> params, Class<T> responseType) {
         String result = sendPostForm(url, params);
         if (StringUtils.isNotBlank(result)) {
-            log.info("接收到 http 请求【】，响应数据：{}", url, result);
+            log.info("接收到 http 请求【{}】，响应数据：{}", url, result);
             return JSONObject.parseObject(result, responseType);
         } else {
             return null;
