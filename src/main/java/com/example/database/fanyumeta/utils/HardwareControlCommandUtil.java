@@ -271,8 +271,11 @@ public class HardwareControlCommandUtil {
             if (isReplace) {
                 for (String key : REPLACE_DESCRIPTION.keySet()) {
                     if (cellValue.contains(key)) {
-                        cellValue = cellValue.replace(key, REPLACE_DESCRIPTION.get(key));
-                        break;
+                        String numberStr = cellValue.replaceAll("\\D+", "");
+                        if (Integer.valueOf(numberStr).equals(Integer.valueOf(key))) {
+                            cellValue = cellValue.replace(key, REPLACE_DESCRIPTION.get(key));
+                            break;
+                        }
                     }
                 }
             }
