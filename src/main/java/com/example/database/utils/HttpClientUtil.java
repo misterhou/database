@@ -328,7 +328,12 @@ public class HttpClientUtil {
         String result = sendPostForm(url, params);
         if (StringUtils.isNotBlank(result)) {
             log.info("接收到 http 请求【{}】，响应数据：{}", url, result);
-            return JSONObject.parseObject(result, responseType);
+            try {
+                return JSONObject.parseObject(result, responseType);
+            } catch (Exception e) {
+                log.error("解析 http 响应数据异常", e);
+                return null;
+            }
         } else {
             return null;
         }
