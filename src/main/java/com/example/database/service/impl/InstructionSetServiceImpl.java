@@ -53,7 +53,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
     }
 
     public String getLargeModelUrl() {
-        return this.env.getProperty("lager-model-url");
+        return this.env.getProperty("fan-yu.large-model.url");
     }
 
     @Override
