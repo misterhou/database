@@ -37,9 +37,9 @@ public class HardwareControlClient {
      */
     public String sendMessage(String message) {
         if (this.hardwareControlProperties.getEnabled()) {
-            List<String> commandList = getHardwareCommand(message);
-            if (!ObjectUtils.isEmpty(commandList)) {
-                return this.sendCommand(commandList.get(0));
+            String command = getHardwareCommand2(message);
+            if (!ObjectUtils.isEmpty(command)) {
+                return this.sendCommand(command);
             } else {
                 return null;
             }
@@ -72,13 +72,26 @@ public class HardwareControlClient {
         }
     }
 
+//    /**
+//     * 通过文字获取中控指令集合
+//     * @param message 文字信息
+//     * @return 中控指令集合
+//     */
+//    private List<String> getHardwareCommand(String message) {
+//        List<String> command = HardwareControlCommandUtil.parse(message);
+//        if (log.isDebugEnabled()) {
+//            log.debug("将【{}】通过系统解析后得到的中控指令【{}】", message, command);
+//        }
+//        return command;
+//    }
+
     /**
      * 通过文字获取中控指令集合
      * @param message 文字信息
      * @return 中控指令集合
      */
-    private List<String> getHardwareCommand(String message) {
-        List<String> command = HardwareControlCommandUtil.parse(message);
+    private String getHardwareCommand2(String message) {
+        String command = HardwareControlCommandUtil.getCommandValue(message);
         if (log.isDebugEnabled()) {
             log.debug("将【{}】通过系统解析后得到的中控指令【{}】", message, command);
         }

@@ -11,7 +11,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -20,10 +19,15 @@ import java.util.regex.Pattern;
 @Slf4j
 public class HardwareControlCommandUtil {
 
+//    /**
+//     * 请求指令缓存
+//     */
+//    private static final Map<String, String> REQUEST_COMMAND_CACHE = new HashMap<>(256);
+
     /**
      * 请求指令缓存
      */
-    private static final Map<String, String> REQUEST_COMMAND_CACHE = new HashMap<>(256);
+    private static final Map<String, List<HardwareCommand>> REQUEST_COMMAND_CACHE2 = new HashMap<>(256);
 
     /**
      * 响应指令缓存
@@ -38,6 +42,65 @@ public class HardwareControlCommandUtil {
 
     private static final Map<String, String> REPLACE_DESCRIPTION = new HashMap<>();
 
+    /**
+     * 设备列表（用于区分设备大类）
+     */
+    private static final List<String> DEVICE_LIST = Arrays.asList(
+            "大屏前西侧空调",
+            "大屏前东侧空调",
+            "参观台西侧空调",
+            "参观台东侧空调",
+            "工作区西侧空调",
+            "工作区东侧空调",
+
+
+            "工作区全部灯光",
+            "工作一区全部灯光",
+            "工作二区全部灯光",
+            "工作三区全部灯光",
+            "工作四区全部灯光",
+
+            "工作一区南排灯光",
+            "工作二区南排灯光",
+            "工作三区南排灯光",
+            "工作四区南排灯光",
+
+            "工作一区北排灯光",
+            "工作二区北排灯光",
+            "工作三区北排灯光",
+            "工作四区北排灯光",
+
+            "东北侧灯带",
+            "东南侧灯带",
+            "西北侧灯带",
+            "西南侧灯带",
+            "东侧曲线灯带",
+            "西侧曲线灯带",
+            "参观台顶部灯带",
+            "参观台后墙灯带",
+            "休息区柱子灯带",
+
+            "灯光模式",
+
+
+            "西门",
+            "东门",
+            "四楼西门",
+            "四楼东门",
+            "五楼西门",
+            "五楼东门",
+
+
+            "窗帘",
+            "西侧窗帘",
+            "东侧窗帘",
+
+
+            "拼控",
+
+            "音频",
+
+            "坐席台灯带");
 
     static {
         REPLACE_DESCRIPTION.put("18", "(18|十八)");
@@ -65,23 +128,202 @@ public class HardwareControlCommandUtil {
         REPLACE_DESCRIPTION.put("9", "(9|九)");
     }
 
-    /**
-     * 解析文本中的指令
-     *
-     * @param message 文本信息
-     * @return 指令集合
-     */
-    public static List<String> parse(String message) {
-        List<String> command = new CopyOnWriteArrayList<>();
-        for (String regStr : REQUEST_COMMAND_CACHE.keySet()) {
-            Pattern pattern = Pattern.compile(regStr);
+//    /**
+//     * 解析文本中的指令
+//     *
+//     * @param message 文本信息
+//     * @return 指令集合
+//     */
+//    public static List<String> parse(String message) {
+//        List<String> command = new CopyOnWriteArrayList<>();
+//        for (String regStr : REQUEST_COMMAND_CACHE.keySet()) {
+//            Pattern pattern = Pattern.compile(regStr);
+////            if (pattern.matcher(message).matches()) {
 //            if (pattern.matcher(message).find()) {
-            if (pattern.matcher(message).matches()) {
-                command.add(REQUEST_COMMAND_CACHE.get(regStr));
+//                command.add(REQUEST_COMMAND_CACHE.get(regStr));
+//            }
+//        }
+//        return command;
+//    }
+
+    /**
+     * 获取指令值
+     *
+     * @param message 指令描述
+     * @return 指令值
+     */
+    public static String getCommandValue(String message) {
+        String commandValue = null;
+        if (isFind("空调", message)) {
+            // 大屏前空调
+            if (isFind("屏", message)) {
+                if (isFind("(西侧|东)", message)) {
+                    commandValue = getRequestCommand("大屏前西侧空调", message);
+                }
+                if (isFind("(东侧| 东)", message)) {
+                    commandValue = getRequestCommand("大屏前东侧空调", message);
+                }
+            }
+            // 工作区空调
+            if (isFind("工作区", message)) {
+                if (isFind("(西侧|东)", message)) {
+                    commandValue = getRequestCommand("工作区西侧空调", message);
+                }
+                if (isFind("(东侧| 东)", message)) {
+                    commandValue = getRequestCommand("工作区东侧空调", message);
+                }
+            }
+            // 参观台空调
+            if (isFind("参观台", message)) {
+                if (isFind("(西侧|东)", message)) {
+                    commandValue = getRequestCommand("参观台西侧空调", message);
+                }
+                if (isFind("(东侧| 东)", message)) {
+                    commandValue = getRequestCommand("参观台东侧空调", message);
+                }
             }
         }
-        return command;
+
+        // 灯带
+        else if (isFind("灯带", message)) {
+            if (isFind("东北", message)) {
+                commandValue = getRequestCommand("东北侧灯带", message);
+            } else if (isFind("东南", message)) {
+                commandValue = getRequestCommand("东南侧灯带", message);
+            } else if (isFind("西北", message)) {
+                commandValue = getRequestCommand("西北侧灯带", message);
+            } else if (isFind("西南", message)) {
+                commandValue = getRequestCommand("西南侧灯带", message);
+            } else if (isFind("曲线", message)) {
+                if (isFind("东", message)) {
+                    commandValue = getRequestCommand("东侧曲线灯带", message);
+                } else if (isFind("西", message)) {
+                    commandValue = getRequestCommand("西侧曲线灯带", message);
+                }
+            } else if (isFind("参观台", message)) {
+                if (isFind("顶", message)) {
+                    commandValue = getRequestCommand("参观台顶部灯带", message);
+                } else if (isFind("后", message)) {
+                    commandValue = getRequestCommand("参观台后墙灯带", message);
+                }
+            } else if (isFind("休息区", message) || isFind("柱子", message)) {
+                commandValue = getRequestCommand("休息区柱子灯带", message);
+            } else if (isFind("坐席台", message)) {
+                commandValue = getRequestCommand("坐席台灯带", message);
+            }
+        }
+
+        // 灯光模式
+        else if (isFind("灯光模式", message)) {
+            commandValue = getRequestCommand("灯光模式", message);
+        }
+
+        // 灯光
+        else if (isFind("灯", message)) {
+            if (isFind("工作区", message)) {
+                commandValue = getRequestCommand("工作区全部灯光", message);
+            } else if (isFind("工作(1|一)区", message)) {
+                if (isFind("南排|南", message)) {
+                    commandValue = getRequestCommand("工作一区南排灯光", message);
+                } else if (isFind("北排|北", message)) {
+                    commandValue = getRequestCommand("工作一区北排灯光", message);
+                } else {
+                    commandValue = getRequestCommand("工作一区全部灯光", message);
+                }
+            } else if (isFind("工作(2|二)区", message)) {
+                if (isFind("南排|南", message)) {
+                    commandValue = getRequestCommand("工作二区南排灯光", message);
+                } else if (isFind("北排|北", message)) {
+                    commandValue = getRequestCommand("工作二区北排灯光", message);
+                } else {
+                    commandValue = getRequestCommand("工作二区全部灯光", message);
+                }
+            } else if (isFind("工作(3|三)区", message)) {
+                if (isFind("南排|南", message)) {
+                    commandValue = getRequestCommand("工作三区南排灯光", message);
+                } else if (isFind("北排|北", message)) {
+                    commandValue = getRequestCommand("工作三区北排灯光", message);
+                } else {
+                    commandValue = getRequestCommand("工作三区全部灯光", message);
+                }
+            } else if (isFind("工作(4|四)区", message)) {
+                if (isFind("南排|南", message)) {
+                    commandValue = getRequestCommand("工作四区南排灯光", message);
+                } else if (isFind("北排|北", message)) {
+                    commandValue = getRequestCommand("工作四区北排灯光", message);
+                } else {
+                    commandValue = getRequestCommand("工作四区全部灯光", message);
+                }
+            }
+
+        }
+
+        // 门
+        else if (isFind("门", message)) {
+            if (isFind("东", message)) {
+                if (isFind("4|四", message)) {
+                    commandValue = getRequestCommand("四楼东门", message);
+                } else if (isFind("5|五", message)) {
+                    commandValue = getRequestCommand("五楼东门", message);
+                } else {
+                    commandValue = getRequestCommand("东门", message);
+                }
+            } else if (isFind("西", message)) {
+                if (isFind("4|四", message)) {
+                    commandValue = getRequestCommand("四楼西门", message);
+                } else if (isFind("5|五", message)) {
+                    commandValue = getRequestCommand("五楼西门", message);
+                } else {
+                    commandValue = getRequestCommand("西门", message);
+                }
+            }
+
+        }
+
+        // 窗帘
+        else if (isFind("窗帘", message)) {
+            if (isFind("西", message)) {
+                commandValue = getRequestCommand("西侧窗帘", message);
+            } else if (isFind("东", message)) {
+                commandValue = getRequestCommand("东侧窗帘", message);
+            } else {
+                commandValue = getRequestCommand("窗帘", message);
+            }
+        }
+
+        // 拼控
+        else if (isFind("拼控", message)) {
+            commandValue = getRequestCommand("拼控", message);
+        }
+
+        // 音频
+        else if (isFind("音频", message)) {
+            commandValue = getRequestCommand("音频", message);
+        }
+        return commandValue;
     }
+
+    private static boolean isFind(String reg, String message) {
+        boolean result = false;
+        Pattern pattern = Pattern.compile(reg);
+        return pattern.matcher(message).find();
+    }
+
+    private static String getRequestCommand(String device, String message) {
+        String commandValue = null;
+        List<HardwareCommand> hardwareCommandList = REQUEST_COMMAND_CACHE2.get(device);
+        if (!ObjectUtils.isEmpty(hardwareCommandList)) {
+            for (HardwareCommand hardwareCommand : hardwareCommandList) {
+                String description = hardwareCommand.getDescription();
+                Pattern pattern = Pattern.compile(description);
+                if (pattern.matcher(message).find()) {
+                    commandValue = hardwareCommand.getValue();
+                }
+            }
+        }
+        return commandValue;
+    }
+
 
     /**
      * 获取响应指令描述
@@ -108,13 +350,48 @@ public class HardwareControlCommandUtil {
 
         List<Command> data = getCommandInfo(excelFile, sheetIndex, targetColumnData, commandDescriptionColumnOffset,
                 maxCommandDescriptionColumnLength, isContainCurrentColumn, true);
-        Map<String, String> cache = new HashMap<>();
-        for (Command command : data) {
-            String value = command.getValue();
-            List<String> description = command.getDescription();
-            String commandKey = getCommandKey(description);
-            cache.put(commandKey, value);
+//        Map<String, String> cache = new HashMap<>();
+//        for (Command command : data) {
+//            String value = command.getValue();
+//            List<String> description = command.getDescription();
+//            String commandKey = getCommandKey(description);
+//            cache.put(commandKey, value);
+//        }
+        Map<String, List<HardwareCommand>> cache = new HashMap<>();
+        for (String device : DEVICE_LIST) {
+            cache.put(device, new ArrayList<>());
+            for (Command command : data) {
+                List<String> descriptionList = command.getDescription();
+                for (String description : descriptionList) {
+                    if (descriptionList.size() == 3) {
+                        String des2 = descriptionList.get(1);
+                        String des3 = descriptionList.get(2);
+                        description = des3 + des2;
+                        if (isFind("灯光模式", description)) {
+                            description = "灯光模式";
+                        }
+                        if (isFind(description, device)) {
+                            List<HardwareCommand> hardwareCommandList = cache.get(device);
+                            hardwareCommandList.add(new HardwareCommand(command.getValue(), descriptionList.get(0)));
+                        }
+                        break;
+                    }
+                    if (device.equals(description)) {
+                        List<HardwareCommand> hardwareCommandList = cache.get(device);
+                        hardwareCommandList.add(new HardwareCommand(command.getValue(), descriptionList.get(0)));
+                    }
+                }
+            }
         }
+//        for (Command command : data) {
+//            List<String> descriptionList = command.getDescription();
+//            for (String description : descriptionList) {
+//                if (!DEVICE_LIST.contains(description)) {
+//                    new HardwareCommand(command.getValue(), description);
+//                }
+//            }
+//        }
+//        System.out.println(cache);
         writeObject2File(cache, commandCacheFile);
     }
 
@@ -154,6 +431,23 @@ public class HardwareControlCommandUtil {
     }
 
     /**
+     * 加载指令文件
+     *
+     * @param commandCacheFile 缓存文件
+     * @return 缓存 map
+     * @throws IOException 配置文件读取出错，会抛出此异常
+     * @throws ClassNotFoundException 配置文件数据有问题，会抛出此异常
+     */
+    public static Map<String, List<HardwareCommand>> loadRequestCommandData(String commandCacheFile) throws IOException, ClassNotFoundException {
+        Map<String, List<HardwareCommand>> data = null;
+        log.info("开始加载指令缓存文件：{}", commandCacheFile);
+        ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(commandCacheFile)));
+        data = (Map<String, List<HardwareCommand>>) inputStream.readObject();
+        log.info("指令数量：{}\n{}", data.size(), data);
+        return data;
+    }
+
+    /**
      * 更新指令缓存数据
      *
      * @param requestCommandConfigFile 请求指令文件
@@ -161,8 +455,10 @@ public class HardwareControlCommandUtil {
      */
     public static void initCache(String requestCommandConfigFile, String receiveCommandConfigFile) {
         try {
-            REQUEST_COMMAND_CACHE.clear();
-            REQUEST_COMMAND_CACHE.putAll(loadData(requestCommandConfigFile));
+//            REQUEST_COMMAND_CACHE.clear();
+//            REQUEST_COMMAND_CACHE.putAll(loadData(requestCommandConfigFile));
+            REQUEST_COMMAND_CACHE2.clear();
+            REQUEST_COMMAND_CACHE2.putAll(loadRequestCommandData(requestCommandConfigFile));
             RECEIVE_COMMAND_CACHE.clear();
             RECEIVE_COMMAND_CACHE.putAll(loadData(receiveCommandConfigFile));
         } catch (Exception e) {
@@ -394,5 +690,23 @@ public class HardwareControlCommandUtil {
          * 指令描述
          */
         List<String> description;
+    }
+
+    /**
+     * 硬件指令实体
+     */
+    @Data
+    @AllArgsConstructor
+    private static class HardwareCommand implements Serializable {
+
+        /**
+         * 指令值
+         */
+        String value;
+
+        /**
+         * 指令描述
+         */
+        String description;
     }
 }
