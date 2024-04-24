@@ -1,9 +1,7 @@
 server:
   port: 7879
 #问答接口
-interlocutionUrl: http://192.168.1.7:8017/add
-# 大模型接口
-lager-model-url: http://10.122.66.165:10025
+interlocutionUrl: http://127.0.0.1:7879/test/imitate/8017
 
 spring:
   datasource:
@@ -26,11 +24,18 @@ logging:
 fan-yu:
   # 调用异常提示信息
   error-message: 对不起，指令执行出错，请重试
+  # 大模型配置
+  large-model:
+    # 请求地址
+    url: http://10.122.66.165:10025
+    param:
+      # 请求参数模板
+      template-file-path: E:/workspace/iedea/fanyu/database/src/main/resources/LargeModelParam
   # 中控系统配置
   hardware-control:
     enabled: true
     host: 127.0.0.1
     port: 8080
     timeout: 15
-    request-command-config-file: E:/monkey/product/config/RequestCommandCache
-    receive-command-config-file: E:/monkey/product/config/ReceiveCommandCache
+    request-command-config-file: E:/workspace/iedea/fanyu/database/RequestCommandCache
+    receive-command-config-file: E:/workspace/iedea/fanyu/database/ReceiveCommandCache

@@ -17,6 +17,10 @@ import org.springframework.stereotype.Component;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,11 +54,24 @@ public class WebSocketServer {
 
     private static InstructionSetService instructionSetService;
 
+    /**
+     * 大模型请求参数模板
+     */
+    private static String largeModelParamTemplateFilePath;
+
+    /**
+     * 调用第三系统出错提示信息
+     */
     private static String errorMessage = "";
 
     @Value("${fan-yu.error-message}")
     public void setErrorMessage(String errorMessage) {
         WebSocketServer.errorMessage = errorMessage;
+    }
+
+    @Value("${fan-yu.large-model.param.template-file-path}")
+    public void setLargeModelParamTemplateFilePath(String largeModelParamTemplateFilePath) {
+        WebSocketServer.largeModelParamTemplateFilePath = largeModelParamTemplateFilePath;
     }
 
     @Autowired
@@ -284,12 +301,55 @@ public class WebSocketServer {
     private InterlocutionResultV2 httpHaveInterlocutionResultV2(String message) {
 //        Map<String, String> map = new HashMap<>();
 //        map.put("text", message);
-        String data = "{\"messages\":[{\"role\":\"user\",\"content\":\"" + message + "\"}]}";
+//        String data = "{\"messages\":[{\"role\":\"user\",\"content\":\"" + message + "\"}]}";
+        String data = this.getLargeModelParam(message);
         log.info("【发给大模型】的消息：{}", data);
         String url = instructionSetService.getLargeModelUrl();
 //        return HttpClientUtil.postFormForObject(url, map, InterlocutionResultV2.class);
         InterlocutionResultV2 ivr = HttpClientUtil.postJsonForObject(url, data, InterlocutionResultV2.class);
         log.info("【接收到大模型】的消息：{}", ivr);
         return ivr;
+    }
+
+    /**
+     * 获取大模型请求参数
+     *
+     * @param message 消息
+     * @return 大模型请求参数
+     */
+    private String getLargeModelParam(String message) {
+        String template = this.getLargeModelParamTemplate();
+        return template.replace("${message}", message);
+    }
+
+    /**
+     * 获取大模型请求参数模板
+     *
+     * @return 大模型请求参数模板
+     */
+    private String getLargeModelParamTemplate() {
+        StringBuilder data = new StringBuilder();
+        InputStreamReader inputStreamReader = null;
+        try {
+            inputStreamReader = new InputStreamReader(new FileInputStream(WebSocketServer.largeModelParamTemplateFilePath),
+                    StandardCharsets.UTF_8);
+            int ch = 0;
+            while ((ch = inputStreamReader.read()) != -1) {
+                data.append((char) ch);
+            }
+        } catch (IOException e) {
+            log.error("读取大模型参数文件出错", e);
+        } finally {
+            if (null != inputStreamReader) {
+                try {
+                    inputStreamReader.close();
+                } catch (IOException e) {
+                    log.error("关闭读取大模型参数文件输入流出错", e);
+                }
+            }
+        }
+        String dataStr = data.toString();
+        log.info("读取到大模型参数文件的数据：{}", dataStr);
+        return dataStr;
     }
 }
