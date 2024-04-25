@@ -1,0 +1,2 @@
+/opt/phenomhuman/qa_docker/java_backend
+docker restart qa_docker-java-backend-1
