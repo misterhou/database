@@ -1,7 +1,7 @@
 server:
   port: 7879
 #问答接口
-interlocutionUrl: http://127.0.0.1:7879/test/imitate/8017
+interlocutionUrl: http://192.168.1.7:8017/add
 
 spring:
   datasource:
@@ -27,15 +27,17 @@ fan-yu:
   # 大模型配置
   large-model:
     # 请求地址
-    url: http://10.122.66.165:10025
+    url: http://127.0.0.1:7879/test/imitate/large/model
     param:
       # 请求参数模板
-      template-file-path: E:/workspace/iedea/fanyu/database/src/main/resources/LargeModelParam
+      template-file-path: E:/monkey/sources/database/src/main/resources/LargeModelParam
+      # 响应数据存放字段
+      response-data-field: answer1
   # 中控系统配置
   hardware-control:
     enabled: true
     host: 127.0.0.1
     port: 8080
     timeout: 15
-    request-command-config-file: E:/workspace/iedea/fanyu/database/RequestCommandCache
-    receive-command-config-file: E:/workspace/iedea/fanyu/database/ReceiveCommandCache
+    request-command-config-file: E:/monkey/sources/database/RequestCommandCache
+    receive-command-config-file: E:/monkey/sources/database/ReceiveCommandCache

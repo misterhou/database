@@ -1,8 +1,8 @@
 package com.example.database.webSocket;
 
+import com.alibaba.fastjson.JSONObject;
 import com.example.database.contant.MyContants;
 import com.example.database.entity.InterlocutionResult;
-import com.example.database.entity.InterlocutionResultV2;
 import com.example.database.entity.ReturnVo;
 import com.example.database.service.InstructionSetService;
 import com.example.database.utils.HttpClientUtil;
@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.ognl.Ognl;
+import org.apache.ibatis.ognl.OgnlException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -64,6 +66,11 @@ public class WebSocketServer {
      */
     private static String errorMessage = "";
 
+    /**
+     * 大模型响应数据存放字段
+     */
+    private static String largeModelResponseDataField = "";
+
     @Value("${fan-yu.error-message}")
     public void setErrorMessage(String errorMessage) {
         WebSocketServer.errorMessage = errorMessage;
@@ -72,6 +79,10 @@ public class WebSocketServer {
     @Value("${fan-yu.large-model.param.template-file-path}")
     public void setLargeModelParamTemplateFilePath(String largeModelParamTemplateFilePath) {
         WebSocketServer.largeModelParamTemplateFilePath = largeModelParamTemplateFilePath;
+    }
+    @Value("${fan-yu.large-model.param.response-data-field}")
+    public void setLargeModelResponseDataField(String responseDataField) {
+        WebSocketServer.largeModelResponseDataField = responseDataField;
     }
 
     @Autowired
@@ -143,17 +154,18 @@ public class WebSocketServer {
         if (ilr != null){
             if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
                 returnVo.setResults(MyContants.NOT_HAVE_ID);
-                InterlocutionResultV2 largeModelResponse = httpHaveInterlocutionResultV2(message);
-                if (largeModelResponse != null) {
-                    String largeModelResponseResult = largeModelResponse.getResult();
+//                InterlocutionResultV2 largeModelResponse = httpHaveInterlocutionResultV2(message);
+//                if (largeModelResponse != null) {
+//                    String largeModelResponseResult = largeModelResponse.getResult();
+                    String largeModelResponseResult = getAnswerFromLargeModel(message);
                     if (StringUtils.isNotBlank(largeModelResponseResult)) {
                         returnVo.setResults(largeModelResponseResult);
                     } else {
                         returnVo.setResults(WebSocketServer.errorMessage);
                     }
-                } else {
-                    returnVo.setResults(WebSocketServer.errorMessage);
-                }
+//                } else {
+//                    returnVo.setResults(WebSocketServer.errorMessage);
+//                }
             }else {
                  instructionSetService.haveReturnVo(ilr, returnVo, message);
             }
@@ -298,17 +310,39 @@ public class WebSocketServer {
         }
     }
 
-    private InterlocutionResultV2 httpHaveInterlocutionResultV2(String message) {
-//        Map<String, String> map = new HashMap<>();
-//        map.put("text", message);
-//        String data = "{\"messages\":[{\"role\":\"user\",\"content\":\"" + message + "\"}]}";
+//    private InterlocutionResultV2 httpHaveInterlocutionResultV2(String message) {
+////        Map<String, String> map = new HashMap<>();
+////        map.put("text", message);
+////        String data = "{\"messages\":[{\"role\":\"user\",\"content\":\"" + message + "\"}]}";
+//        String data = this.getLargeModelParam(message);
+//        log.info("【发给大模型】的消息：{}", data);
+//        String url = instructionSetService.getLargeModelUrl();
+////        return HttpClientUtil.postFormForObject(url, map, InterlocutionResultV2.class);
+//        InterlocutionResultV2 ivr = HttpClientUtil.postJsonForObject(url, data, InterlocutionResultV2.class);
+//        log.info("【接收到大模型】的消息：{}", ivr);
+//        return ivr;
+//    }
+
+    /**
+     * 获取答案通过大模型
+     *
+     * @param message 问题
+     * @return 答案
+     */
+    private String getAnswerFromLargeModel(String message) {
+        String answer = null;
         String data = this.getLargeModelParam(message);
         log.info("【发给大模型】的消息：{}", data);
         String url = instructionSetService.getLargeModelUrl();
-//        return HttpClientUtil.postFormForObject(url, map, InterlocutionResultV2.class);
-        InterlocutionResultV2 ivr = HttpClientUtil.postJsonForObject(url, data, InterlocutionResultV2.class);
-        log.info("【接收到大模型】的消息：{}", ivr);
-        return ivr;
+        try {
+            String largeModelResult = HttpClientUtil.sendPostJson(url, data);
+            JSONObject largeModelResponse = JSONObject.parseObject(largeModelResult);
+            log.info("【接收到大模型】的消息：{}", largeModelResponse);
+            answer = Ognl.getValue(WebSocketServer.largeModelResponseDataField, largeModelResponse).toString();
+        } catch (Exception e) {
+            log.error("接收大模型响应数据出错", e);
+        }
+        return answer;
     }
 
     /**
