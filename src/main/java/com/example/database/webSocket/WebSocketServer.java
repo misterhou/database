@@ -339,8 +339,9 @@ public class WebSocketServer {
             JSONObject largeModelResponse = JSONObject.parseObject(largeModelResult);
             log.info("【接收到大模型】的消息：{}", largeModelResponse);
             answer = Ognl.getValue(WebSocketServer.largeModelResponseDataField, largeModelResponse).toString();
+            log.info("【解析大模型】响应数据，解析参数：{}，解析结果：{}", WebSocketServer.largeModelResponseDataField, answer);
         } catch (Exception e) {
-            log.error("接收大模型响应数据出错", e);
+            log.error("【解析大模型】响应数据出错，解析参数：{}", WebSocketServer.largeModelResponseDataField, e);
         }
         return answer;
     }
