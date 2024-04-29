@@ -46,7 +46,7 @@ public class TestController {
 
     @PostMapping("/imitate/large/model")
     public String imitateLargeModel(String message) {
-        return "{\"answer\":\"回答内容\",\"docs\":[]}";
+        return "{\"answer\":\"问题答案\",\"docs\":[]}";
     }
 
 
