@@ -27,10 +27,12 @@ fan-yu:
   # 大模型配置
   large-model:
     # 请求地址
-    url: http://10.122.66.165:10025
+    url: http://10.122.66.165:10025/diaodu
     param:
       # 请求参数模板
       template-file-path: /home/config/LargeModelParam
+      # 响应数据存放字段
+      response-data-field: answer
   # 中控系统配置
   hardware-control:
     enabled: true
@@ -39,3 +41,9 @@ fan-yu:
     timeout: 15
     request-command-config-file: /home/config/RequestCommandCache
     receive-command-config-file: /home/config/ReceiveCommandCache
+  # 泰豪配置
+  tell-how:
+    # 图片地址
+    pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=
+    # 图片文件
+    pic-config-file: /home/config/PicDataCache
