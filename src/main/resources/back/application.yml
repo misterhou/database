@@ -1,0 +1,41 @@
+server:
+  port: 7879
+#问答接口
+interlocutionUrl: http://SimCSE:8017/add
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://database:3306/real_time_database?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    username: ami
+    password: Phenom2023
+
+mybatis-plus:
+  type-aliases-package: com.example.database.domain
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+logging:
+  path: /home/logs/database
+  level:
+    io.netty.handler.logging: debug
+
+fan-yu:
+  # 调用异常提示信息
+  error-message: 对不起，指令执行出错，请重试
+  # 大模型配置
+  large-model:
+    # 请求地址
+    url: http://10.122.66.165:10025
+    param:
+      # 请求参数模板
+      template-file-path: /home/config/LargeModelParam
+  # 中控系统配置
+  hardware-control:
+    enabled: true
+    host: 24.37.123.161
+    port: 9876
+    timeout: 15
+    request-command-config-file: /home/config/RequestCommandCache
+    receive-command-config-file: /home/config/ReceiveCommandCache
