@@ -1,6 +1,7 @@
 package com.example.database.fanyumeta.controller;
 
 import com.example.database.fanyumeta.client.HardwareControlClient;
+import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -49,5 +50,10 @@ public class TestController {
         return "{\"answer\":\"问题答案\",\"docs\":[]}";
     }
 
+    @GetMapping("/tell-how/send/{message}")
+    public String sendMessage2Client(@PathVariable String message) {
+        TellHowServer.noticeClient(message, null);
+        return "success";
+    }
 
 }

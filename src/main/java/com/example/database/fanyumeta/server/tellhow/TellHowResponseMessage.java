@@ -1,0 +1,62 @@
+package com.example.database.fanyumeta.server.tellhow;
+
+import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
+/**
+ * 泰豪响应数据
+ */
+@Data
+public class TellHowResponseMessage {
+
+    /**
+     * 开图功能
+     */
+    public static final String KAI_TU_FUNCTION = "kai-tu";
+
+    public TellHowResponseMessage() {
+        this.id = id = UUID.randomUUID().toString().replaceAll("-", "");
+        this.result = false;
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        this.data = "";
+    }
+
+    public TellHowResponseMessage(String reqId, String data) {
+        this();
+        this.reqId = reqId;
+        this.data = data;
+    }
+
+    /**
+     * 响应唯一标识
+     */
+    private String id;
+
+    /**
+     * 请求唯一标识
+     */
+    private String reqId;
+
+    /**
+     * 响应结果
+     */
+    private Boolean result;
+
+    /**
+     * 响应时间
+     */
+    private String timestamp;
+
+    /**
+     * 功能
+     */
+    private String function;
+
+    /**
+     * 图片地址
+     */
+    private Object data;
+}

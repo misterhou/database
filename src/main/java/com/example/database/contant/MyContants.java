@@ -3,7 +3,7 @@ package com.example.database.contant;
 public class MyContants {
     public static final String SJK_ZL = "数据库查询指令";
     public static final String YX_ZL = "运行指令";
-
+    public static final String KAI_TU = "开图指令";
     public static final String YX_ZL_ANS = "好的";
     public static final String NOT_HAVE_ID = "您的指令还没有开发，请查看指令库";
 

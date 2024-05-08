@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.contant.MyContants;
 import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
+import com.example.database.fanyumeta.server.TellHowServer;
+import com.example.database.fanyumeta.utils.PicDataUtil;
 import com.example.database.service.InstructionSetService;
 import com.example.database.utils.HttpClientUtil;
 import com.example.database.utils.ZenzeUtils;
@@ -166,8 +168,19 @@ public class WebSocketServer {
 //                } else {
 //                    returnVo.setResults(WebSocketServer.errorMessage);
 //                }
-            }else {
-                 instructionSetService.haveReturnVo(ilr, returnVo, message);
+            } else {
+                // 开图指令
+                if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
+                    returnVo.setResults(MyContants.YX_ZL_ANS);
+                    String picName = PicDataUtil.getPicName(ilr.getId());
+                    if (StringUtils.isNotBlank(picName)) {
+                        TellHowServer.noticeClient(picName, null);
+                    } else {
+                        log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+                    }
+                } else {
+                    instructionSetService.haveReturnVo(ilr, returnVo, message);
+                }
             }
         } else {
             returnVo.setResults(WebSocketServer.errorMessage);
