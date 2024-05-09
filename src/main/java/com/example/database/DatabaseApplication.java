@@ -12,6 +12,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @MapperScan("com.example.database.mapper")
 @SpringBootApplication
@@ -26,6 +28,7 @@ public class DatabaseApplication {
         PicDataUtil.initPicData(environment.getProperty("fan-yu.tell-how.pic-config-file"));
 //        testOgnl();
 //        generateCacheFile();
+//        testPattern();
     }
 
     private static void generateCacheFile() {
@@ -51,6 +54,16 @@ public class DatabaseApplication {
             System.out.println(value);
         } catch (OgnlException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void testPattern() {
+        String str = "35kV容城县王庄站";
+        Pattern pattern = Pattern.compile("\\d+(kV|kv|KV)");
+        Matcher matcher = pattern.matcher(str);
+        if (matcher.find()) {
+            String patterStr = matcher.group();
+            System.out.println(patterStr);
         }
     }
 
