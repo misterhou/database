@@ -1,24 +1,19 @@
 package com.example.database.fanyumeta.server.tellhow;
 
+import com.example.database.fanyumeta.utils.StringUtils;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
 
 /**
- * 泰豪响应数据
+ * 发送给泰豪的数据
  */
 @Data
 public class TellHowResponseMessage {
 
-    /**
-     * 开图功能
-     */
-    public static final String KAI_TU_FUNCTION = "kai-tu";
-
     public TellHowResponseMessage() {
-        this.id = id = UUID.randomUUID().toString().replaceAll("-", "");
+        this.id = StringUtils.getUUID();
         this.result = false;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         this.data = "";

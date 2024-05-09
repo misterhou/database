@@ -1,6 +1,10 @@
 package com.example.database.fanyumeta.server;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.example.database.fanyumeta.server.gh.GHResponseMessage;
+import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
+import com.example.database.fanyumeta.server.tellhow.TellHowRequestMessage;
 import com.example.database.fanyumeta.server.tellhow.TellHowResponseMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -31,31 +35,49 @@ public class TellHowServer {
     @OnOpen
     public void onOpen(Session session) {
         sessionList.add(session);
-        log.info("TellHowServer onOpen");
+        log.info("【泰豪服务】客户端已连接");
     }
 
     @OnClose
     public void onClose(Session session) {
         sessionList.remove(session);
-        log.info("TellHowServer onClose");
+        log.info("【泰豪服务】客户端已断开");
     }
 
     @OnMessage
     public void onMessage(Session session, String message) {
-        log.info("TellHowServer onMessage: {}", message);
+        log.info("【接收到泰豪】的消息: {}", message);
+        TellHowRequestMessage tellHowRequestMessage = null;
         try {
-            session.getBasicRemote().sendText("{\"id\":\"无\",\"jpgPath\":\"无\",\"results\":\"TellHowServer onMessage" + message + "\"," +
-                    "\"tabData\":\"无\"}");
-        } catch (IOException e) {
-            log.error("TellHowServer onMessage error: {}", e.getMessage());
+            tellHowRequestMessage = JSONObject.parseObject(message, TellHowRequestMessage.class);
+            if (null != tellHowRequestMessage) {
+                if (Service.CALL_OUT.equals(tellHowRequestMessage.getService())) {
+                    this.sendMessage2Gh(tellHowRequestMessage);
+                }
+            }
+        } catch (Exception e) {
+            log.error("【接收到泰豪】的消息处理出错", e);
         }
+//
+//        try {
+//
+//            session.getBasicRemote().sendText("{\"id\":\"无\",\"jpgPath\":\"无\",\"results\":\"TellHowServer onMessage\"," +
+//                    "\"tabData\":\"无\"}");
+//        } catch (IOException e) {
+//            log.error("TellHowServer onMessage error: {}", e.getMessage());
+//        }
     }
 
     @OnError
     public void onError(Throwable error) {
-        log.info("TellHowServer onError: {}", error.getMessage());
+        log.info("【泰豪服务】异常: {}", error);
     }
 
+    /**
+     * 发送给客户端开图消息
+     * @param picName 图片名称
+     * @param client 客户端，为空发给所有客户端
+     */
     public static void noticeClient(String picName, Session... client) {
         List<Session> clients = null;
         if (ObjectUtils.isEmpty(client)) {
@@ -75,6 +97,44 @@ public class TellHowServer {
                 log.info("【发送给泰豪】的开图消息：{}", jsonObject);
             } catch (IOException e) {
                 log.error("TellHowServer noticeClient error: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 发送给泰豪的消息
+     * @param message 图片名称
+     * @param client 客户端，为空发给所有客户端
+     */
+    public static void noticeClient2(ResponseMessage message, Session... client) {
+        List<Session> clients = null;
+        if (ObjectUtils.isEmpty(client)) {
+            clients = sessionList;
+        } else {
+            clients = Arrays.asList(client);
+        }
+        for (Session session : clients) {
+            try {
+                String jsonObject = JSON.toJSONString(message);
+                session.getBasicRemote().sendText(jsonObject);
+                log.info("【发送给泰豪】的消息：{}", jsonObject);
+            } catch (IOException e) {
+                log.error("【发送给泰豪】的消息出错", e);
+            }
+        }
+    }
+
+    /**
+     * 发送消息到广哈
+     * @param tellHowRequestMessage 消息
+     */
+    private void sendMessage2Gh(TellHowRequestMessage tellHowRequestMessage) {
+        if (null != tellHowRequestMessage) {
+            try {
+                GHResponseMessage ghResponseMessage = new GHResponseMessage(tellHowRequestMessage);
+                GHServer.noticeClient(ghResponseMessage);
+            } catch (Exception e) {
+                log.error("发送消息到广哈出错", e);
             }
         }
     }
