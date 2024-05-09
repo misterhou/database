@@ -72,6 +72,7 @@ public class TellHowServer {
                 }
                 String jsonObject = JSON.toJSONString(tellHowResponseMessage);
                 session.getBasicRemote().sendText(jsonObject);
+                log.info("【发送给泰豪】的开图消息：{}", jsonObject);
             } catch (IOException e) {
                 log.error("TellHowServer noticeClient error: {}", e.getMessage());
             }
