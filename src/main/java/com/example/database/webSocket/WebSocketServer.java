@@ -1,5 +1,6 @@
 package com.example.database.webSocket;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.contant.MyContants;
 import com.example.database.entity.InterlocutionResult;
@@ -18,6 +19,7 @@ import org.apache.ibatis.ognl.OgnlException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
@@ -25,9 +27,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * websocket操作类
@@ -73,6 +76,21 @@ public class WebSocketServer {
      */
     private static String largeModelResponseDataField = "";
 
+    /**
+     * 大模型响应数据出处存放字段
+     */
+    private static String largeModelResponseDataSourceField = "";
+
+    /**
+     * 大模型响应数据出处前缀
+     */
+    private static String largeModelSourcePrefix = "";
+
+    /**
+     * 大模型响应数据出处后缀
+     */
+    private static String largeModelSourceSuffix = "";
+
     @Value("${fan-yu.error-message}")
     public void setErrorMessage(String errorMessage) {
         WebSocketServer.errorMessage = errorMessage;
@@ -85,6 +103,21 @@ public class WebSocketServer {
     @Value("${fan-yu.large-model.param.response-data-field}")
     public void setLargeModelResponseDataField(String responseDataField) {
         WebSocketServer.largeModelResponseDataField = responseDataField;
+    }
+
+    @Value("${fan-yu.large-model.param.response-data-source-field}")
+    public void setLargeModelResponseDataSourceField(String responseDataSourceField) {
+        WebSocketServer.largeModelResponseDataSourceField = responseDataSourceField;
+    }
+
+    @Value("${fan-yu.large-model.source.prefix}")
+    public void setLargeModelSourcePrefix(String sourcePrefix) {
+        WebSocketServer.largeModelSourcePrefix = sourcePrefix;
+    }
+
+    @Value("${fan-yu.large-model.source.suffix}")
+    public void setLargeModelSourceSuffix(String sourceSuffix) {
+        WebSocketServer.largeModelSourceSuffix = sourceSuffix;
     }
 
     @Autowired
@@ -354,6 +387,12 @@ public class WebSocketServer {
             Object fieldValue = Ognl.getValue(WebSocketServer.largeModelResponseDataField, largeModelResponse);
             if (fieldValue instanceof String) {
                 answer = fieldValue.toString().replaceAll("\n", "");
+                String docName = getDocName(largeModelResponse);
+                if (StringUtils.isNotBlank(docName)) {
+                    String largeModelSource =
+                            WebSocketServer.largeModelSourcePrefix + docName + WebSocketServer.largeModelSourceSuffix;
+                    answer = largeModelSource + answer;
+                }
             }
             log.info("【解析大模型】响应数据，解析参数：{}，解析结果：{}", WebSocketServer.largeModelResponseDataField, answer);
         } catch (Exception e) {
@@ -402,5 +441,41 @@ public class WebSocketServer {
         String dataStr = data.toString();
         log.info("读取到大模型参数文件的数据：{}", dataStr);
         return dataStr;
+    }
+
+    /**
+     * 获取大模型数据出处
+     * @param largeModelResponse 大模型返回数据
+     * @return 数据出处
+     */
+    private String getDocName(JSONObject largeModelResponse) {
+        JSONArray docs = null;
+        try {
+            Object fieldValue = Ognl.getValue(WebSocketServer.largeModelResponseDataSourceField, largeModelResponse);
+            if (fieldValue instanceof JSONArray) {
+                docs = (JSONArray) fieldValue;
+            }
+        } catch (OgnlException e) {
+            throw new RuntimeException(e);
+        }
+        HashSet<String> docNames = new HashSet<>();
+        if (docs != null && docs.size() > 0) {
+            for (Object doc : docs) {
+                if (doc instanceof String) {
+                    String docContent = (String) doc;
+                    Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+                    Matcher matcher = pattern.matcher(docContent);
+                    List<String> targetContent = new ArrayList<>();
+                    while (matcher.find()) {
+                        targetContent.add(matcher.group());
+                    }
+                    if (targetContent.size() >= 2) {
+                        String docName = targetContent.get(1);
+                        docNames.add(docName.substring(1, docName.length() - 1).replaceAll("\\.[^\\.]+$", ""));
+                    }
+                }
+            }
+        }
+        return String.join("，", docNames);
     }
 }

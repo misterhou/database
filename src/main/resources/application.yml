@@ -7,7 +7,7 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     #url: jdbc:mysql://192.168.1.4:3306/real_time_database?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
-    url: jdbc:mysql://localhost:3306/real_time_database?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://192.168.1.7:3306/real_time_database?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&rewriteBatchedStatements=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true
     username: ami
     password: ami
 
@@ -27,16 +27,24 @@ fan-yu:
   # 大模型配置
   large-model:
     # 请求地址
-    url: http://127.0.0.1:7879/test/imitate/large/model
+    url: http://192.168.1.22:7879/test/imitate/large/model
+    # 数据出处
+    source:
+      # 前缀
+      prefix: "根据"
+      # 后缀
+      suffix: "得出："
     param:
       # 请求参数模板
       template-file-path: E:/monkey/sources/database/src/main/resources/LargeModelParam
       # 响应数据存放字段
       response-data-field: answer
+      # 响应数据出处存放字段
+      response-data-source-field: docs
   # 中控系统配置
   hardware-control:
     enabled: true
-    host: 127.0.0.1
+    host: 192.168.1.7
     port: 8080
     timeout: 15
     request-command-config-file: E:/monkey/sources/database/RequestCommandCache
