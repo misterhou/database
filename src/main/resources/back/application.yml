@@ -28,11 +28,19 @@ fan-yu:
   large-model:
     # 请求地址
     url: http://10.122.66.165:10025/diaodu
+    # 数据出处
+    source:
+      # 前缀
+      prefix: "根据"
+      # 后缀
+      suffix: "得出："
     param:
       # 请求参数模板
       template-file-path: /home/config/LargeModelParam
       # 响应数据存放字段
       response-data-field: answer
+      # 响应数据出处存放字段
+      response-data-source-field: docs
   # 中控系统配置
   hardware-control:
     enabled: true
