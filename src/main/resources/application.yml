@@ -36,7 +36,7 @@ fan-yu:
       suffix: "得出："
     param:
       # 请求参数模板
-      template-file-path: E:/monkey/sources/database/src/main/resources/LargeModelParam
+      template-file-path: E:/monkey/sources/java/database/src/main/resources/LargeModelParam
       # 响应数据存放字段
       response-data-field: answer
       # 响应数据出处存放字段
@@ -47,11 +47,11 @@ fan-yu:
     host: 192.168.1.7
     port: 8080
     timeout: 15
-    request-command-config-file: E:/monkey/sources/database/RequestCommandCache
-    receive-command-config-file: E:/monkey/sources/database/ReceiveCommandCache
+    request-command-config-file: E:/monkey/sources/java/database/RequestCommandCache
+    receive-command-config-file: E:/monkey/sources/java/database/ReceiveCommandCache
   # 泰豪配置
   tell-how:
     # 图片地址
     pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=
     # 图片文件
-    pic-config-file: E:/monkey/sources/database/PicDataCache
+    pic-config-file: E:/monkey/sources/java/database/PicDataCache
