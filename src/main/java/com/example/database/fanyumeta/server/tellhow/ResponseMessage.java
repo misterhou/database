@@ -18,7 +18,13 @@ public class ResponseMessage {
         this.ghReqId = ghReqId;
         this.service = service;
         this.data = data;
-        this.user = new User();
+        if (null != data) {
+            this.result = true;
+        } else {
+            this.result = false;
+        }
+        this.timestamp = StringUtils.getTimestamp();
+//        this.user = new User();
     }
 
     public ResponseMessage(GHRequestMessage ghRequestMessage) {
@@ -46,6 +52,16 @@ public class ResponseMessage {
      * 请求数据
      */
     private Object data;
+
+    /**
+     * 响应时间
+     */
+    private String timestamp;
+
+    /**
+     * 响应结果
+     */
+    private Boolean result;
 
     /**
      * 声纹用户信息

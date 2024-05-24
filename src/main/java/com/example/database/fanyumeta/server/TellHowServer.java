@@ -5,18 +5,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.server.gh.GHResponseMessage;
 import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
 import com.example.database.fanyumeta.server.tellhow.TellHowRequestMessage;
-import com.example.database.fanyumeta.server.tellhow.TellHowResponseMessage;
+import com.example.database.fanyumeta.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Component
@@ -87,14 +88,21 @@ public class TellHowServer {
         }
         for (Session session : clients) {
             try {
-                TellHowResponseMessage tellHowResponseMessage = new TellHowResponseMessage("123",
-                        TellHowServer.picAddr + picName);
-                if (!StringUtils.isEmpty(picName)) {
-                    tellHowResponseMessage.setResult(true);
+//                TellHowResponseMessage data = new TellHowResponseMessage("123",
+//                        TellHowServer.picAddr + picName);
+//                if (!StringUtils.isEmpty(picName)) {
+//                    data.setResult(true);
+//                }
+                if (StringUtils.isNotBlank(picName)) {
+                    Map<String, String> data = new HashMap<>();
+                    data.put("picUrl", TellHowServer.picAddr + picName);
+                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null, Service.KAI_TU, data);
+                    String jsonObject = JSON.toJSONString(tellHowResponseMessage);
+                    session.getBasicRemote().sendText(jsonObject);
+                    log.info("【发送给泰豪】的开图消息：{}", jsonObject);
+                } else {
+                    log.warn("开图图片为空");
                 }
-                String jsonObject = JSON.toJSONString(tellHowResponseMessage);
-                session.getBasicRemote().sendText(jsonObject);
-                log.info("【发送给泰豪】的开图消息：{}", jsonObject);
             } catch (IOException e) {
                 log.error("TellHowServer noticeClient error: {}", e.getMessage());
             }

@@ -10,12 +10,13 @@ import java.time.format.DateTimeFormatter;
  * 发送给泰豪的数据
  */
 @Data
+@Deprecated
 public class TellHowResponseMessage {
 
     public TellHowResponseMessage() {
         this.id = StringUtils.getUUID();
         this.result = false;
-        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        this.timestamp = StringUtils.getTimestamp();
         this.data = "";
     }
 
