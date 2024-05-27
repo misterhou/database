@@ -27,7 +27,7 @@ fan-yu:
   # 大模型配置
   large-model:
     # 请求地址
-    url: http://192.168.1.22:7879/test/imitate/large/model
+    url: http://192.168.1.22:7879/imitate/large/model
     # 数据出处
     source:
       # 前缀
@@ -55,3 +55,5 @@ fan-yu:
     pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=
     # 图片文件
     pic-config-file: E:/monkey/sources/java/database/PicDataCache
+    # 服务地址
+    service-addr: http://192.168.1.22:7879/imitate/tell-how

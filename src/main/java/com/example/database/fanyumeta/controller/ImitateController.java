@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/test")
-public class TestController {
+@RequestMapping("/imitate")
+public class ImitateController {
 
     @Resource
     private HardwareControlClient hardwareControlClient;
@@ -32,9 +32,9 @@ public class TestController {
         return this.hardwareControlClient.sendCommand(message);
     }
 
-    @PostMapping("/imitate/8017")
+    @PostMapping("/8017")
     public String imitate8017(String message) {
-        return "{\"id\": \"39\", \"question\": \"\\u5927\\u5c4f\\u524d\\u897f\\u4fa7\\u7a7a\\u8c03\\u6253\\u5f00\", \"cate\": \"\\u628a\\u5927\\u5c4f\\u524d\\u897f\\u4fa7/\\u4e1c\\u4fa7\\u7a7a\\u8c03\\u6e29\\u5ea6\\u8c03\\u523023\\u5ea6\", \"directiveType\": \"\\u8fd0\\u884c\\u6307\\u4ee4\", \"directive\": \"\\u65e0\"}";
+        return "{\"id\": \"10000\", \"question\": \"\\u5927\\u5c4f\\u524d\\u897f\\u4fa7\\u7a7a\\u8c03\\u6253\\u5f00\", \"cate\": \"\\u628a\\u5927\\u5c4f\\u524d\\u897f\\u4fa7/\\u4e1c\\u4fa7\\u7a7a\\u8c03\\u6e29\\u5ea6\\u8c03\\u523023\\u5ea6\", \"directiveType\": \"数据库查询指令\", \"directive\": \"\\u65e0\"}";
     }
 
     @GetMapping("/update/command/cache")
@@ -45,7 +45,7 @@ public class TestController {
         return "success";
     }
 
-    @PostMapping("/imitate/large/model")
+    @PostMapping("/large/model")
     public String imitateLargeModel(String message) {
         try {
             Thread.sleep(3000);
@@ -59,6 +59,45 @@ public class TestController {
     public String sendMessage2Client(@PathVariable String message) {
         TellHowServer.noticeClient(message, null);
         return "success";
+    }
+
+    @GetMapping("/tell-how/admin/data/dutyPersonnelInfo")
+    public String dutyPersonnelInfo(String dateTime, String dutyOrderName, String actionType) {
+        System.out.println("dateTime: " + dateTime + ", dutyOrderName: " + dutyOrderName + ", actionType: " + actionType);
+        String data = "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"personnelName\": \"韩松原\",\n" +
+                "                \"personnelIdentity\": \"值长\",\n" +
+                "                \"personnelPhoto\": \"664568d484aebd7b45a3d212\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"personnelName\": \"赵学良\",\n" +
+                "                \"personnelIdentity\": \"正值\",\n" +
+                "                \"personnelPhoto\": \"664568d484aebd7b45a3d212\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"personnelName\": \"康奇豹\",\n" +
+                "                \"personnelIdentity\": \"副值\",\n" +
+                "                \"personnelPhoto\": \"664568d484aebd7b45a3d212\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"personnelName\": \"邱林涛\",\n" +
+                "                \"personnelIdentity\": \"调度跟班\",\n" +
+                "                \"personnelPhoto\": \"664568d484aebd7b45a3d212\"\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+        return data;
     }
 
 }

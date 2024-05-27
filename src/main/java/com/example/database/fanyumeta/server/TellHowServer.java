@@ -93,7 +93,7 @@ public class TellHowServer {
 //                if (!StringUtils.isEmpty(picName)) {
 //                    data.setResult(true);
 //                }
-                if (StringUtils.isNotBlank(picName)) {
+                if (StringUtils.hasText(picName)) {
                     Map<String, String> data = new HashMap<>();
                     data.put("picUrl", TellHowServer.picAddr + picName);
                     ResponseMessage tellHowResponseMessage = new ResponseMessage(null, Service.KAI_TU, data);
