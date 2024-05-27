@@ -40,4 +40,10 @@ public class ReturnVo {
      * */
    // private String question;
 
+    /**
+     * 挥手动作
+     * 1：左侧挥手，2：左上侧挥手；4：中间挥手；无：无动作
+     */
+    private String poseId = "无";
+
 }
