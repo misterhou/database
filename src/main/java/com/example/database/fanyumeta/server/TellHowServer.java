@@ -96,7 +96,9 @@ public class TellHowServer {
                 if (StringUtils.hasText(picName)) {
                     Map<String, String> data = new HashMap<>();
                     data.put("picUrl", TellHowServer.picAddr + picName);
-                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null, Service.KAI_TU, data);
+                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null, Service.KAI_TU, data,
+                            // 开图窗口大小默认值
+                            new ResponseMessage.WindowSize("1964px", "857px"));
                     String jsonObject = JSON.toJSONString(tellHowResponseMessage);
                     session.getBasicRemote().sendText(jsonObject);
                     log.info("【发送给泰豪】的开图消息：{}", jsonObject);

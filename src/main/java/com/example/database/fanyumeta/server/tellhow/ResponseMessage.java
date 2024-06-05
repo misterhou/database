@@ -3,6 +3,7 @@ package com.example.database.fanyumeta.server.tellhow;
 import com.example.database.fanyumeta.server.Service;
 import com.example.database.fanyumeta.server.gh.GHRequestMessage;
 import com.example.database.fanyumeta.utils.StringUtils;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,11 +14,12 @@ import java.io.Serializable;
 @Data
 public class ResponseMessage {
 
-    public ResponseMessage(String ghReqId, Service service, Object data) {
+    public ResponseMessage(String ghReqId, Service service, Object data, WindowSize windowSize) {
         this.id = StringUtils.getUUID();
         this.ghReqId = ghReqId;
         this.service = service;
         this.data = data;
+        this.frmSize = windowSize;
         if (null != data) {
             this.result = true;
         } else {
@@ -30,7 +32,7 @@ public class ResponseMessage {
     public ResponseMessage(GHRequestMessage ghRequestMessage) {
         this(ghRequestMessage.getId(),
                 ghRequestMessage.getService(),
-                ghRequestMessage.getData());
+                ghRequestMessage.getData(), null);
     }
 
     /**
@@ -52,6 +54,16 @@ public class ResponseMessage {
      * 请求数据
      */
     private Object data;
+
+    /**
+     * 窗口大小
+     */
+    private WindowSize frmSize;
+
+    /**
+     * 菜单编号
+     */
+    private String menuCode;
 
     /**
      * 响应时间
@@ -88,5 +100,20 @@ public class ResponseMessage {
          * 匹配度
          */
         private String matchDegree;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class WindowSize implements Serializable {
+
+        /**
+         * 宽度
+         */
+        private String width;
+
+        /**
+         * 高度
+         */
+        private String height;
     }
 }
