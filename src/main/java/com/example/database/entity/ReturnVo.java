@@ -46,4 +46,11 @@ public class ReturnVo {
      */
     private String poseId = "无";
 
+    /**
+     * 数据来源：
+     * llm： 代表大模型
+     * NanRui：代表问题来着南瑞
+     */
+    private String source = "llm";
+
 }
