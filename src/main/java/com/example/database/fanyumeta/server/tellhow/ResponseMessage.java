@@ -1,6 +1,6 @@
 package com.example.database.fanyumeta.server.tellhow;
 
-import com.example.database.fanyumeta.server.Service;
+import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.gh.GHRequestMessage;
 import com.example.database.fanyumeta.utils.StringUtils;
 import lombok.AllArgsConstructor;
@@ -14,10 +14,10 @@ import java.io.Serializable;
 @Data
 public class ResponseMessage {
 
-    public ResponseMessage(String ghReqId, Service service, Object data, WindowSize windowSize) {
+    public ResponseMessage(String ghReqId, ServiceType serviceType, Object data, WindowSize windowSize) {
         this.id = StringUtils.getUUID();
         this.ghReqId = ghReqId;
-        this.service = service;
+        this.service = serviceType;
         this.data = data;
         this.frmSize = windowSize;
         if (null != data) {
@@ -31,7 +31,7 @@ public class ResponseMessage {
 
     public ResponseMessage(GHRequestMessage ghRequestMessage) {
         this(ghRequestMessage.getId(),
-                ghRequestMessage.getService(),
+                ghRequestMessage.getServiceType(),
                 ghRequestMessage.getData(), null);
     }
 
@@ -48,7 +48,7 @@ public class ResponseMessage {
     /**
      * 请求服务
      */
-    private Service service;
+    private ServiceType service;
 
     /**
      * 请求数据
@@ -63,7 +63,7 @@ public class ResponseMessage {
     /**
      * 菜单编号
      */
-    private String menuCode;
+    private TellHowMenu menuCode;
 
     /**
      * 响应时间
@@ -79,6 +79,10 @@ public class ResponseMessage {
      * 声纹用户信息
      */
     private User user;
+
+    public String getMenuCode() {
+        return null == this.menuCode ? null : this.menuCode.code;
+    }
 
     /**
      * 用户信息
@@ -115,5 +119,27 @@ public class ResponseMessage {
          * 高度
          */
         private String height;
+    }
+
+    /**
+     * 泰豪菜单枚举
+     */
+    public enum TellHowMenu {
+
+        /**
+         * 值班人员信息
+         */
+        DUTY_PERSONNEL_INFO("zbryxx"),
+
+        /**
+         * 负荷走势预测
+         */
+        FORECAST_LOAD_TREND("fhzsyc_zw");
+
+        private String code;
+
+        TellHowMenu(String code) {
+            this.code = code;
+        }
     }
 }

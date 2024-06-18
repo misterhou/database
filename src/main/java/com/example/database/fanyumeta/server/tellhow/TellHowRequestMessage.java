@@ -1,6 +1,6 @@
 package com.example.database.fanyumeta.server.tellhow;
 
-import com.example.database.fanyumeta.server.Service;
+import com.example.database.fanyumeta.server.ServiceType;
 import lombok.Data;
 
 /**
@@ -17,7 +17,7 @@ public class TellHowRequestMessage {
     /**
      * 请求服务
      */
-    private Service service;
+    private ServiceType serviceType;
 
     /**
      * 请求数据

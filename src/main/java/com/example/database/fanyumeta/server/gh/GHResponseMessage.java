@@ -1,6 +1,6 @@
 package com.example.database.fanyumeta.server.gh;
 
-import com.example.database.fanyumeta.server.Service;
+import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.tellhow.TellHowRequestMessage;
 import com.example.database.fanyumeta.utils.StringUtils;
 import lombok.Data;
@@ -11,20 +11,20 @@ import lombok.Data;
 @Data
 public class GHResponseMessage {
 
-    public GHResponseMessage(String tellHowReqId, Service service, Object data) {
-        this(service, data);
+    public GHResponseMessage(String tellHowReqId, ServiceType serviceType, Object data) {
+        this(serviceType, data);
         this.tellHowReqId = tellHowReqId;
     }
 
-    public GHResponseMessage(Service service, Object data) {
+    public GHResponseMessage(ServiceType serviceType, Object data) {
         this.id = StringUtils.getUUID();
-        this.service = service;
+        this.serviceType = serviceType;
         this.data = data;
     }
 
     public GHResponseMessage(TellHowRequestMessage tellHowRequestMessage) {
         this(tellHowRequestMessage.getId(),
-                tellHowRequestMessage.getService(),
+                tellHowRequestMessage.getServiceType(),
                 tellHowRequestMessage.getData());
     }
 
@@ -41,7 +41,7 @@ public class GHResponseMessage {
     /**
      * 请求服务
      */
-    private Service service;
+    private ServiceType serviceType;
 
     /**
      * 请求数据

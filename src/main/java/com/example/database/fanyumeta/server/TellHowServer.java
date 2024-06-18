@@ -52,7 +52,7 @@ public class TellHowServer {
         try {
             tellHowRequestMessage = JSONObject.parseObject(message, TellHowRequestMessage.class);
             if (null != tellHowRequestMessage) {
-                if (Service.CALL_OUT.equals(tellHowRequestMessage.getService())) {
+                if (ServiceType.CALL_OUT.equals(tellHowRequestMessage.getServiceType())) {
                     this.sendMessage2Gh(tellHowRequestMessage);
                 }
             }
@@ -96,7 +96,7 @@ public class TellHowServer {
                 if (StringUtils.hasText(picName)) {
                     Map<String, String> data = new HashMap<>();
                     data.put("picUrl", TellHowServer.picAddr + picName);
-                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null, Service.KAI_TU, data,
+                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null, ServiceType.KAI_TU, data,
                             // 开图窗口大小默认值
                             new ResponseMessage.WindowSize("1964px", "857px"));
                     String jsonObject = JSON.toJSONString(tellHowResponseMessage);

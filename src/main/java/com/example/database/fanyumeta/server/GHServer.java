@@ -44,7 +44,7 @@ public class GHServer {
         try {
             GHRequestMessage ghRequestMessage = JSON.parseObject(message, GHRequestMessage.class);
             if (null != ghRequestMessage) {
-                if (Service.CALL_OUT.equals(ghRequestMessage.getService())) {
+                if (ServiceType.CALL_OUT.equals(ghRequestMessage.getServiceType())) {
                     this.sendMessage2TellHow(ghRequestMessage);
                 }
             }
