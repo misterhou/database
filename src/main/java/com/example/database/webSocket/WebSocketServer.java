@@ -204,9 +204,12 @@ public class WebSocketServer {
             } else {
                 // 开图指令
                 if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
-                    returnVo.setResults(MyContants.YX_ZL_ANS);
                     String picName = PicDataUtil.getPicName(ilr.getId());
                     if (StringUtils.isNotBlank(picName)) {
+                        int index = message.indexOf("打开");
+                        returnVo.setResults("好的，已打开" + message.substring(index + 2) + "，请查看");
+                        // 通知数智人往右挥手
+                        returnVo.setPoseId("3");
                         TellHowServer.noticeClient(picName, null);
                     } else {
                         log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
