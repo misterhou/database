@@ -5,9 +5,11 @@ import com.example.database.contant.MyContants;
 import com.example.database.domain.*;
 import com.example.database.entity.*;
 import com.example.database.fanyumeta.client.HardwareControlClient;
-import com.example.database.fanyumeta.client.HardwareControlProperties;
 import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
+import com.example.database.fanyumeta.server.ServiceType;
+import com.example.database.fanyumeta.server.TellHowServer;
+import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
 import com.example.database.service.*;
 import com.example.database.mapper.InstructionSetMapper;
 import com.example.database.utils.ArabicNumeralsUtil;
@@ -91,6 +93,13 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             if (serialNum == 10000) {   // 从泰豪获取数据
                 TellHowVO result = this.tellHowClient.dutyPersonnelInfo(null, "夜班");
                 if (null != result) {
+                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null,
+                            ServiceType.ZHIBIAO,
+                            null,
+                            null);
+                    tellHowResponseMessage.setResult(null);
+                    tellHowResponseMessage.setMenuCode(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
+                    TellHowServer.noticeClient2(tellHowResponseMessage);
                     String voiceContent = result.getVoiceContent();
                     if (StringUtils.isNotBlank(voiceContent)) {
                         returnVo.setResults(voiceContent);
