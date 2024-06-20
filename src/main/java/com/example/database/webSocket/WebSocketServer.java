@@ -187,7 +187,8 @@ public class WebSocketServer {
         }
         returnVo.setTabData("无");
         if (ilr != null){
-            if (StringUtils.isBlank(ilr.getId()) || "无".equals(ilr.getId())) {
+            String commandId = ilr.getId();
+            if (StringUtils.isBlank(commandId) || "无".equals(commandId)) {
                 returnVo.setResults(MyContants.NOT_HAVE_ID);
 //                InterlocutionResultV2 largeModelResponse = httpHaveInterlocutionResultV2(message);
 //                if (largeModelResponse != null) {
@@ -204,7 +205,7 @@ public class WebSocketServer {
             } else {
                 // 开图指令
                 if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
-                    String picName = PicDataUtil.getPicName(ilr.getId());
+                    String picName = PicDataUtil.getPicName(commandId);
                     if (StringUtils.isNotBlank(picName)) {
                         int index = message.indexOf("打开");
                         returnVo.setResults("好的，已打开" + message.substring(index + 2) + "，请查看");
@@ -212,7 +213,12 @@ public class WebSocketServer {
                         returnVo.setPoseId("3");
                         TellHowServer.noticeClient(picName, null);
                     } else {
-                        log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+                        if (MyContants.CLOSE_PIC_WINDOW_ID.equals(commandId)) {
+                            returnVo.setResults(MyContants.YX_ZL_ANS);
+                            // TODO: 缺少向泰豪发送关闭窗口指令，待泰豪提供接口报文 2024.6.20
+                        } else {
+                            log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+                        }
                     }
                 } else {
                     instructionSetService.haveReturnVo(ilr, returnVo, message);
