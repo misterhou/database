@@ -7,6 +7,7 @@ import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.TellHowServer;
+import com.example.database.fanyumeta.server.tellhow.PicType;
 import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
 import com.example.database.fanyumeta.utils.PicDataUtil;
 import com.example.database.service.InstructionSetService;
@@ -188,11 +189,20 @@ public class WebSocketServer {
         }
         returnVo.setTabData("无");
         Pattern closePicPattern = Pattern.compile("^关闭.*图$");
+        Pattern openContactPicPattern = Pattern.compile("^打开.*联络图$");
         if (closePicPattern.matcher(message).find()) {
             returnVo.setResults(MyContants.YX_ZL_ANS);
             ResponseMessage responseMessage = new ResponseMessage(null,
                     ServiceType.CLOSE_NOTICE, null, null);
             TellHowServer.noticeClient2(responseMessage);
+        } else if (openContactPicPattern.matcher(message).find()) { // 打开联络图
+            String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
+            if (StringUtils.isNotBlank(substationRtKeyId)) {
+                returnVo.setResults(this.getOpenPicNotice(message));
+                // 通知数智人往右挥手
+                returnVo.setPoseId("3");
+                TellHowServer.noticeClient(substationRtKeyId, PicType.CONTACT, null);
+            }
         } else {
             InterlocutionResult ilr = httpHaveInterlocutionResult(message);
             if (ilr != null){
@@ -215,17 +225,7 @@ public class WebSocketServer {
                             returnVo.setPoseId("3");
                             TellHowServer.noticeClient(picName, null);
                         } else {
-                            if (MyContants.OPEN_CONTACT_PIC_ID.equals(commandId)) {
-                                String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
-                                if (StringUtils.isNotBlank(substationRtKeyId)) {
-                                    returnVo.setResults(this.getOpenPicNotice(message));
-                                    // 通知数智人往右挥手
-                                    returnVo.setPoseId("3");
-                                    TellHowServer.noticeClient(substationRtKeyId, null);
-                                }
-                            } else {
-                                log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
-                            }
+                            log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
                         }
                     } else {
                         instructionSetService.haveReturnVo(ilr, returnVo, message);

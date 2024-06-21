@@ -10,13 +10,4 @@ public class MyContants {
     public static final String RESULT_FAIL1 = "对不起，我不大清楚您的问题";
     public static final String RESULT_FAIL2 = "对不起，数据库没有查询到相关答案";
 
-    /**
-     * 关闭开图窗口指令 id
-     */
-    public static final String CLOSE_PIC_WINDOW_ID = "307";
-
-    /**
-     * 打开联络图指令 id
-     */
-    public static final String OPEN_CONTACT_PIC_ID = "308";
 }
