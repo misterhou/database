@@ -207,8 +207,7 @@ public class WebSocketServer {
                 if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
                     String picName = PicDataUtil.getPicName(commandId);
                     if (StringUtils.isNotBlank(picName)) {
-                        int index = message.indexOf("打开");
-                        returnVo.setResults("好的，已打开" + message.substring(index + 2) + "，请查看");
+                        returnVo.setResults(this.getOpenPicNotice(message));
                         // 通知数智人往右挥手
                         returnVo.setPoseId("3");
                         TellHowServer.noticeClient(picName, null);
@@ -216,6 +215,14 @@ public class WebSocketServer {
                         if (MyContants.CLOSE_PIC_WINDOW_ID.equals(commandId)) {
                             returnVo.setResults(MyContants.YX_ZL_ANS);
                             // TODO: 缺少向泰豪发送关闭窗口指令，待泰豪提供接口报文 2024.6.20
+                        } else if (MyContants.OPEN_CONTACT_PIC_ID.equals(commandId)) {
+                            String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
+                            if (StringUtils.isNotBlank(substationRtKeyId)) {
+                                returnVo.setResults(this.getOpenPicNotice(message));
+                                // 通知数智人往右挥手
+                                returnVo.setPoseId("3");
+                                TellHowServer.noticeClient(substationRtKeyId, null);
+                            }
                         } else {
                             log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
                         }
@@ -486,5 +493,16 @@ public class WebSocketServer {
             }
         }
         return String.join("，", docNames);
+    }
+
+    /**
+     * 获取打开图片的提示语
+     *
+     * @param message 消息
+     * @return 开图提示语
+     */
+    private String getOpenPicNotice(String message) {
+        int index = message.indexOf("打开");
+        return "好的，已打开" + message.substring(index + 2) + "，请查看";
     }
 }

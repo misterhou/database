@@ -26,6 +26,7 @@ public class DatabaseApplication {
                 environment.getProperty("fan-yu.hardware-control.request-command-config-file"),
                 environment.getProperty("fan-yu.hardware-control.receive-command-config-file"));
         PicDataUtil.initPicData(environment.getProperty("fan-yu.tell-how.pic-config-file"));
+        PicDataUtil.initSubstationData(environment.getProperty("fan-yu.tell-how.substation-config-file"));
 //        testOgnl();
 //        generateCacheFile();
 //        testPattern();
@@ -41,6 +42,8 @@ public class DatabaseApplication {
                     "RequestReceiveCommandCache");
             PicDataUtil.generatePicDataCacheFile("src/main/resources/开图清单.xlsx",
                     "PicDataCache");
+            PicDataUtil.generateStationPicDataCacheFile("src/main/resources/厂站信息.xlsx",
+                    "SubstationDataCache");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -66,5 +69,4 @@ public class DatabaseApplication {
             System.out.println(patterStr);
         }
     }
-
 }

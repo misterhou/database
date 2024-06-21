@@ -2,7 +2,6 @@ package com.example.database.fanyumeta.utils;
 
 import com.example.database.utils.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,7 +20,20 @@ import java.util.regex.Pattern;
 @Slf4j
 public class PicDataUtil {
 
+    /**
+     * 图片数据缓存（南瑞开发的接线图/间隔图）
+     */
     private static List<Map<String, String>> picDataCache = new ArrayList<>(256);
+
+    /**
+     * 厂站图片数据缓存（东方电子开发的厂站联络图）
+     */
+    private static List<Map<String, String>> substationDataCache = new ArrayList<>(256);
+
+    /**
+     * 厂站表 id
+     */
+    private static final String SUBSTATION_TABLE_ID = "112";
 
     /**
      * 初始化图片数据缓存
@@ -33,6 +45,20 @@ public class PicDataUtil {
             picDataCache.addAll(loadPicDataCacheFile(picDataCacheFile));
         } catch (Exception e) {
             log.error("加载图片数据缓存文件出错", e);
+        }
+    }
+
+    /**
+     * 初始化厂站图片数据缓存
+     *
+     * @param substationDataFile 图片数据缓存文件
+     */
+    public static void initSubstationData(String substationDataFile) {
+        substationDataCache.clear();
+        try {
+            substationDataCache.addAll(loadPicDataCacheFile(substationDataFile));
+        } catch (Exception e) {
+            log.error("加载厂站图片数据缓存文件出错", e);
         }
     }
 
@@ -75,16 +101,38 @@ public class PicDataUtil {
      * @return 图片名称
      */
     public static String getPicName(String id) {
-        String picName = null;
-        for (Map<String, String> picData : picDataCache) {
+        return getValue(id, picDataCache);
+    }
+
+    /**
+     * 获取厂站图片 id
+     *
+     * @param message 厂站名称
+     * @return 厂站图片 id
+     */
+    public static String getSubstationRtKeyId(String message) {
+        String rtKeyId = null;
+        String substationId = getSubstationId(message);
+        if (StringUtils.hasText(substationId)) {
+            rtKeyId = SUBSTATION_TABLE_ID + "_" + substationId;
+        }
+        return rtKeyId;
+    }
+
+    public static String getSubstationId(String text) {
+        String substationId = null;
+        for (Map<String, String> picData : substationDataCache) {
+            text = text.replaceAll("打开", "");
+            text = text.replaceAll("联络图", "");
             for (String key : picData.keySet()) {
-                if (key.equals(id)) {
-                    picName = picData.get(key);
+                if (text.equals(key)) {
+                    substationId = picData.get(key);
                 }
             }
         }
-        return picName;
+        return substationId;
     }
+
     /**
      * 生成图片数据缓存文件
      * @param excelFile excel 文件
@@ -95,6 +143,18 @@ public class PicDataUtil {
         List<Map<String, String>> data = ExcelUtils.getData(excelFile, 0, "图形名称", -3);
         writeObject2File(data, cacheFile);
     }
+
+    /**
+     * 生成厂站图片数据缓存文件
+     * @param excelFile excel 文件
+     * @param cacheFile 缓存文件
+     * @throws Exception 当读取 excel 数据报错时，会抛出此异常
+     */
+    public static void generateStationPicDataCacheFile(String excelFile, String cacheFile) throws Exception {
+        List<Map<String, String>> data = ExcelUtils.getData(excelFile, 0, "id", 1);
+        writeObject2File(data, cacheFile);
+    }
+
 
     /**
      * 将对象写入文件
@@ -124,7 +184,10 @@ public class PicDataUtil {
         log.info("开始加载图片缓存文件：{}", commandCacheFile);
         ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(commandCacheFile)));
         data = (List<Map<String, String>>) inputStream.readObject();
-        log.info("图片数量：{}\n{}", data.size(), data);
+        if (log.isDebugEnabled()) {
+            log.debug("图片缓存文件数据：{}", data);
+        }
+        log.info("图片数量：{}", data.size());
         return data;
     }
 
@@ -138,5 +201,23 @@ public class PicDataUtil {
     private static boolean isFind(String reg, String message) {
         Pattern pattern = Pattern.compile(reg);
         return pattern.matcher(message).find();
+    }
+
+    /**
+     * 获取图片名称
+     * @param id 图片 id
+     * @param dataCache 图片缓存数据
+     * @return 图片名称
+     */
+    private static String getValue(String id, List<Map<String, String>> dataCache) {
+        String picName = null;
+        for (Map<String, String> picData : dataCache) {
+            for (String key : picData.keySet()) {
+                if (key.equals(id)) {
+                    picName = picData.get(key);
+                }
+            }
+        }
+        return picName;
     }
 }

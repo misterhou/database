@@ -3,6 +3,7 @@ package com.example.database.fanyumeta.server;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.server.gh.GHResponseMessage;
+import com.example.database.fanyumeta.server.tellhow.PicType;
 import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
 import com.example.database.fanyumeta.server.tellhow.TellHowRequestMessage;
 import com.example.database.fanyumeta.utils.StringUtils;
@@ -29,9 +30,19 @@ public class TellHowServer {
 
     private static String picAddr = "";
 
+    /**
+     * 联络图访问地址
+     */
+    private static String contactPicAddr = "";
+
     @Value("${fan-yu.tell-how.pic-addr}")
     public void setPicAddr(String picAddr) {
         TellHowServer.picAddr = picAddr;
+    }
+
+    @Value("${fan-yu.tell-how.contact-pic-addr}")
+    public void setContactPicAddr(String contactPicAddr) {
+        TellHowServer.contactPicAddr = contactPicAddr;
     }
     @OnOpen
     public void onOpen(Session session) {
@@ -80,6 +91,15 @@ public class TellHowServer {
      * @param client 客户端，为空发给所有客户端
      */
     public static void noticeClient(String picName, Session... client) {
+        noticeClient(picName, PicType.NR, client);
+    }
+
+    /**
+     * 发送给客户端开图消息
+     * @param picName 图片名称
+     * @param client 客户端，为空发给所有客户端
+     */
+    public static void noticeClient(String picName, PicType picType, Session... client) {
         List<Session> clients = null;
         if (ObjectUtils.isEmpty(client)) {
             clients = sessionList;
@@ -95,7 +115,19 @@ public class TellHowServer {
 //                }
                 if (StringUtils.hasText(picName)) {
                     Map<String, String> data = new HashMap<>();
-                    data.put("picUrl", TellHowServer.picAddr + picName);
+                    String picAddr = "";
+                    switch (picType) {
+                        case NR:
+                            picAddr = TellHowServer.picAddr;
+                            break;
+                        case CONTACT:
+                            picAddr = TellHowServer.contactPicAddr;
+                            break;
+                        default:
+                            picAddr = "";
+                            break;
+                    }
+                    data.put("picUrl", picAddr + picName);
                     ResponseMessage tellHowResponseMessage = new ResponseMessage(null, ServiceType.KAI_TU, data,
                             // 开图窗口大小默认值
                             new ResponseMessage.WindowSize("1964px", "857px"));
@@ -110,6 +142,7 @@ public class TellHowServer {
             }
         }
     }
+
 
     /**
      * 发送给泰豪的消息

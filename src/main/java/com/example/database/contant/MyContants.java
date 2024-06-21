@@ -14,4 +14,9 @@ public class MyContants {
      * 关闭开图窗口指令 id
      */
     public static final String CLOSE_PIC_WINDOW_ID = "307";
+
+    /**
+     * 打开联络图指令 id
+     */
+    public static final String OPEN_CONTACT_PIC_ID = "308";
 }
