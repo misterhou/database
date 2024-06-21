@@ -5,7 +5,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.contant.MyContants;
 import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
+import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.TellHowServer;
+import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
 import com.example.database.fanyumeta.utils.PicDataUtil;
 import com.example.database.service.InstructionSetService;
 import com.example.database.utils.HttpClientUtil;
@@ -175,7 +177,6 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String message) {
         log.info("【接收到天工】的消息:{}", message);
-        InterlocutionResult ilr = httpHaveInterlocutionResult(message);
         Integer sjInt = ZenzeUtils.haveSj();
         ReturnVo returnVo = new ReturnVo();
         returnVo.setId("无");
@@ -186,53 +187,53 @@ public class WebSocketServer {
             returnVo.setResults(MyContants.RESULT_FAIL2);
         }
         returnVo.setTabData("无");
-        if (ilr != null){
-            String commandId = ilr.getId();
-            if (StringUtils.isBlank(commandId) || "无".equals(commandId)) {
-                returnVo.setResults(MyContants.NOT_HAVE_ID);
-//                InterlocutionResultV2 largeModelResponse = httpHaveInterlocutionResultV2(message);
-//                if (largeModelResponse != null) {
-//                    String largeModelResponseResult = largeModelResponse.getResult();
+        Pattern closePicPattern = Pattern.compile("^关闭.*图$");
+        if (closePicPattern.matcher(message).find()) {
+            returnVo.setResults(MyContants.YX_ZL_ANS);
+            ResponseMessage responseMessage = new ResponseMessage(null,
+                    ServiceType.CLOSE_NOTICE, null, null);
+            TellHowServer.noticeClient2(responseMessage);
+        } else {
+            InterlocutionResult ilr = httpHaveInterlocutionResult(message);
+            if (ilr != null){
+                String commandId = ilr.getId();
+                if (StringUtils.isBlank(commandId) || "无".equals(commandId)) {
+                    returnVo.setResults(MyContants.NOT_HAVE_ID);
                     String largeModelResponseResult = getAnswerFromLargeModel(message);
                     if (StringUtils.isNotBlank(largeModelResponseResult)) {
                         returnVo.setResults(largeModelResponseResult);
                     } else {
                         returnVo.setResults(WebSocketServer.errorMessage);
                     }
-//                } else {
-//                    returnVo.setResults(WebSocketServer.errorMessage);
-//                }
-            } else {
-                // 开图指令
-                if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
-                    String picName = PicDataUtil.getPicName(commandId);
-                    if (StringUtils.isNotBlank(picName)) {
-                        returnVo.setResults(this.getOpenPicNotice(message));
-                        // 通知数智人往右挥手
-                        returnVo.setPoseId("3");
-                        TellHowServer.noticeClient(picName, null);
-                    } else {
-                        if (MyContants.CLOSE_PIC_WINDOW_ID.equals(commandId)) {
-                            returnVo.setResults(MyContants.YX_ZL_ANS);
-                            // TODO: 缺少向泰豪发送关闭窗口指令，待泰豪提供接口报文 2024.6.20
-                        } else if (MyContants.OPEN_CONTACT_PIC_ID.equals(commandId)) {
-                            String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
-                            if (StringUtils.isNotBlank(substationRtKeyId)) {
-                                returnVo.setResults(this.getOpenPicNotice(message));
-                                // 通知数智人往右挥手
-                                returnVo.setPoseId("3");
-                                TellHowServer.noticeClient(substationRtKeyId, null);
-                            }
-                        } else {
-                            log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
-                        }
-                    }
                 } else {
-                    instructionSetService.haveReturnVo(ilr, returnVo, message);
+                    // 开图指令
+                    if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
+                        String picName = PicDataUtil.getPicName(commandId);
+                        if (StringUtils.isNotBlank(picName)) {
+                            returnVo.setResults(this.getOpenPicNotice(message));
+                            // 通知数智人往右挥手
+                            returnVo.setPoseId("3");
+                            TellHowServer.noticeClient(picName, null);
+                        } else {
+                            if (MyContants.OPEN_CONTACT_PIC_ID.equals(commandId)) {
+                                String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
+                                if (StringUtils.isNotBlank(substationRtKeyId)) {
+                                    returnVo.setResults(this.getOpenPicNotice(message));
+                                    // 通知数智人往右挥手
+                                    returnVo.setPoseId("3");
+                                    TellHowServer.noticeClient(substationRtKeyId, null);
+                                }
+                            } else {
+                                log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+                            }
+                        }
+                    } else {
+                        instructionSetService.haveReturnVo(ilr, returnVo, message);
+                    }
                 }
+            } else {
+                returnVo.setResults(WebSocketServer.errorMessage);
             }
-        } else {
-            returnVo.setResults(WebSocketServer.errorMessage);
         }
 
         //创建 ObjectMapper 对象

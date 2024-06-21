@@ -18,5 +18,10 @@ public enum ServiceType {
     /**
      * 呼出（泰豪呼出应用，需要调用广哈呼出接口）
      */
-    CALL_OUT
+    CALL_OUT,
+
+    /**
+     * 关闭开图窗口
+     */
+    CLOSE_NOTICE
 }
