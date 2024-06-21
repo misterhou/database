@@ -426,7 +426,10 @@ public class HardwareControlCommandUtil {
         log.info("开始加载指令缓存文件：{}", commandCacheFile);
         ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(commandCacheFile)));
         data = (Map<String, String>) inputStream.readObject();
-        log.info("指令数量：{}\n{}", data.size(), data);
+        if (log.isDebugEnabled()) {
+            log.debug("缓存文件数据：{}", data);
+        }
+        log.info("指令数量：{}", data.size());
         return data;
     }
 
@@ -443,7 +446,10 @@ public class HardwareControlCommandUtil {
         log.info("开始加载指令缓存文件：{}", commandCacheFile);
         ObjectInputStream inputStream = new ObjectInputStream(Files.newInputStream(Paths.get(commandCacheFile)));
         data = (Map<String, List<HardwareCommand>>) inputStream.readObject();
-        log.info("指令数量：{}\n{}", data.size(), data);
+        if (log.isDebugEnabled()) {
+            log.debug("缓存文件数据：{}", data);
+        }
+        log.info("指令数量：{}", data.size());
         return data;
     }
 
