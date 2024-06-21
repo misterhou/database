@@ -1,14 +1,10 @@
 package com.example.database.utils;
 
-import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.util.StringUtils;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +56,32 @@ public class ExcelUtils {
         }
         workbook.close();
         return data;
+    }
+
+    /**
+     * 获取厂站联络图配置
+     *
+     * @param excelFile excel文件
+     * @throws Exception 读取文件异常
+     */
+    public static String getSubstationContactPicConfig(String excelFile) throws Exception {
+        StringBuilder fileContent = new StringBuilder();
+        FileInputStream fis = new FileInputStream(excelFile);
+        Workbook workbook = WorkbookFactory.create(fis);
+        int sheetIndex = 0;
+        Sheet sheet = workbook.getSheetAt(sheetIndex);
+        for (Row row : sheet) {
+            Cell idCell = row.getCell(0);
+            Cell nameCell = row.getCell(1);
+            String idValue = idCell.toString();
+            String nameValue = nameCell.toString();
+            fileContent.append("打开").append(nameValue).append("联络图\t")
+                    .append("112_").append(idValue)
+                    .append("\t开图指令\n");
+//            System.out.println("打开" + nameValue + "联络图\t" + "112_" + idValue + "\t开图指令");
+        }
+        workbook.close();
+        return fileContent.toString();
     }
 
     /**
