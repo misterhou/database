@@ -3,8 +3,13 @@ package com.example.database.fanyumeta.controller;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
+import com.example.database.fanyumeta.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
@@ -98,6 +103,11 @@ public class ImitateController {
                 "    }\n" +
                 "}";
         return data;
+    }
+
+    @GetMapping("/pinyin/{text}")
+    public String pinyin(@PathVariable("text") String text) {
+        return StringUtils.getPinyin(text);
     }
 
 }
