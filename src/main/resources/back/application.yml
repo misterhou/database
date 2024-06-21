@@ -40,7 +40,7 @@ fan-yu:
       # 响应数据存放字段
       response-data-field: answer
       # 响应数据出处存放字段
-      response-data-source-field: docs
+      response-data-source-field: docs1
   # 中控系统配置
   hardware-control:
     enabled: true
