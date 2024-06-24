@@ -12,6 +12,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -28,7 +30,15 @@ public class PicDataUtil {
     /**
      * 厂站图片数据缓存（东方电子开发的厂站联络图）
      */
-    private static List<Map<String, String>> substationDataCache = new ArrayList<>(256);
+//    private static List<Map<String, String>> substationDataCache = new ArrayList<>(256);
+    private static Map<String, String> substationDataCache = new TreeMap<>((o1, o2) -> {
+        StringBuilder o1Builder = new StringBuilder(o1);
+        StringBuilder o2Builder = new StringBuilder(o2);
+        String o1Reverse = o1Builder.reverse().toString();
+        String o2Reverse = o2Builder.reverse().toString();
+        return o2Reverse.compareTo(o1Reverse);
+    });
+
 
     /**
      * 厂站表 id
@@ -56,7 +66,13 @@ public class PicDataUtil {
     public static void initSubstationData(String substationDataFile) {
         substationDataCache.clear();
         try {
-            substationDataCache.addAll(loadPicDataCacheFile(substationDataFile));
+            List<Map<String, String>> substationExcelData = new ArrayList<>(256);
+            substationExcelData.addAll(loadPicDataCacheFile(substationDataFile));
+            for (Map<String, String> picData : substationExcelData) {
+                for (String key : picData.keySet()) {
+                    substationDataCache.put(key, picData.get(key));
+                }
+            }
         } catch (Exception e) {
             log.error("加载厂站图片数据缓存文件出错", e);
         }
@@ -121,13 +137,15 @@ public class PicDataUtil {
 
     public static String getSubstationId(String text) {
         String substationId = null;
-        for (Map<String, String> picData : substationDataCache) {
-            text = text.replaceAll("打开", "");
-            text = text.replaceAll("联络图", "");
-            for (String key : picData.keySet()) {
-                if (text.equals(key)) {
-                    substationId = picData.get(key);
-                }
+        text = text.replaceAll("打开", "");
+        text = text.replaceAll("联络图", "");
+        for (String key : substationDataCache.keySet()) {
+            Pattern namePatter = Pattern.compile(key);
+            Matcher matcher = namePatter.matcher(text);
+            if (matcher.find()) {
+                log.info("【联络图匹配结果】开图指令：{}, 匹配到的厂站：{}", text, key);
+                substationId = substationDataCache.get(key);
+                break;
             }
         }
         return substationId;
