@@ -56,6 +56,6 @@ fan-yu:
     # 图片文件
     pic-config-file: /home/config/PicDataCache
     # 厂站配置文件
-    substation-config-file: /home/config/SubStationDataCache
+    substation-config-file: /home/config/SubstationDataCache
     # 联络图访问地址
     contact-pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=dfe_test_cl.sys.pic.g;rtkeyId=
