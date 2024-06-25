@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@MapperScan("com.example.database.mapper")
+@MapperScan({"com.example.database.mapper", "com.example.database.fanyumeta.mapper"})
 @SpringBootApplication
 public class DatabaseApplication {
 

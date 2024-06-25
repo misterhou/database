@@ -38,6 +38,7 @@ public class TellHowClient {
                 2：数据需要组织用列表或者折线图表，梵钰组织界面梵钰播报，调开图链接，挥右边
                 3：数据本身大屏有的，泰豪前端做下高亮显示，梵钰播报。按实际方位挥
                 4：文档和大百科，梵钰组织界面调开图链接，梵钰播报，挥右边
+                5：与电网一张图联动，泰豪前端联动，梵钰播报，挥左边
                 6：开接线图时挥左边在电网接线图与数智人中间
             2. dateTime（非必填）：日期时间 （格式：2024-05-01 00:00:00）
             3. dutyOrderName（非必填）：值次名称
@@ -99,5 +100,89 @@ public class TellHowClient {
             log.error("获取泰豪结果出错", e);
         }
         return tellHowVO;
+    }
+
+    /**
+     * 获取雄安总加负荷曲线
+     *
+     * @param date 日期
+     * @return 曲线数据
+     */
+    public JSONObject totalLoadCurve(LocalDate date) {
+        String dateTime = StringUtils.getDateStr(date) + " 00:00:00";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("dateTime", dateTime);
+        params.put("actionType", actionType);
+        String url = this.tellHowProperties.getServiceAddr() + "/data/totalLoadCurve";
+        return sendMessage(url, params);
+    }
+
+    private JSONObject sendMessage(String url, Map<String, String> params) {
+        JSONObject data = null;
+        try {
+            String responseData = HttpClientUtil.sendGet(url , params);
+            log.info("调用泰豪接口：{}，请求参数：{}，响应结果：{}", url, params, responseData);
+            JSONObject res = JSONObject.parseObject(responseData);
+            if (res.getIntValue("code") == 0) {
+                data = res.getJSONObject("data");
+            } else {
+                log.error("泰豪响应结果不正确");
+            }
+        } catch (Exception e) {
+            log.error("调用泰豪接口出错", e);
+        }
+        return data;
+    }
+
+    /**
+     * 动作类型
+     */
+    private static enum ActionType {
+        /*
+        1. actionType（必填）: 动作类型
+                1：文字的结果，框里面显示，梵钰播报，动作挥中间
+                2：数据需要组织用列表或者折线图表，梵钰组织界面梵钰播报，调开图链接，挥右边
+                3：数据本身大屏有的，泰豪前端做下高亮显示，梵钰播报。按实际方位挥
+                4：文档和大百科，梵钰组织界面调开图链接，梵钰播报，挥右边
+                5：与电网一张图联动，泰豪前端联动，梵钰播报，挥左边
+                6：开接线图时挥左边在电网接线图与数智人中间
+         */
+
+        /**
+         * 1：文字的结果，框里面显示，梵钰播报，动作挥中间
+         */
+        ONE("1"),
+
+        /**
+         * 2：数据需要组织用列表或者折线图表，梵钰组织界面梵钰播报，调开图链接，挥右边
+         */
+        TWO("2"),
+
+        /**
+         * 3：数据本身大屏有的，泰豪前端做下高亮显示，梵钰播报。按实际方位挥
+         */
+        THREE("3"),
+
+        /**
+         * 4：文档和大百科，梵钰组织界面调开图链接，梵钰播报，挥右边
+         */
+        FOUR("4"),
+
+        /**
+         * 5：与电网一张图联动，泰豪前端联动，梵钰播报，挥左边
+         */
+        FIVE("5"),
+
+        /**
+         * 6：开接线图时挥左边在电网接线图与数智人中间
+         */
+        SIX("6");
+
+        private String value;
+
+        ActionType(String value) {
+            this.value = value;
+        }
     }
 }

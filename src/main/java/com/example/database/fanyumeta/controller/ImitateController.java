@@ -105,6 +105,54 @@ public class ImitateController {
         return data;
     }
 
+    @GetMapping("/tell-how/data/totalLoadCurve")
+    public String totalLoadCurve(String dateTime, String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": {\n" +
+                "            \"minValue\": 405.06,\n" +
+                "            \"yesterdayCurve\": {\n" +
+                "                \"xData\": [\n" +
+                "                    \"2024-06-04 00:00\",\n" +
+                "                    \"2024-06-04 00:01\",\n" +
+                "                    \"2024-06-04 23:58\",\n" +
+                "                    \"2024-06-04 23:59\"\n" +
+                "                ],\n" +
+                "                \"yData\": [\n" +
+                "                    476.4,\n" +
+                "                    474.12,\n" +
+                "                    488.06,\n" +
+                "                    487.14\n" +
+                "                ]\n" +
+                "            },\n" +
+                "            \"todayCurve\": {\n" +
+                "                \"min\": 405.06,\n" +
+                "                \"max\": 785.02,\n" +
+                "                \"xData\": [\n" +
+                "                    \"2024-06-05 00:00\",\n" +
+                "                    \"2024-06-05 00:01\",\n" +
+                "                    \"2024-06-05 23:58\",\n" +
+                "                    \"2024-06-05 23:59\"\n" +
+                "                ],\n" +
+                "                \"yData\": [\n" +
+                "                    486.71,\n" +
+                "                    484.02,\n" +
+                "                    482.88,\n" +
+                "                    482.87\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        },\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"1\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

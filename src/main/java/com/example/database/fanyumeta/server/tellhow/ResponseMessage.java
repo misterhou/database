@@ -132,6 +132,11 @@ public class ResponseMessage {
         DUTY_PERSONNEL_INFO("zbryxx"),
 
         /**
+         * 雄安总加负荷曲线
+         */
+        TOTAL_LOAD_CURVE("xazjfhqx"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

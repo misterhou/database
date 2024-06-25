@@ -1,5 +1,6 @@
 package com.example.database.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.database.contant.MyContants;
 import com.example.database.domain.*;
@@ -21,6 +22,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,17 +95,35 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             if (serialNum == 10000) {   // 从泰豪获取数据
                 TellHowVO result = this.tellHowClient.dutyPersonnelInfo(null, "夜班");
                 if (null != result) {
-                    ResponseMessage tellHowResponseMessage = new ResponseMessage(null,
-                            ServiceType.ZHIBIAO,
-                            null,
-                            null);
-                    tellHowResponseMessage.setResult(null);
-                    tellHowResponseMessage.setMenuCode(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
-                    TellHowServer.noticeClient2(tellHowResponseMessage);
                     String voiceContent = result.getVoiceContent();
                     if (StringUtils.isNotBlank(voiceContent)) {
                         returnVo.setResults(voiceContent);
                         returnVo.setPoseId(result.getPoseId());
+                    }
+                    noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
+                }
+            } else if (serialNum == 100010) {
+                if (com.example.database.fanyumeta.utils.StringUtils.regexIsFind("今日|今天", message)) {
+                    JSONObject data = this.tellHowClient.totalLoadCurve(LocalDate.now());
+                    if (null != data) {
+                        JSONObject resData = data.getJSONObject("resData");
+                        if (null != resData) {
+                            JSONObject todayCurve = resData.getJSONObject("todayCurve");
+                            if (null != todayCurve) {
+                                String maxValue = todayCurve.getString("max");
+                                if (StringUtils.isNotBlank(maxValue)) {
+                                    returnVo.setResults(message.replace("多少", maxValue + "MW"));
+                                    JSONObject actionData = data.getJSONObject("actionData");
+                                    if (null != actionData) {
+                                        String poseId = actionData.getString("poseId");
+                                        if (StringUtils.isNotBlank(poseId)) {
+                                            returnVo.setPoseId(poseId);
+                                        }
+                                    }
+                                    noticeTellHowAction(ResponseMessage.TellHowMenu.TOTAL_LOAD_CURVE);
+                                }
+                            }
+                        }
                     }
                 }
             } else {
@@ -300,6 +320,16 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
             }
         }
+    }
+
+    private static void noticeTellHowAction(ResponseMessage.TellHowMenu totalLoadCurve) {
+        ResponseMessage tellHowResponseMessage = new ResponseMessage(null,
+                ServiceType.ZHIBIAO,
+                null,
+                null);
+        tellHowResponseMessage.setResult(null);
+        tellHowResponseMessage.setMenuCode(totalLoadCurve);
+        TellHowServer.noticeClient2(tellHowResponseMessage);
     }
 
     //处理图片信息

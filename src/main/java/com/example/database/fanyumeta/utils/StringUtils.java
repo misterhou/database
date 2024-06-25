@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class StringUtils extends org.springframework.util.StringUtils {
 
@@ -51,6 +52,18 @@ public class StringUtils extends org.springframework.util.StringUtils {
     public static String getDateChinaStr(LocalDate localDate) {
         Assert.notNull(localDate, "localDate 参数不能为空");
         return localDate.format(DateTimeFormatter.ofPattern("yyyy年MM月dd日"));
+    }
+
+    /**
+     * 正则表达式匹配
+     *
+     * @param reg 正则表达式
+     * @param message 待匹配字符串
+     * @return 是否匹配
+     */
+    public static boolean regexIsFind(String reg, String message) {
+        Pattern pattern = Pattern.compile(reg);
+        return pattern.matcher(message).find();
     }
 
     public static String getPinyin(String text) {
