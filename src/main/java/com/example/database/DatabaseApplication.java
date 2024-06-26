@@ -3,6 +3,7 @@ package com.example.database;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import com.example.database.fanyumeta.utils.PicDataUtil;
+import com.example.database.fanyumeta.utils.StringUtils;
 import org.apache.ibatis.ognl.Ognl;
 import org.apache.ibatis.ognl.OgnlException;
 import org.mybatis.spring.annotation.MapperScan;
@@ -30,6 +31,7 @@ public class DatabaseApplication {
 //        testOgnl();
 //        generateCacheFile();
 //        testPattern();
+//        testSegment();
     }
 
     private static void generateCacheFile() {
@@ -68,5 +70,9 @@ public class DatabaseApplication {
             String patterStr = matcher.group();
             System.out.println(patterStr);
         }
+    }
+
+    private static void testSegment() {
+        System.out.println(StringUtils.segment("打开剧村站10kV1B母线溯源图"));
     }
 }
