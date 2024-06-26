@@ -63,5 +63,9 @@ fan-yu:
     service-addr: http://192.168.1.22:7879/imitate/tell-how
     # 厂站配置文件
     substation-config-file: E:/monkey/sources/java/database/SubstationDataCache
+    # 溯源配置文件
+    source-config-file: E:/monkey/sources/java/database/SourceDataCache
     # 联络图访问地址
     contact-pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=dfe_test_cl.sys.pic.g;rtkeyId=
+    # 溯源图访问地址
+    source-pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=device_supply_path.sys.pic.g;rtkeyId=

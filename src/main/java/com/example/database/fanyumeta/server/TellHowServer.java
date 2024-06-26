@@ -35,6 +35,11 @@ public class TellHowServer {
      */
     private static String contactPicAddr = "";
 
+    /**
+     * 溯源图访问地址
+     */
+    private static String sourcePicAddr = "";
+
     @Value("${fan-yu.tell-how.pic-addr}")
     public void setPicAddr(String picAddr) {
         TellHowServer.picAddr = picAddr;
@@ -43,6 +48,10 @@ public class TellHowServer {
     @Value("${fan-yu.tell-how.contact-pic-addr}")
     public void setContactPicAddr(String contactPicAddr) {
         TellHowServer.contactPicAddr = contactPicAddr;
+    }
+    @Value("${fan-yu.tell-how.source-pic-addr}")
+    public void setSourcePicAddr(String sourcePicAddr) {
+        TellHowServer.sourcePicAddr = sourcePicAddr;
     }
     @OnOpen
     public void onOpen(Session session) {
@@ -122,6 +131,9 @@ public class TellHowServer {
                             break;
                         case CONTACT:
                             picAddr = TellHowServer.contactPicAddr;
+                            break;
+                        case SOURCE:
+                            picAddr = TellHowServer.sourcePicAddr;
                             break;
                         default:
                             picAddr = "";

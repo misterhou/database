@@ -2,17 +2,15 @@ package com.example.database.fanyumeta.utils;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.corpus.io.IIOAdapter;
-import com.hankcs.hanlp.dictionary.CustomDictionary;
 import com.hankcs.hanlp.dictionary.py.Pinyin;
-import com.hankcs.hanlp.seg.common.Term;
 import org.springframework.util.Assert;
+import org.wltea.analyzer.core.IKSegmenter;
+import org.wltea.analyzer.core.Lexeme;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,25 +18,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class StringUtils extends org.springframework.util.StringUtils {
 
-    /**
-     * 初始化自定义词典
-     */
-    static {
-        InputStream is = StringUtils.class.getResourceAsStream("/dictionary/custom/ext.txt");
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
-        String line = null;
-        try {
-            while ((line = bufferedReader.readLine()) != null) {
-                CustomDictionary.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    /**
+//     * 初始化自定义词典
+//     */
+//    static {
+//        InputStream is = StringUtils.class.getResourceAsStream("/dictionary/custom/ext.txt");
+//        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+//        String line = null;
+//        try {
+//            while ((line = bufferedReader.readLine()) != null) {
+//                CustomDictionary.add(line);
+//            }
+//            bufferedReader.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 获取 UUID 字符串
@@ -94,9 +92,17 @@ public class StringUtils extends org.springframework.util.StringUtils {
      * @param text 文本
      * @return 分词列表
      */
-    public static List<String> segment(String text) {
-        List<Term> terms = HanLP.segment(text);
-        return terms.stream().map(term -> term.word).collect(Collectors.toList());
+    public static List<String> segment(String text) throws IOException {
+//        List<Term> terms = HanLP.segment(text);
+//        return terms.stream().map(term -> term.word).collect(Collectors.toList());
+        List<String> keyword = new ArrayList<>();
+        StringReader re = new StringReader(text.trim());
+        IKSegmenter ik = new IKSegmenter(re,true);
+        Lexeme lex;
+        while((lex = ik.next())!=null){
+            keyword.add(lex.getLexemeText());
+        }
+        return keyword;
     }
 
     public static String getPinyin(String text) {

@@ -7,9 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -30,15 +34,12 @@ public class PicDataUtil {
     /**
      * 厂站图片数据缓存（东方电子开发的厂站联络图）
      */
-//    private static List<Map<String, String>> substationDataCache = new ArrayList<>(256);
-    private static Map<String, String> substationDataCache = new TreeMap<>((o1, o2) -> {
-        StringBuilder o1Builder = new StringBuilder(o1);
-        StringBuilder o2Builder = new StringBuilder(o2);
-        String o1Reverse = o1Builder.reverse().toString();
-        String o2Reverse = o2Builder.reverse().toString();
-        return o2Reverse.compareTo(o1Reverse);
-    });
+    private static Map<String, String> substationDataCache = new TreeMap<>(new DeviceNameComparator());
 
+    /**
+     * 溯源图数据缓存
+     */
+    private static Map<String, String> sourcePicDataCache = new TreeMap<>(new DeviceNameComparator());
 
     /**
      * 厂站表 id
@@ -64,17 +65,24 @@ public class PicDataUtil {
      * @param substationDataFile 图片数据缓存文件
      */
     public static void initSubstationData(String substationDataFile) {
-        substationDataCache.clear();
         try {
-            List<Map<String, String>> substationExcelData = new ArrayList<>(256);
-            substationExcelData.addAll(loadPicDataCacheFile(substationDataFile));
-            for (Map<String, String> picData : substationExcelData) {
-                for (String key : picData.keySet()) {
-                    substationDataCache.put(key, picData.get(key));
-                }
-            }
+            loadExcelData2Map(substationDataFile, substationDataCache);
         } catch (Exception e) {
             log.error("加载厂站图片数据缓存文件出错", e);
+        }
+    }
+
+    /**
+     * 初始化溯源图数据缓存
+     *
+     * @param transformerDataFile 数据缓存文件
+     */
+    public static void initSourcePicData(String transformerDataFile) {
+        sourcePicDataCache.clear();
+        try {
+            loadExcelData2Map(transformerDataFile, sourcePicDataCache);
+        } catch (Exception e) {
+            log.error("加载溯源图缓存文件出错", e);
         }
     }
 
@@ -135,6 +143,12 @@ public class PicDataUtil {
         return rtKeyId;
     }
 
+    /**
+     * 获取联络图 id
+     *
+     * @param text 开图文本
+     * @return 联络图 id
+     */
     public static String getSubstationId(String text) {
         String substationId = null;
         text = text.replaceAll("打开", "");
@@ -153,6 +167,55 @@ public class PicDataUtil {
             }
         }
         return substationId;
+    }
+
+    /**
+     * 获取溯源图 id
+     * @param text 开图文本
+     * @return 溯源图 id
+     */
+    public static String getSourcePicRtKeyId(String text) {
+        String rtKeyId = null;
+        text = text.replaceAll("打开", "");
+        text = text.replaceAll("溯源图", "");
+        List<String> keywordList = null;
+        try {
+            keywordList = StringUtils.segment(text);
+        } catch (IOException e) {
+            log.error("分词出错", e);
+        }
+        for (String key : sourcePicDataCache.keySet()) {
+            int count = 0;
+            for (String keyword : keywordList) {
+                if (StringUtils.regexIsFind(keyword, key.toLowerCase())) {
+                    count++;
+                }
+            }
+            BigDecimal score = BigDecimal.valueOf(count).divide(
+                    BigDecimal.valueOf(keywordList.size()),
+                    4, RoundingMode.HALF_UP);
+            if (log.isDebugEnabled()) {
+                log.debug("匹配度：{}", score);
+            }
+            if (score.doubleValue() > 0.8) {
+                log.info("【溯源图匹配结果】开图指令：{}, 匹配到的设备：{}, 匹配度：{}", text, key, score);
+                rtKeyId = sourcePicDataCache.get(key);
+                if (StringUtils.hasText(rtKeyId)) {
+                    // 去掉前 4 位
+                    rtKeyId = rtKeyId.substring(0, 4) + "_" + rtKeyId.substring(4);
+                }
+                if (StringUtils.hasText(rtKeyId)) {
+                    // 溯源图需补 4 个 0
+                    rtKeyId = rtKeyId + "0000";
+                }
+                if (StringUtils.hasText(rtKeyId)) {
+                    // 去掉开头的 0
+                    rtKeyId = rtKeyId.replaceAll("^0", "");
+                }
+                break;
+            }
+        }
+        return rtKeyId;
     }
 
     /**
@@ -177,6 +240,15 @@ public class PicDataUtil {
         writeObject2File(data, cacheFile);
     }
 
+    public static void generateSourcePicDataCacheFile(List<String> excelFileList, String cacheFile) throws Exception {
+        List<Map<String, String>> data = new ArrayList<>(20000);
+        for (String excelFile : excelFileList) {
+            List<Map<String, String>> subData = ExcelUtils.getData2(excelFile, 0,
+                    "id", Arrays.asList(3, 2, 1));
+            data.addAll(subData);
+        }
+        writeObject2File(data, cacheFile);
+    }
 
     /**
      * 将对象写入文件
@@ -241,5 +313,36 @@ public class PicDataUtil {
             }
         }
         return picName;
+    }
+
+    /**
+     * 设备名称逆序比较器
+     */
+    private static class DeviceNameComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            StringBuilder o1Builder = new StringBuilder(o1);
+            StringBuilder o2Builder = new StringBuilder(o2);
+            String o1Reverse = o1Builder.reverse().toString();
+            String o2Reverse = o2Builder.reverse().toString();
+            return o2Reverse.compareTo(o1Reverse);
+        }
+    }
+
+    /**
+     * 加载 excel 数据
+     * @param excelFile excel 文件
+     * @param dataCache 数据缓存
+     * @throws Exception 加载数据出错时，会抛出此异常
+     */
+    private static void loadExcelData2Map(String excelFile, Map<String, String> dataCache) throws Exception {
+        dataCache.clear();
+        List<Map<String, String>> transformerExcelData = new ArrayList<>(256);
+        transformerExcelData.addAll(loadPicDataCacheFile(excelFile));
+        for (Map<String, String> picData : transformerExcelData) {
+            for (String key : picData.keySet()) {
+                dataCache.put(key, picData.get(key));
+            }
+        }
     }
 }

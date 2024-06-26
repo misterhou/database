@@ -12,6 +12,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,6 +30,7 @@ public class DatabaseApplication {
                 environment.getProperty("fan-yu.hardware-control.receive-command-config-file"));
         PicDataUtil.initPicData(environment.getProperty("fan-yu.tell-how.pic-config-file"));
         PicDataUtil.initSubstationData(environment.getProperty("fan-yu.tell-how.substation-config-file"));
+        PicDataUtil.initSourcePicData(environment.getProperty("fan-yu.tell-how.source-config-file"));
 //        testOgnl();
 //        generateCacheFile();
 //        testPattern();
@@ -36,16 +39,20 @@ public class DatabaseApplication {
 
     private static void generateCacheFile() {
         try {
-            HardwareControlCommandUtil.generateRequestCommandCacheFile("src/main/resources/中控指令集.xlsx",
-                    "RequestCommandCache");
-            HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
-                    "ReceiveCommandCache");
-            HardwareControlCommandUtil.generateRequestReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
-                    "RequestReceiveCommandCache");
-            PicDataUtil.generatePicDataCacheFile("src/main/resources/开图清单.xlsx",
-                    "PicDataCache");
-            PicDataUtil.generateStationPicDataCacheFile("src/main/resources/厂站信息.xlsx",
-                    "SubstationDataCache");
+//            HardwareControlCommandUtil.generateRequestCommandCacheFile("src/main/resources/中控指令集.xlsx",
+//                    "RequestCommandCache");
+//            HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
+//                    "ReceiveCommandCache");
+//            HardwareControlCommandUtil.generateRequestReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
+//                    "RequestReceiveCommandCache");
+//            PicDataUtil.generatePicDataCacheFile("src/main/resources/开图清单.xlsx",
+//                    "PicDataCache");
+//            PicDataUtil.generateStationPicDataCacheFile("src/main/resources/厂站信息.xlsx",
+//                    "SubstationDataCache");
+            PicDataUtil.generateSourcePicDataCacheFile(Arrays.asList(
+                    "src/main/resources/v_rt_dev_transfmwd.xlsx",
+                            "src/main/resources/v_rt_dev_dmsbreaker.xlsx"),
+                    "SourceDataCache");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -72,7 +79,7 @@ public class DatabaseApplication {
         }
     }
 
-    private static void testSegment() {
+    private static void testSegment() throws IOException {
         System.out.println(StringUtils.segment("打开剧村站10kV1B母线溯源图"));
     }
 }

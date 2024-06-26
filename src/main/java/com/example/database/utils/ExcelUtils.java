@@ -58,6 +58,53 @@ public class ExcelUtils {
         return data;
     }
 
+    public static List<Map<String, String>> getData2(String excelFile, Integer sheetIndex, String valueColumnName,
+            List<Integer> keyColumnOffsetList) throws Exception {
+        List<Map<String, String>> data = new ArrayList<>();
+        FileInputStream fis = new FileInputStream(excelFile);
+        Workbook workbook = WorkbookFactory.create(fis);
+        Sheet sheet = workbook.getSheetAt(sheetIndex);
+        for (Row row : sheet) {
+            for (Cell cell : row) {
+                String cellValue = cell.toString();
+                if (valueColumnName.equals(cellValue)) {
+                    int startRowNum = cell.getRowIndex();
+                    int startCellNum = cell.getColumnIndex();
+                    log.info(valueColumnName + " row: " + startRowNum + ", column: " + startCellNum);
+                    for (int i = (startRowNum + 1); i <= sheet.getLastRowNum(); i++) {
+                        Row commandRow = sheet.getRow(i);
+                        Cell commandColumn = commandRow.getCell(startCellNum);
+                        if (null == commandColumn) {
+                            log.warn("遇到空白数据列，退出");
+                            break;
+                        } else if (!StringUtils.hasText(commandColumn.toString())) {
+                            log.warn("遇到空白数据列，退出（row：{}，column：{}）", commandColumn.getRowIndex(),
+                                    commandColumn.getColumnIndex());
+                            break;
+                        }
+                        int commandValueColumnIndex = commandColumn.getColumnIndex();
+                        int minRowIndex = 0;
+                        StringBuilder key = new StringBuilder();
+                        String value = getColumnValue(sheet, i, commandValueColumnIndex, minRowIndex);
+                        for (Integer keyColumnOffset : keyColumnOffsetList) {
+                            Integer keyColumnIndex = commandValueColumnIndex + keyColumnOffset;
+                            String subKey = getColumnValue(sheet, i, keyColumnIndex, minRowIndex);
+                            subKey = replaceSpecialSymbol(subKey);
+                            key.append(subKey);
+                        }
+                        Map<String, String> dataRow = new HashMap<>();
+                        dataRow.put(key.toString(), value);
+                        data.add(dataRow);
+                        System.out.println("rowIndex: " + i + " - key：" + key + "， value：" + value);
+                    }
+                    log.info("\n=========================================================================================================");
+                }
+            }
+        }
+        workbook.close();
+        return data;
+    }
+
     /**
      * 获取厂站联络图配置
      *
@@ -105,5 +152,20 @@ public class ExcelUtils {
             cellValue = cellValue.replaceFirst("\\.\\d*", "");
         }
         return cellValue;
+    }
+
+    /**
+     * 特殊字符处理
+     *
+     * @param text 待处理文本
+     * @return 处理后的文本
+     */
+    private static String replaceSpecialSymbol(String text) {
+        text = text.replaceAll("#1|1#", "1号");
+        text = text.replaceAll("#2|2#", "2号");
+        text = text.replaceAll("#3|3#", "3号");
+        text = text.replaceAll("#4|4#", "4号");
+        text = text.replaceAll("#5|5#", "5号");
+        return text;
     }
 }
