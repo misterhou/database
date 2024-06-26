@@ -145,6 +145,10 @@ public class PicDataUtil {
             if (matcher.find()) {
                 log.info("【联络图匹配结果】开图指令：{}, 匹配到的厂站：{}", text, key);
                 substationId = substationDataCache.get(key);
+                if (StringUtils.hasText(substationId)) {
+                    // 去掉前 4 位
+                    substationId = substationId.substring(4);
+                }
                 break;
             }
         }
