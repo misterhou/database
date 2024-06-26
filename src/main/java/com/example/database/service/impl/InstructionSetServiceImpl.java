@@ -92,35 +92,76 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
         this.haveJpgPath(ilResult, returnVo);
         //数据库指令
         if (MyContants.SJK_ZL.equals(directiveType)) {
-            if (serialNum == 10000) {   // 从泰豪获取数据
-                TellHowVO result = this.tellHowClient.dutyPersonnelInfo(null, "夜班");
-                if (null != result) {
-                    String voiceContent = result.getVoiceContent();
-                    if (StringUtils.isNotBlank(voiceContent)) {
-                        returnVo.setResults(voiceContent);
-                        returnVo.setPoseId(result.getPoseId());
+            if (serialNum == 35 || serialNum == 103) {
+                if (regexIsFind("值班", message)) {
+                    TellHowVO result = this.tellHowClient.dutyPersonnelInfo(null, "夜班");
+                    if (null != result) {
+                        String voiceContent = result.getVoiceContent();
+                        if (StringUtils.isNotBlank(voiceContent)) {
+                            returnVo.setResults(voiceContent);
+                            returnVo.setPoseId(result.getPoseId());
+                        }
+                        noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
                     }
-                    noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
-                }
-            } else if (serialNum == 100010) {
-                if (com.example.database.fanyumeta.utils.StringUtils.regexIsFind("今日|今天", message)) {
-                    JSONObject data = this.tellHowClient.totalLoadCurve(LocalDate.now());
-                    if (null != data) {
-                        JSONObject resData = data.getJSONObject("resData");
-                        if (null != resData) {
-                            JSONObject todayCurve = resData.getJSONObject("todayCurve");
-                            if (null != todayCurve) {
-                                String maxValue = todayCurve.getString("max");
-                                if (StringUtils.isNotBlank(maxValue)) {
-                                    returnVo.setResults(message.replace("多少", maxValue + "MW"));
-                                    JSONObject actionData = data.getJSONObject("actionData");
-                                    if (null != actionData) {
-                                        String poseId = actionData.getString("poseId");
-                                        if (StringUtils.isNotBlank(poseId)) {
-                                            returnVo.setPoseId(poseId);
+                } else if (regexIsFind("负荷", message)) {
+                    if (regexIsFind("今日|今天", message)) {
+                        TellHowClient.Area area = null;
+                        ResponseMessage.TellHowMenu menu = null;
+                        if (regexIsFind("安新", message)) {
+                            area = TellHowClient.Area.AN_XIN;
+                            menu = ResponseMessage.TellHowMenu.AN_XIN_LOAD_CURVE;
+                        } else if (regexIsFind("容城", message)) {
+                            area = TellHowClient.Area.RONG_CHENG;
+                            menu = ResponseMessage.TellHowMenu.RONG_CHENG_LOAD_CURVE;
+                        } else if (regexIsFind("雄县县城", message)) {
+                            area = TellHowClient.Area.XIONG_XIAN;
+                            menu = ResponseMessage.TellHowMenu.XIONG_XIAN_LOAD_CURVE;
+                        } else if (regexIsFind("沧州片区", message)) {
+                            area = TellHowClient.Area.CANG_ZHOU;
+                            menu = ResponseMessage.TellHowMenu.CANG_ZHOU_LOAD_CURVE;
+                        } else if (regexIsFind("容东", message)) {
+                            area = TellHowClient.Area.RONG_DONG;
+                            menu = ResponseMessage.TellHowMenu.RONG_DONG_LOAD_CURVE;
+                        } else if (regexIsFind("容西", message)) {
+                            area = TellHowClient.Area.RONG_XI;
+                            menu = ResponseMessage.TellHowMenu.RONG_XI_LOAD_CURVE;
+                        } else if (regexIsFind("雄东", message)) {
+                            area = TellHowClient.Area.XIONG_DONG;
+                            menu = ResponseMessage.TellHowMenu.XIONG_DONG_LOAD_CURVE;
+                        } else if (regexIsFind("启动", message)) {
+                            area = TellHowClient.Area.QI_DONG;
+                            menu = ResponseMessage.TellHowMenu.QI_DONG_LOAD_CURVE;
+                        } else if (regexIsFind("目标电网", message)) {
+                            area = TellHowClient.Area.MU_BIAO;
+                            menu = ResponseMessage.TellHowMenu.MU_BIAO_LOAD_CURVE;
+                        } else if (regexIsFind("雄县.*沧州.*", message)) {
+                            area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
+                            menu = ResponseMessage.TellHowMenu.XIONG_XIAN_CANG_ZHOU_LOAD_CURVE;
+                        }
+                        JSONObject data = null;
+                        if (null != area) {
+                            data = this.tellHowClient.zoneLoadCurve(LocalDate.now(), area);
+                        } else {
+                            data = this.tellHowClient.totalLoadCurve(LocalDate.now());
+                            menu = ResponseMessage.TellHowMenu.TOTAL_LOAD_CURVE;
+                        }
+                        if (null != data) {
+                            JSONObject resData = data.getJSONObject("resData");
+                            if (null != resData) {
+                                JSONObject todayCurve = resData.getJSONObject("todayCurve");
+                                if (null != todayCurve) {
+                                    String maxValue = todayCurve.getString("max");
+                                    if (StringUtils.isNotBlank(maxValue)) {
+                                        returnVo.setResults(message.replace("多少", maxValue + "MW"));
+                                        JSONObject actionData = data.getJSONObject("actionData");
+                                        if (null != actionData) {
+                                            String poseId = actionData.getString("poseId");
+                                            if (StringUtils.isNotBlank(poseId)) {
+                                                returnVo.setPoseId(poseId);
+                                            }
                                         }
+                                        noticeTellHowAction(menu);
                                     }
-                                    noticeTellHowAction(ResponseMessage.TellHowMenu.TOTAL_LOAD_CURVE);
                                 }
                             }
                         }
@@ -350,6 +391,17 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
         if (question.contains("主网检修计划")) {
             returnVo.setJpgPath("/home/jpgs/jxjh1.png");
         }
+    }
+
+    /**
+     * 判断是否匹配
+     *
+     * @param regex 正则表达式
+     * @param text 待匹配文本
+     * @return 匹配结果
+     */
+    private Boolean regexIsFind(String regex, String text) {
+        return com.example.database.fanyumeta.utils.StringUtils.regexIsFind(regex, text);
     }
 }
 

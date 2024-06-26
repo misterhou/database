@@ -137,6 +137,56 @@ public class ResponseMessage {
         TOTAL_LOAD_CURVE("xazjfhqx"),
 
         /**
+         * 电网分片区负荷曲线安新县dwfpqfhqx_01
+         */
+        AN_XIN_LOAD_CURVE("dwfpqfhqx_01"),
+
+        /**
+         * 电网分片区负荷曲线容城县dwfpqfhqx_02
+         */
+        RONG_CHENG_LOAD_CURVE("dwfpqfhqx_02"),
+
+        /**
+         * 电网分片区负荷曲线雄县县城dwfpqfhqx_03
+         */
+        XIONG_XIAN_LOAD_CURVE("dwfpqfhqx_03"),
+
+        /**
+         * 电网分片区负荷曲线沧州片区dwfpqfhqx_04
+         */
+        CANG_ZHOU_LOAD_CURVE("dwfpqfhqx_04"),
+
+        /**
+         * 电网分片区负荷曲线容东片区dwfpqfhqx_05
+         */
+        RONG_DONG_LOAD_CURVE("dwfpqfhqx_05"),
+
+        /**
+         * 电网分片区负荷曲线容西片区dwfpqfhqx_06
+         */
+        RONG_XI_LOAD_CURVE("dwfpqfhqx_06"),
+
+        /**
+         * 电网分片区负荷曲线雄东片区dwfpqfhqx_07
+         */
+        XIONG_DONG_LOAD_CURVE("dwfpqfhqx_07"),
+
+        /**
+         * 电网分片区负荷曲线启动区dwfpqfhqx_08
+         */
+        QI_DONG_LOAD_CURVE("dwfpqfhqx_08"),
+
+        /**
+         * 电网分片区负荷曲线目标电网dwfpqfhqx_09
+         */
+        MU_BIAO_LOAD_CURVE("dwfpqfhqx_09"),
+
+        /**
+         * 电网分片区负荷曲线雄县(含沧州)dwfpqfhqx_10
+         */
+        XIONG_XIAN_CANG_ZHOU_LOAD_CURVE("dwfpqfhqx_10"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");
