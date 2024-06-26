@@ -153,6 +153,61 @@ public class ImitateController {
                 "}";
     }
 
+    /**
+     * 模拟泰豪雄安分片区负荷曲线
+     * @param dateTime 查询时间
+     * @param actionType 动作类型
+     * @param area 区域
+     * @return 负荷曲线
+     */
+    @GetMapping("/tell-how/data/zoneLoadCurve")
+    public String zoneLoadCurve(String dateTime, String actionType, Integer area) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": {\n" +
+                "            \"minValue\": 12.84,\n" +
+                "            \"yesterdayCurve\": {\n" +
+                "                \"xData\": [\n" +
+                "                    \"2024-06-04 00:00\",\n" +
+                "                    \"2024-06-04 00:05\",\n" +
+                "                    \"2024-06-04 23:50\",\n" +
+                "                    \"2024-06-04 23:55\"\n" +
+                "                ],\n" +
+                "                \"yData\": [\n" +
+                "                    16.98,\n" +
+                "                    16.31,\n" +
+                "                    18.26,\n" +
+                "                    18.16\n" +
+                "                ]\n" +
+                "            },\n" +
+                "            \"todayCurve\": {\n" +
+                "                \"min\": 12.84,\n" +
+                "                \"max\": 31.78,\n" +
+                "                \"xData\": [\n" +
+                "                    \"2024-06-05 00:00\",\n" +
+                "                    \"2024-06-05 00:05\",\n" +
+                "                    \"2024-06-05 23:50\",\n" +
+                "                    \"2024-06-05 23:55\"\n" +
+                "                ],\n" +
+                "                \"yData\": [\n" +
+                "                    18.16,\n" +
+                "                    17.36,\n" +
+                "                    17.21,\n" +
+                "                    17.36\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        },\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"1\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

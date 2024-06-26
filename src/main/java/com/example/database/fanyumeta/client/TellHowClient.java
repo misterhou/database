@@ -118,6 +118,23 @@ public class TellHowClient {
         return sendMessage(url, params);
     }
 
+    /**
+     * 获取雄安分片区负荷曲线
+     *
+     * @param date 日期
+     * @return 曲线数据
+     */
+    public JSONObject zoneLoadCurve(LocalDate date, Area area) {
+        String dateTime = StringUtils.getDateStr(date) + " 00:00:00";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("dateTime", dateTime);
+        params.put("actionType", actionType);
+        params.put("area", area.value);
+        String url = this.tellHowProperties.getServiceAddr() + "/data/zoneLoadCurve";
+        return sendMessage(url, params);
+    }
+
     private JSONObject sendMessage(String url, Map<String, String> params) {
         JSONObject data = null;
         try {
@@ -138,7 +155,7 @@ public class TellHowClient {
     /**
      * 动作类型
      */
-    private static enum ActionType {
+    private enum ActionType {
         /*
         1. actionType（必填）: 动作类型
                 1：文字的结果，框里面显示，梵钰播报，动作挥中间
@@ -184,5 +201,36 @@ public class TellHowClient {
         ActionType(String value) {
             this.value = value;
         }
+    }
+
+    public enum Area {
+
+        // 安新县：1
+        AN_XIN(1),
+        // 容城县：2
+        RONG_CHENG(2),
+        // 雄县县城：3
+        XIONG_XIAN(3),
+        // 沧州片区：4
+        CANG_ZHOU(4),
+        // 容东片区：5
+        RONG_DONG(5),
+        // 容西片区：6
+        RONG_XI(6),
+        // 雄东片区：7
+        XIONG_DONG(7),
+        // 启动区：8
+        QI_DONG(8),
+        // 目标电网：9
+        MU_BIAO(9),
+        // 雄县(含沧州)：10
+        XIONG_XIAN_CANG_ZHOU(10);
+
+
+        Area(Integer value) {
+            this.value = value == null ? "" : value.toString();
+        }
+
+        private String value;
     }
 }
