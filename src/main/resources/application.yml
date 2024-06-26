@@ -49,6 +49,10 @@ fan-yu:
     timeout: 15
     request-command-config-file: E:/monkey/sources/java/database/RequestCommandCache
     receive-command-config-file: E:/monkey/sources/java/database/ReceiveCommandCache
+  # 南瑞相关配置
+  nan-rui:
+    # 服务地址
+    service-addr: http://192.168.1.22:10000/nr
   # 泰豪配置
   tell-how:
     # 图片地址

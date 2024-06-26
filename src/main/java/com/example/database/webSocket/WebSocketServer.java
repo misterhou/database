@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.contant.MyContants;
 import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
+import com.example.database.fanyumeta.client.NanRuiClient;
 import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.server.tellhow.PicType;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
@@ -63,6 +65,11 @@ public class WebSocketServer {
     private static ConcurrentHashMap<String, Session> sessionPool = new ConcurrentHashMap<>();
 
     private static InstructionSetService instructionSetService;
+
+    /**
+     * 南瑞客户端
+     */
+    private static NanRuiClient nanRuiClient;
 
     /**
      * 大模型请求参数模板
@@ -128,6 +135,11 @@ public class WebSocketServer {
         WebSocketServer.instructionSetService = instructionSetService;
     }
 
+    @Resource
+    public void setNanRuiClient(NanRuiClient nanRuiClient) {
+        WebSocketServer.nanRuiClient = nanRuiClient;
+    }
+
     /**
      * 链接成功调用的方法
      */
@@ -188,9 +200,14 @@ public class WebSocketServer {
             returnVo.setResults(MyContants.RESULT_FAIL2);
         }
         returnVo.setTabData("无");
+        Pattern weatherPattern = Pattern.compile("天气.*(怎么样|如何)");
         Pattern closePicPattern = Pattern.compile("^关闭.*图$");
         Pattern openContactPicPattern = Pattern.compile("^打开.*联络图$");
-        if (closePicPattern.matcher(message).find()) {
+        if (weatherPattern.matcher(message).find()) {
+            String cityName = message.substring(0, message.indexOf("天气")).substring(message.indexOf("今") + 1);
+            String weatherInfo = WebSocketServer.nanRuiClient.getWeather(cityName);
+            returnVo.setResults(weatherInfo);
+        } else if (closePicPattern.matcher(message).find()) {
             returnVo.setResults(MyContants.YX_ZL_ANS);
             ResponseMessage responseMessage = new ResponseMessage(null,
                     ServiceType.CLOSE_NOTICE, null, null);
