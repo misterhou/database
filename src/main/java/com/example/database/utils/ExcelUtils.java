@@ -2,7 +2,7 @@ package com.example.database.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
-import org.springframework.util.StringUtils;
+import com.example.database.fanyumeta.utils.StringUtils;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -89,7 +89,7 @@ public class ExcelUtils {
                         for (Integer keyColumnOffset : keyColumnOffsetList) {
                             Integer keyColumnIndex = commandValueColumnIndex + keyColumnOffset;
                             String subKey = getColumnValue(sheet, i, keyColumnIndex, minRowIndex);
-                            subKey = replaceSpecialSymbol(subKey);
+                            subKey = StringUtils.replaceSpecialSymbol(subKey);
                             key.append(subKey);
                         }
                         Map<String, String> dataRow = new HashMap<>();
@@ -152,20 +152,5 @@ public class ExcelUtils {
             cellValue = cellValue.replaceFirst("\\.\\d*", "");
         }
         return cellValue;
-    }
-
-    /**
-     * 特殊字符处理
-     *
-     * @param text 待处理文本
-     * @return 处理后的文本
-     */
-    private static String replaceSpecialSymbol(String text) {
-        text = text.replaceAll("#1|1#", "1号");
-        text = text.replaceAll("#2|2#", "2号");
-        text = text.replaceAll("#3|3#", "3号");
-        text = text.replaceAll("#4|4#", "4号");
-        text = text.replaceAll("#5|5#", "5号");
-        return text;
     }
 }

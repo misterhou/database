@@ -122,6 +122,21 @@ public class StringUtils extends org.springframework.util.StringUtils {
         return String.join("", pinYinList);
     }
 
+    /**
+     * 特殊字符处理
+     *
+     * @param text 待处理文本
+     * @return 处理后的文本
+     */
+    public static String replaceSpecialSymbol(String text) {
+        text = text.replaceAll("#1|1#", "1号");
+        text = text.replaceAll("#2|2#", "2号");
+        text = text.replaceAll("#3|3#", "3号");
+        text = text.replaceAll("#4|4#", "4号");
+        text = text.replaceAll("#5|5#", "5号");
+        return text;
+    }
+
     private static class SpringbootResourceIOAdapter implements IIOAdapter {
         @Override
         public InputStream open(String path) throws IOException {
