@@ -1,6 +1,7 @@
 package com.example.database;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.database.fanyumeta.component.DBCheck;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import com.example.database.fanyumeta.utils.PicDataUtil;
 import com.example.database.fanyumeta.utils.StringUtils;
@@ -31,6 +32,8 @@ public class DatabaseApplication {
         PicDataUtil.initPicData(environment.getProperty("fan-yu.tell-how.pic-config-file"));
         PicDataUtil.initSubstationData(environment.getProperty("fan-yu.tell-how.substation-config-file"));
         PicDataUtil.initSourcePicData(environment.getProperty("fan-yu.tell-how.source-config-file"));
+        DBCheck dbCheck = ctx.getBean(DBCheck.class);
+        dbCheck.checkTableExist();
 //        testOgnl();
 //        generateCacheFile();
 //        testPattern();
