@@ -208,6 +208,31 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/transLoadRate")
+    public String transLoadRate(String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"number\": 1,\n" +
+                "                \"id\": null,\n" +
+                "                \"devName\": \"#1 主变-中\",\n" +
+                "                \"stName\": \"剧村站\",\n" +
+                "                \"maxRate\": 100.3,\n" +
+                "                \"realtimeRate\": 70.2\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

@@ -1,11 +1,13 @@
 package com.example.database.fanyumeta.client.vo;
 
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * 泰豪负荷曲线值对象（非全部字段）
  */
 @Data
+@ToString
 public class TellHowCurveVO {
 
     /**

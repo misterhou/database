@@ -3,7 +3,9 @@ package com.example.database.fanyumeta.client;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
+import com.example.database.fanyumeta.client.vo.TransLoadRate;
 import com.example.database.fanyumeta.utils.StringUtils;
 import com.example.database.utils.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -140,6 +144,22 @@ public class TellHowClient {
         return tellHowCurveVO;
     }
 
+    /**
+     * 获取主变负载率
+     *
+     * @return 主变负载率
+     */
+    public TellHowTransLoadRateVO transLoadRate() {
+        TellHowTransLoadRateVO tellHowTransLoadRateVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/transLoadRate";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowTransLoadRateVO = this.parserTransLoadRateData(res);
+        return tellHowTransLoadRateVO;
+    }
+
     private JSONObject sendMessage(String url, Map<String, String> params) {
         JSONObject data = null;
         try {
@@ -180,6 +200,43 @@ public class TellHowClient {
             }
         }
         return tellHowCurveVO;
+    }
+
+
+    /**
+     * 解析主变负荷率
+     *
+     * @param data 泰豪接口返回数据
+     * @return 主变负荷率
+     */
+    private TellHowTransLoadRateVO parserTransLoadRateData(JSONObject data) {
+        TellHowTransLoadRateVO tellHowTransLoadRateVO = null;
+        if (null != data) {
+            tellHowTransLoadRateVO = new TellHowTransLoadRateVO();
+            JSONArray resData = data.getJSONArray("resData");
+            if (null != resData) {
+                List<TransLoadRate> transLoadRateList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject transLoadRateItem = resData.getJSONObject(i);
+                    if (null != transLoadRateItem) {
+                        TransLoadRate transLoadRate = new TransLoadRate();
+                        transLoadRate.setDevName(transLoadRateItem.getString("devName"));
+                        transLoadRate.setStName(transLoadRateItem.getString("stName"));
+                        transLoadRate.setMaxRate(transLoadRateItem.getString("maxRate"));
+                        transLoadRate.setRealtimeRate(transLoadRateItem.getString("realtimeRate"));
+                        transLoadRate.setFullName(transLoadRate.getStName() + StringUtils.replaceSpecialSymbol(transLoadRate.getDevName()));
+                        transLoadRateList.add(transLoadRate);
+                    }
+                }
+                tellHowTransLoadRateVO.setTransLoadRateList(transLoadRateList);
+            }
+            JSONObject actionData = data.getJSONObject("actionData");
+            if (null != actionData) {
+                String poseId = actionData.getString("poseId");
+                tellHowTransLoadRateVO.setPoseId(poseId);
+            }
+        }
+        return tellHowTransLoadRateVO;
     }
 
     /**

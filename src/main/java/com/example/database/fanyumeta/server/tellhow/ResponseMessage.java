@@ -186,6 +186,12 @@ public class ResponseMessage {
          */
         XIONG_XIAN_CANG_ZHOU_LOAD_CURVE("dwfpqfhqx_10"),
 
+
+        /**
+         * 主变负载率
+         */
+        TRANS_LOAD_RATE("zbfzlb"),
+
         /**
          * 负荷走势预测
          */

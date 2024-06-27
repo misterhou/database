@@ -14,10 +14,13 @@ import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
+import com.example.database.fanyumeta.client.vo.TransLoadRate;
 import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
+import com.example.database.fanyumeta.utils.SimilarityUtil;
 import com.example.database.mapper.InstructionSetMapper;
 import com.example.database.service.AnnualElectricityConsumptionService;
 import com.example.database.service.GeneratrixService;
@@ -27,6 +30,8 @@ import com.example.database.service.RiskAnalysisService;
 import com.example.database.service.TransformerService;
 import com.example.database.utils.ArabicNumeralsUtil;
 import com.example.database.utils.GeneratrixUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,6 +41,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,6 +51,7 @@ import java.util.List;
  * @createDate 2023-09-20 09:56:26
  */
 @Service
+@Slf4j
 public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper, InstructionSet>
         implements InstructionSetService {
     @Autowired
@@ -166,6 +173,34 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                     returnVo.setPoseId(poseId);
                                 }
                                 noticeTellHowAction(menu);
+                            }
+                        }
+                    }
+                }
+            } else if (serialNum == 307) {
+                String text = message.replaceAll("(负载率|是多少)", "");
+                TellHowTransLoadRateVO tellHowTransLoadRateVO = this.tellHowClient.transLoadRate();
+                if (null != tellHowTransLoadRateVO) {
+                    List<TransLoadRate> transLoadRateList = tellHowTransLoadRateVO.getTransLoadRateList();
+                    if (ObjectUtils.isNotEmpty(transLoadRateList)) {
+                        for (TransLoadRate transLoadRate : transLoadRateList) {
+                            String fullName = transLoadRate.getFullName();
+                            if (StringUtils.isNotBlank(fullName)) {
+                                double similarity = SimilarityUtil.getSimilarity(fullName, text);
+                                log.info("【相似度】【{}】与【{}】的为：{}", fullName, text, similarity);
+                                if (similarity > 0.8) {
+                                    StringBuilder rate = new StringBuilder();
+                                    rate.append(transLoadRate.getRealtimeRate())
+                                            .append(", 最大负载率是").append(transLoadRate.getMaxRate());
+                                    String result = message.replaceAll("多少", rate.toString());
+                                    returnVo.setResults(result);
+                                    String poseId = tellHowTransLoadRateVO.getPoseId();
+                                    if (StringUtils.isNotBlank(poseId)) {
+                                        returnVo.setPoseId(poseId);
+                                    }
+                                    noticeTellHowAction(ResponseMessage.TellHowMenu.TRANS_LOAD_RATE);
+                                    break;
+                                }
                             }
                         }
                     }
