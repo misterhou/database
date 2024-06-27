@@ -185,7 +185,7 @@ public class ImitateController {
                 "            },\n" +
                 "            \"todayCurve\": {\n" +
                 "                \"min\": 12.84,\n" +
-                "                \"max\": 31.78,\n" +
+                "                \"max\": 52.78,\n" +
                 "                \"xData\": [\n" +
                 "                    \"2024-06-05 00:00\",\n" +
                 "                    \"2024-06-05 00:05\",\n" +

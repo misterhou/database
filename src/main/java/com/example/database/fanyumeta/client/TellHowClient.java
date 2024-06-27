@@ -2,6 +2,7 @@ package com.example.database.fanyumeta.client;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.utils.StringUtils;
 import com.example.database.utils.HttpClientUtil;
@@ -108,14 +109,16 @@ public class TellHowClient {
      * @param date 日期
      * @return 曲线数据
      */
-    public JSONObject totalLoadCurve(LocalDate date) {
+    public TellHowCurveVO totalLoadCurve(LocalDate date) {
         String dateTime = StringUtils.getDateStr(date) + " 00:00:00";
         String actionType = ActionType.THREE.value;
         Map<String, String> params = new HashMap<>();
         params.put("dateTime", dateTime);
         params.put("actionType", actionType);
         String url = this.tellHowProperties.getServiceAddr() + "/data/totalLoadCurve";
-        return sendMessage(url, params);
+        JSONObject res = sendMessage(url, params);
+        TellHowCurveVO tellHowCurveVO = this.parserData(res);
+        return tellHowCurveVO;
     }
 
     /**
@@ -124,7 +127,7 @@ public class TellHowClient {
      * @param date 日期
      * @return 曲线数据
      */
-    public JSONObject zoneLoadCurve(LocalDate date, Area area) {
+    public TellHowCurveVO zoneLoadCurve(LocalDate date, Area area) {
         String dateTime = StringUtils.getDateStr(date) + " 00:00:00";
         String actionType = ActionType.THREE.value;
         Map<String, String> params = new HashMap<>();
@@ -132,7 +135,9 @@ public class TellHowClient {
         params.put("actionType", actionType);
         params.put("area", area.value);
         String url = this.tellHowProperties.getServiceAddr() + "/data/zoneLoadCurve";
-        return sendMessage(url, params);
+        JSONObject res = sendMessage(url, params);
+        TellHowCurveVO tellHowCurveVO = this.parserData(res);
+        return tellHowCurveVO;
     }
 
     private JSONObject sendMessage(String url, Map<String, String> params) {
@@ -150,6 +155,31 @@ public class TellHowClient {
             log.error("调用泰豪接口出错", e);
         }
         return data;
+    }
+
+    private TellHowCurveVO parserData(JSONObject data) {
+        TellHowCurveVO tellHowCurveVO = null;
+        if (null != data) {
+            JSONObject resData = data.getJSONObject("resData");
+            if (null != resData) {
+                tellHowCurveVO = new TellHowCurveVO();
+                JSONObject todayCurve = resData.getJSONObject("todayCurve");
+                if (null != todayCurve) {
+                    String maxValue = todayCurve.getString("max");
+                    if (StringUtils.hasText(maxValue)) {
+                        tellHowCurveVO.setDateMaxValue(maxValue);
+                    }
+                }
+            }
+            JSONObject actionData = data.getJSONObject("actionData");
+            if (null != actionData) {
+                String poseId = actionData.getString("poseId");
+                if (StringUtils.hasText(poseId)) {
+                    tellHowCurveVO.setPoseId(poseId);
+                }
+            }
+        }
+        return tellHowCurveVO;
     }
 
     /**
@@ -232,5 +262,9 @@ public class TellHowClient {
         }
 
         private String value;
+
+        public String getValue() {
+            return this.value;
+        }
     }
 }

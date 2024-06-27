@@ -1,18 +1,30 @@
 package com.example.database.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.database.contant.MyContants;
-import com.example.database.domain.*;
-import com.example.database.entity.*;
+import com.example.database.domain.AnnualElectricityConsumption;
+import com.example.database.domain.Generatrix;
+import com.example.database.domain.InstructionSet;
+import com.example.database.domain.Line;
+import com.example.database.domain.RiskAnalysis;
+import com.example.database.entity.Generatrix1;
+import com.example.database.entity.Generatrix3;
+import com.example.database.entity.InterlocutionResult;
+import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
+import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
-import com.example.database.service.*;
 import com.example.database.mapper.InstructionSetMapper;
+import com.example.database.service.AnnualElectricityConsumptionService;
+import com.example.database.service.GeneratrixService;
+import com.example.database.service.InstructionSetService;
+import com.example.database.service.LineService;
+import com.example.database.service.RiskAnalysisService;
+import com.example.database.service.TransformerService;
 import com.example.database.utils.ArabicNumeralsUtil;
 import com.example.database.utils.GeneratrixUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -138,31 +150,22 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                             area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
                             menu = ResponseMessage.TellHowMenu.XIONG_XIAN_CANG_ZHOU_LOAD_CURVE;
                         }
-                        JSONObject data = null;
+                        TellHowCurveVO tellHowCurveVO = null;
                         if (null != area) {
-                            data = this.tellHowClient.zoneLoadCurve(LocalDate.now(), area);
+                            tellHowCurveVO = this.tellHowClient.zoneLoadCurve(LocalDate.now(), area);
                         } else {
-                            data = this.tellHowClient.totalLoadCurve(LocalDate.now());
+                            tellHowCurveVO = this.tellHowClient.totalLoadCurve(LocalDate.now());
                             menu = ResponseMessage.TellHowMenu.TOTAL_LOAD_CURVE;
                         }
-                        if (null != data) {
-                            JSONObject resData = data.getJSONObject("resData");
-                            if (null != resData) {
-                                JSONObject todayCurve = resData.getJSONObject("todayCurve");
-                                if (null != todayCurve) {
-                                    String maxValue = todayCurve.getString("max");
-                                    if (StringUtils.isNotBlank(maxValue)) {
-                                        returnVo.setResults(message.replace("多少", maxValue + "MW"));
-                                        JSONObject actionData = data.getJSONObject("actionData");
-                                        if (null != actionData) {
-                                            String poseId = actionData.getString("poseId");
-                                            if (StringUtils.isNotBlank(poseId)) {
-                                                returnVo.setPoseId(poseId);
-                                            }
-                                        }
-                                        noticeTellHowAction(menu);
-                                    }
+                        if (null != tellHowCurveVO) {
+                            String maxValue = tellHowCurveVO.getDateMaxValue();
+                            if (StringUtils.isNotBlank(maxValue)) {
+                                returnVo.setResults(message.replace("多少", maxValue + "MW"));
+                                String poseId = tellHowCurveVO.getPoseId();
+                                if (StringUtils.isNotBlank(poseId)) {
+                                    returnVo.setPoseId(poseId);
                                 }
+                                noticeTellHowAction(menu);
                             }
                         }
                     }
