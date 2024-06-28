@@ -5,11 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
+import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
+import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
@@ -20,6 +22,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -230,6 +233,24 @@ public class TellHowClient {
         JSONObject res = sendMessage(url, params);
         tellHowCurrentGridFailureVO = this.parserCurrentGridFailureData(res);
         return tellHowCurrentGridFailureVO;
+    }
+
+    /**
+     * 获取保电信息
+     *
+     * @param date 保电开始日期
+     * @return 保电信息
+     */
+    public TellHowPowerSupplyInfoVO powerSupplyInfo(String date) {
+        TellHowPowerSupplyInfoVO tellHowPowerSupplyInfoVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/powerSupplyInfo";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        params.put("dateTime", date + " 00:00:00");
+        JSONObject res = sendMessage(url, params);
+        tellHowPowerSupplyInfoVO = this.parserPowerSupplyInfoData(res);
+        return tellHowPowerSupplyInfoVO;
     }
 
     /**
@@ -458,6 +479,44 @@ public class TellHowClient {
             }
         }
         return tellHowCurrentGridFailureVO;
+    }
+
+    /**
+     * 解析保电信息
+     *
+     * @param res 泰豪接口返回数据
+     * @return 保电信息
+     */
+    private TellHowPowerSupplyInfoVO parserPowerSupplyInfoData(JSONObject res) {
+        TellHowPowerSupplyInfoVO tellHowPowerSupplyInfoVO = null;
+        if (res != null) {
+            JSONArray resData = res.getJSONArray("resData");
+            if (resData != null && resData.size() > 0) {
+                tellHowPowerSupplyInfoVO = new TellHowPowerSupplyInfoVO();
+                List<PowerSupplyInfo> powerSupplyInfoList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject jsonObject = resData.getJSONObject(i);
+                    PowerSupplyInfo powerSupplyInfo = new PowerSupplyInfo();
+                    powerSupplyInfo.setStartTime(jsonObject.getString("startTime"));
+                    powerSupplyInfo.setTaskName(jsonObject.getString("taskName"));
+                    JSONArray userList = jsonObject.getJSONArray("userList");
+                    if (userList != null && userList.size() > 0) {
+                        List<String> userListList = new ArrayList<>();
+                        for (int j = 0; j < userList.size(); j++) {
+                            userListList.add(userList.getString(j));
+                        }
+                        powerSupplyInfo.setUserList(String.join(",", userListList));
+                    }
+                    powerSupplyInfoList.add(powerSupplyInfo);
+                }
+                tellHowPowerSupplyInfoVO.setPowerSupplyInfoList(powerSupplyInfoList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (actionData != null) {
+                tellHowPowerSupplyInfoVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowPowerSupplyInfoVO;
     }
 
     /**

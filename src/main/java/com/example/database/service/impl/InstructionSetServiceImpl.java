@@ -16,11 +16,13 @@ import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
+import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
+import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
@@ -47,6 +49,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -311,6 +314,31 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
                 returnVo.setResults(result);
                 noticeTellHowAction(ResponseMessage.TellHowMenu.CURRENT_GRID_FAILURE);
+            } else if (serialNum == 312) {  // 保电信息查询
+                String result = null;
+                TellHowPowerSupplyInfoVO tellHowPowerSupplyInfoVO = this.tellHowClient.powerSupplyInfo(
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+                if (null != tellHowPowerSupplyInfoVO) {
+                    List<PowerSupplyInfo> powerSupplyInfoList = tellHowPowerSupplyInfoVO.getPowerSupplyInfoList();
+                    if (ObjectUtils.isNotEmpty(powerSupplyInfoList)) {
+                        List<String> taskNameList = new ArrayList<>();
+                        for (PowerSupplyInfo powerSupplyInfo : powerSupplyInfoList) {
+                            String taskName = powerSupplyInfo.getTaskName();
+                            if (StringUtils.isNotBlank(taskName)) {
+                                taskNameList.add(taskName);
+                            }
+                        }
+                        if (ObjectUtils.isNotEmpty(taskNameList)) {
+                            result = "当前保电任务有：" + StringUtils.join(taskNameList, ",");
+                        }
+                    }
+                    returnVo.setPoseId(tellHowPowerSupplyInfoVO.getPoseId());
+                }
+                if (StringUtils.isBlank(result)) {
+                    result = "当前没有保电任务";
+                }
+                returnVo.setResults(result);
+                noticeTellHowAction(ResponseMessage.TellHowMenu.POWER_SUPPLY_INFO);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);

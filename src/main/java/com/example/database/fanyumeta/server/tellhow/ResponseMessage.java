@@ -213,6 +213,11 @@ public class ResponseMessage {
         CURRENT_GRID_FAILURE("dqdwgzsj"),
 
         /**
+         * 供电信息
+         */
+        POWER_SUPPLY_INFO("bdxxzs"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

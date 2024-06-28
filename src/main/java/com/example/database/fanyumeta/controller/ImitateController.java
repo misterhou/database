@@ -4,11 +4,13 @@ import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import com.example.database.fanyumeta.utils.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -67,8 +69,8 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/admin/data/dutyPersonnelInfo")
-    public String dutyPersonnelInfo(String dateTime, String dutyOrderName, String actionType) {
-        System.out.println("dateTime: " + dateTime + ", dutyOrderName: " + dutyOrderName + ", actionType: " + actionType);
+    public String dutyPersonnelInfo(@RequestParam("dateTime") String dateTime,
+            @RequestParam("dutyOrderName") String dutyOrderName, @RequestParam("actionType") String actionType) {
         String data = "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -106,7 +108,7 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/data/totalLoadCurve")
-    public String totalLoadCurve(String dateTime, String actionType) {
+    public String totalLoadCurve(@RequestParam("dateTime") String dateTime, @RequestParam("actionType") String actionType) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -161,7 +163,7 @@ public class ImitateController {
      * @return 负荷曲线
      */
     @GetMapping("/tell-how/data/zoneLoadCurve")
-    public String zoneLoadCurve(String dateTime, String actionType, Integer area) {
+    public String zoneLoadCurve(@RequestParam("dateTime") String dateTime, @RequestParam("actionType") String actionType, @RequestParam("area") Integer area) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -209,7 +211,7 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/data/transLoadRate")
-    public String transLoadRate(String actionType) {
+    public String transLoadRate(@RequestParam("actionType") String actionType) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -234,7 +236,7 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/data/lineLoadRate")
-    public String lineLoadRate(String actionType) {
+    public String lineLoadRate(@RequestParam("actionType") String actionType) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -286,7 +288,7 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/num/numMinusOneDetails")
-    public String numMinusOneDetails(String actionType) {
+    public String numMinusOneDetails(@RequestParam("actionType") String actionType) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -356,7 +358,7 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/data/importantUser")
-    public String numMinusOneDetails2(String year, String actionType) {
+    public String numMinusOneDetails2(@RequestParam("year") String year, @RequestParam("actionType") String actionType) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -402,7 +404,7 @@ public class ImitateController {
     }
 
     @GetMapping("/tell-how/data/currentGridFailure")
-    public String currentGridFailure(String year, String actionType) {
+    public String currentGridFailure(@RequestParam("actionType") String actionType) {
         return "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +
@@ -440,6 +442,37 @@ public class ImitateController {
                 "\t\t\t\t\"faultDescribe\": \"广王I线 线路跳闸\"\n" +
                 "\t\t\t}\n" +
                 "\t\t],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
+    @GetMapping("/tell-how/data/powerSupplyInfo")
+    public String powerSupplyInfo(@RequestParam("dateTime") String dateTime, @RequestParam("actionType") String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"startTime\": \"2024-05-10 10:00\",\n" +
+                "                \"taskName\": \"测试\",\n" +
+                "                \"userList\": [\n" +
+                "                    \"雄安服务中心\"\n" +
+                "                ]\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"startTime\": \"2024-05-19 09:30\",\n" +
+                "                \"taskName\": \"保电事件\",\n" +
+                "                \"userList\": [\n" +
+                "                    \"雄安国际酒店\"\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        ],\n" +
                 "        \"actionData\": {\n" +
                 "            \"poseId\": \"3\",\n" +
                 "            \"actionType\": \"3\"\n" +
