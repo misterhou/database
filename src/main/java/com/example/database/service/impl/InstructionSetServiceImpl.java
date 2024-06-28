@@ -14,8 +14,10 @@ import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
+import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
+import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
@@ -118,7 +120,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
         this.haveJpgPath(ilResult, returnVo);
         //数据库指令
         if (MyContants.SJK_ZL.equals(directiveType)) {
-            if (serialNum == 35 || serialNum == 103) {
+            if (serialNum == 35 || serialNum == 103) {  // 雄安总负荷/分片区负荷
                 if (regexIsFind("值班", message)) {
                     TellHowVO result = this.tellHowClient.dutyPersonnelInfo(null, "夜班");
                     if (null != result) {
@@ -184,7 +186,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                     }
                 }
-            } else if (serialNum == 307) {
+            } else if (serialNum == 307) {  // 主变负载率
                 String text = message.replaceAll("(负载率|是多少)", "");
                 TellHowTransLoadRateVO tellHowTransLoadRateVO = this.tellHowClient.transLoadRate();
                 if (null != tellHowTransLoadRateVO) {
@@ -215,7 +217,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                     }
                 }
-            } else if (serialNum == 308) {
+            } else if (serialNum == 308) {  // 线路负载率
                 String text = message.replaceAll("(负载率|是多少)", "");
                 TellHowLineLoadRateVO tellHowLineLoadRateVO = this.tellHowClient.lineLoadRate();
                 if (null != tellHowLineLoadRateVO) {
@@ -246,6 +248,29 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                     }
                 }
+            } else if (serialNum == 309) {  // N-1 风险
+                String notice = null;
+                TellHowNumMinusOneDetailsVO tellHowNumMinusOneDetailsVO = this.tellHowClient.numMinusOneDetails();
+                if (null != tellHowNumMinusOneDetailsVO) {
+                    List<NumMinusOneDetails> numMinusOneDetailsList = tellHowNumMinusOneDetailsVO.getNumMinusOneDetailsList();
+                    if (ObjectUtils.isNotEmpty(numMinusOneDetailsList)) {
+                        List<String> deviceNameList = new ArrayList<>();
+                        for (NumMinusOneDetails numMinusOneDetails : numMinusOneDetailsList) {
+                            String devName = numMinusOneDetails.getDevName();
+                            if (StringUtils.isNotBlank(devName)) {
+                                deviceNameList.add(devName);
+                            }
+                        }
+                        if (ObjectUtils.isNotEmpty(deviceNameList)) {
+                           notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在 N-1 风险";
+                       }
+                    }
+                }
+                if (StringUtils.isBlank(notice)) {
+                    notice = "当前没有 N-1 风险";
+                }
+                returnVo.setResults(notice);
+                noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);

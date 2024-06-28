@@ -198,6 +198,11 @@ public class ResponseMessage {
         LINE_LOAD_RATE("zbfzlv"),
 
         /**
+         * N-1 明细
+         */
+        NUM_MINUS_ONE("n-1mx"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

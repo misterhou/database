@@ -285,6 +285,76 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/num/numMinusOneDetails")
+    public String numMinusOneDetails(String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"childrenItem\": [\n" +
+                "                    {\n" +
+                "                        \"number\": 1,\n" +
+                "                        \"devName\": \"2#主变-中\",\n" +
+                "                        \"stName\": \"白洋淀站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 2,\n" +
+                "                        \"devName\": \"2#主变-高\",\n" +
+                "                        \"stName\": \"白洋淀站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 3,\n" +
+                "                        \"devName\": \"1#主变-中\",\n" +
+                "                        \"stName\": \"容城站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 4,\n" +
+                "                        \"devName\": \"1#主变-高\",\n" +
+                "                        \"stName\": \"容城站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 5,\n" +
+                "                        \"devName\": \"2#主变-中\",\n" +
+                "                        \"stName\": \"容城站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 6,\n" +
+                "                        \"devName\": \"2#主变-高\",\n" +
+                "                        \"stName\": \"容城站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 7,\n" +
+                "                        \"devName\": \"三台站/110kV.#2主变-高\",\n" +
+                "                        \"stName\": \"三台站\"\n" +
+                "                    },\n" +
+                "                    {\n" +
+                "                        \"number\": 8,\n" +
+                "                        \"devName\": \"三台站/10kV.#2主变-低\",\n" +
+                "                        \"stName\": \"三台站\"\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"childrenItem\": [\n" +
+                "                    {\n" +
+                "                        \"number\": 9,\n" +
+                "                        \"devName\": \"新安站/110kV.#1主变-高\",\n" +
+                "                        \"stName\": \"新安站\"\n" +
+                "                    }\n" +
+                "                ]\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"1\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

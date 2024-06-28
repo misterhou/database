@@ -3,8 +3,10 @@ package com.example.database.fanyumeta.client;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
+import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
+import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
@@ -123,7 +125,7 @@ public class TellHowClient {
         params.put("actionType", actionType);
         String url = this.tellHowProperties.getServiceAddr() + "/data/totalLoadCurve";
         JSONObject res = sendMessage(url, params);
-        TellHowCurveVO tellHowCurveVO = this.parserData(res);
+        TellHowCurveVO tellHowCurveVO = this.parserLoadCurveData(res);
         return tellHowCurveVO;
     }
 
@@ -142,7 +144,7 @@ public class TellHowClient {
         params.put("area", area.value);
         String url = this.tellHowProperties.getServiceAddr() + "/data/zoneLoadCurve";
         JSONObject res = sendMessage(url, params);
-        TellHowCurveVO tellHowCurveVO = this.parserData(res);
+        TellHowCurveVO tellHowCurveVO = this.parserLoadCurveData(res);
         return tellHowCurveVO;
     }
 
@@ -162,6 +164,11 @@ public class TellHowClient {
         return tellHowTransLoadRateVO;
     }
 
+    /**
+     * 获取线路负载率
+     *
+     * @return 线路负载率
+     */
     public TellHowLineLoadRateVO lineLoadRate() {
         TellHowLineLoadRateVO tellHowLineLoadRateVO = null;
         String url = this.tellHowProperties.getServiceAddr() + "/data/lineLoadRate";
@@ -173,6 +180,29 @@ public class TellHowClient {
         return tellHowLineLoadRateVO;
     }
 
+    /**
+     * 获取 N-1 详情
+     *
+     * @return N-1 详情
+     */
+    public TellHowNumMinusOneDetailsVO numMinusOneDetails() {
+        TellHowNumMinusOneDetailsVO tellHowNumMinusOneDetailsVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/num/numMinusOneDetails";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowNumMinusOneDetailsVO = this.parserNumMinusOneDetailsData(res);
+        return tellHowNumMinusOneDetailsVO;
+    }
+
+    /**
+     * 发送请求
+     *
+     * @param url 请求地址
+     * @param params 请求参数
+     * @return 响应结果
+     */
     private JSONObject sendMessage(String url, Map<String, String> params) {
         JSONObject data = null;
         try {
@@ -190,7 +220,13 @@ public class TellHowClient {
         return data;
     }
 
-    private TellHowCurveVO parserData(JSONObject data) {
+    /**
+     * 解析负荷曲线曲线数据
+     *
+     * @param data 泰豪接口返回数据
+     * @return 负荷曲线曲线数据
+     */
+    private TellHowCurveVO parserLoadCurveData(JSONObject data) {
         TellHowCurveVO tellHowCurveVO = null;
         if (null != data) {
             JSONObject resData = data.getJSONObject("resData");
@@ -284,6 +320,48 @@ public class TellHowClient {
             }
         }
         return tellHowLineLoadRateVO;
+    }
+
+    /**
+     * 解析 N-1 详情
+     *
+     * @param res 泰豪接口返回数据
+     * @return N-1 详情
+     */
+    private TellHowNumMinusOneDetailsVO parserNumMinusOneDetailsData(JSONObject res) {
+        TellHowNumMinusOneDetailsVO tellHowNumMinusOneDetailsVO = null;
+        if (null != res) {
+            tellHowNumMinusOneDetailsVO = new TellHowNumMinusOneDetailsVO();
+            JSONArray resData = res.getJSONArray("resData");
+            if (null != resData) {
+                List<NumMinusOneDetails> numMinusOneDetailsList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject numMinusOneDetailsItem = resData.getJSONObject(i);
+                    if (null != numMinusOneDetailsItem) {
+                        JSONArray childrenItem = numMinusOneDetailsItem.getJSONArray("childrenItem");
+                        if (null != childrenItem) {
+                            for (int j = 0; j < childrenItem.size(); j++) {
+                                JSONObject childrenItemItem = childrenItem.getJSONObject(j);
+                                if (null != childrenItemItem) {
+                                    NumMinusOneDetails numMinusOneDetails = new NumMinusOneDetails();
+                                    numMinusOneDetails.setNumber(childrenItemItem.getString("number"));
+                                    numMinusOneDetails.setDevName(childrenItemItem.getString("devName"));
+                                    numMinusOneDetails.setStName(childrenItemItem.getString("stName"));
+                                    numMinusOneDetailsList.add(numMinusOneDetails);
+                                }
+                            }
+                        }
+                    }
+                }
+                tellHowNumMinusOneDetailsVO.setNumMinusOneDetailsList(numMinusOneDetailsList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (null != actionData) {
+                String poseId = actionData.getString("poseId");
+                tellHowNumMinusOneDetailsVO.setPoseId(poseId);
+            }
+        }
+        return tellHowNumMinusOneDetailsVO;
     }
 
     /**
