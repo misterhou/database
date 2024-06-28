@@ -208,6 +208,11 @@ public class ResponseMessage {
         IMPORTANT_USER("zyyhtj"),
 
         /**
+         * 当前电网故障
+         */
+        CURRENT_GRID_FAILURE("dqdwgzsj"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

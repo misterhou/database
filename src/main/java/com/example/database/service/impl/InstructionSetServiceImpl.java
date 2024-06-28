@@ -13,8 +13,10 @@ import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
+import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
+import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
@@ -273,7 +275,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
                 returnVo.setResults(notice);
                 noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
-            } else if (serialNum == 310) {
+            } else if (serialNum == 310) {  // 重要用户统计
                 String result = null;
                 TellHowImportantUserVO tellHowImportantUserVO = this.tellHowClient.importantUser();
                 if (null != tellHowImportantUserVO) {
@@ -285,6 +287,30 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
                 returnVo.setResults(result);
                 noticeTellHowAction(ResponseMessage.TellHowMenu.IMPORTANT_USER);
+            } else if (serialNum == 311) {  // 当前电网故障事件
+                String result = null;
+                TellHowCurrentGridFailureVO tellHowCurrentGridFailureVO = this.tellHowClient.currentGridFailure();
+                if (null != tellHowCurrentGridFailureVO) {
+                    List<CurrentGridFailure> currentGridFailureList = tellHowCurrentGridFailureVO
+                            .getCurrentGridFailureList();
+                    if (ObjectUtils.isNotEmpty(currentGridFailureList)) {
+                        List<String> faultDescribeList = new ArrayList<>();
+                        for (CurrentGridFailure currentGridFailure : currentGridFailureList) {
+                            String faultDescribe = currentGridFailure.getFaultDescribe();
+                            if (StringUtils.isNotBlank(faultDescribe)) {
+                               faultDescribeList.add(faultDescribe);
+                            }
+                        }
+                        if (ObjectUtils.isNotEmpty(faultDescribeList)) {
+                            result = "当前" + StringUtils.join(faultDescribeList, ",");
+                        }
+                    }
+                }
+                if (StringUtils.isBlank(result)) {
+                    result = "当前没有电网故障事件";
+                }
+                returnVo.setResults(result);
+                noticeTellHowAction(ResponseMessage.TellHowMenu.CURRENT_GRID_FAILURE);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);

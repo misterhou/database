@@ -2,8 +2,10 @@ package com.example.database.fanyumeta.client;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
+import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
@@ -215,6 +217,22 @@ public class TellHowClient {
     }
 
     /**
+     * 获取当前电网故障
+     *
+     * @return 当前电网故障
+     */
+    public TellHowCurrentGridFailureVO currentGridFailure() {
+        TellHowCurrentGridFailureVO tellHowCurrentGridFailureVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/currentGridFailure";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowCurrentGridFailureVO = this.parserCurrentGridFailureData(res);
+        return tellHowCurrentGridFailureVO;
+    }
+
+    /**
      * 发送请求
      *
      * @param url 请求地址
@@ -406,6 +424,40 @@ public class TellHowClient {
             }
         }
         return tellHowImportantUserVO;
+    }
+
+    /**
+     * 解析当前电网故障
+     *
+     * @param res 泰豪接口返回数据
+     * @return 当前电网故障
+     */
+    private TellHowCurrentGridFailureVO parserCurrentGridFailureData(JSONObject res) {
+        TellHowCurrentGridFailureVO tellHowCurrentGridFailureVO = null;
+        if (res != null) {
+            tellHowCurrentGridFailureVO = new TellHowCurrentGridFailureVO();
+            JSONArray resData = res.getJSONArray("resData");
+            if (resData != null) {
+                List<CurrentGridFailure> currentGridFailureList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject jsonObject = resData.getJSONObject(i);
+                    if (jsonObject != null) {
+                        CurrentGridFailure currentGridFailure = new CurrentGridFailure();
+                        currentGridFailure.setStatus(jsonObject.getString("status"));
+                        currentGridFailure.setFaultStartTime(jsonObject.getString("faultStartTime"));
+                        currentGridFailure.setFaultDescribe(jsonObject.getString("faultDescribe"));
+                        currentGridFailure.setFaultType(jsonObject.getString("faultType"));
+                        currentGridFailureList.add(currentGridFailure);
+                    }
+                }
+                tellHowCurrentGridFailureVO.setCurrentGridFailureList(currentGridFailureList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (actionData != null) {
+                tellHowCurrentGridFailureVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowCurrentGridFailureVO;
     }
 
     /**

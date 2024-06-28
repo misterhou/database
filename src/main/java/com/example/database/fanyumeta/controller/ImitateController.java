@@ -401,6 +401,53 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/currentGridFailure")
+    public String currentGridFailure(String year, String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "\t\t\t{\n" +
+                "\t\t\t\t\"faultStartTime\": \"2022-05-28 11:20\",\n" +
+                "\t\t\t\t\"status\": \"故障确认\",\n" +
+                "\t\t\t\t\"faultType\": \"无\",\n" +
+                "\t\t\t\t\"faultDescribe\": \"5004开关 河北电网 500kV慈云 开关故障\"\n" +
+                "\t\t\t},\n" +
+                "\t\t\t{\n" +
+                "\t\t\t\t\"faultStartTime\": \"2021-12-14 11:12\",\n" +
+                "\t\t\t\t\"status\": \"故障确认\",\n" +
+                "\t\t\t\t\"faultType\": \"三相跳闸\",\n" +
+                "\t\t\t\t\"faultDescribe\": \"#1母线 雄州站 河北保定电网 220kV 母线跳闸\"\n" +
+                "\t\t\t},\n" +
+                "\t\t\t{\n" +
+                "\t\t\t\t\"faultStartTime\": \"2021-12-13 11:27\",\n" +
+                "\t\t\t\t\"status\": \"故障确认\",\n" +
+                "\t\t\t\t\"faultType\": \"负荷跳闸\",\n" +
+                "\t\t\t\t\"faultDescribe\": \"广王I线 线路跳闸\"\n" +
+                "\t\t\t},\n" +
+                "\t\t\t{\n" +
+                "\t\t\t\t\"faultStartTime\": \"2021-12-11 09:18\",\n" +
+                "\t\t\t\t\"status\": \"故障分析\",\n" +
+                "\t\t\t\t\"faultType\": \"短路跳闸\",\n" +
+                "\t\t\t\t\"faultDescribe\": \"广王I线 线路跳闸\"\n" +
+                "\t\t\t},\n" +
+                "\t\t\t{\n" +
+                "\t\t\t\t\"faultStartTime\": \"2021-12-11 09:18\",\n" +
+                "\t\t\t\t\"status\": \"故障发布\",\n" +
+                "\t\t\t\t\"faultType\": \"短路跳闸\",\n" +
+                "\t\t\t\t\"faultDescribe\": \"广王I线 线路跳闸\"\n" +
+                "\t\t\t}\n" +
+                "\t\t],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);
