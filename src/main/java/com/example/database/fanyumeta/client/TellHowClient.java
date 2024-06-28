@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
@@ -197,6 +198,23 @@ public class TellHowClient {
     }
 
     /**
+     * 获取重要用户
+     *
+     * @return 重要用户
+     */
+    public TellHowImportantUserVO importantUser() {
+        TellHowImportantUserVO tellHowImportantUserVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/importantUser";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        params.put("year", String.valueOf(LocalDate.now().getYear()));
+        JSONObject res = sendMessage(url, params);
+        tellHowImportantUserVO = this.parserImportantUserData(res);
+        return tellHowImportantUserVO;
+    }
+
+    /**
      * 发送请求
      *
      * @param url 请求地址
@@ -362,6 +380,32 @@ public class TellHowClient {
             }
         }
         return tellHowNumMinusOneDetailsVO;
+    }
+
+    /**
+     * 解析重要用户数据
+     *
+     * @param res 泰豪接口返回数据
+     * @return 泰豪重要客户信息
+     */
+    private TellHowImportantUserVO parserImportantUserData(JSONObject res) {
+        TellHowImportantUserVO tellHowImportantUserVO = null;
+        if (res != null) {
+            JSONObject resData = res.getJSONObject("resData");
+            if (resData != null) {
+                tellHowImportantUserVO = new TellHowImportantUserVO();
+                String total = resData.getString("total");
+                tellHowImportantUserVO.setTotal(total);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (actionData != null) {
+                String poseId = actionData.getString("poseId");
+                if (StringUtils.hasText(poseId)) {
+                    tellHowImportantUserVO.setPoseId(poseId);
+                }
+            }
+        }
+        return tellHowImportantUserVO;
     }
 
     /**

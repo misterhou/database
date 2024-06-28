@@ -203,6 +203,11 @@ public class ResponseMessage {
         NUM_MINUS_ONE("n-1mx"),
 
         /**
+         * 重要用户
+         */
+        IMPORTANT_USER("zyyhtj"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

@@ -16,6 +16,7 @@ import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
@@ -263,14 +264,27 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                         if (ObjectUtils.isNotEmpty(deviceNameList)) {
                            notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在 N-1 风险";
-                       }
+                        }
                     }
+                    returnVo.setPoseId(tellHowNumMinusOneDetailsVO.getPoseId());
                 }
                 if (StringUtils.isBlank(notice)) {
                     notice = "当前没有 N-1 风险";
                 }
                 returnVo.setResults(notice);
                 noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
+            } else if (serialNum == 310) {
+                String result = null;
+                TellHowImportantUserVO tellHowImportantUserVO = this.tellHowClient.importantUser();
+                if (null != tellHowImportantUserVO) {
+                    String total = tellHowImportantUserVO.getTotal();
+                    if (StringUtils.isNotBlank(total)) {
+                        result = "重要用户总数是" + total;
+                    }
+                    returnVo.setPoseId(tellHowImportantUserVO.getPoseId());
+                }
+                returnVo.setResults(result);
+                noticeTellHowAction(ResponseMessage.TellHowMenu.IMPORTANT_USER);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);

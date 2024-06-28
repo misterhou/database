@@ -355,6 +355,52 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/importantUser")
+    public String numMinusOneDetails2(String year, String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": {\n" +
+                "            \"total\": 10,\n" +
+                "            \"xData\": [\n" +
+                "                \"2024-01\",\n" +
+                "                \"2024-02\",\n" +
+                "                \"2024-03\",\n" +
+                "                \"2024-04\",\n" +
+                "                \"2024-05\",\n" +
+                "                \"2024-06\",\n" +
+                "                \"2024-07\",\n" +
+                "                \"2024-08\",\n" +
+                "                \"2024-09\",\n" +
+                "                \"2024-10\",\n" +
+                "                \"2024-11\",\n" +
+                "                \"2024-12\"\n" +
+                "            ],\n" +
+                "            \"yData\": [\n" +
+                "                2,\n" +
+                "                1,\n" +
+                "                3,\n" +
+                "                1,\n" +
+                "                3,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null\n" +
+                "            ]\n" +
+                "        },\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"1\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);
