@@ -233,6 +233,58 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/lineLoadRate")
+    public String lineLoadRate(String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"number\": 1,\n" +
+                "                \"id\": null,\n" +
+                "                \"devName\": \"平仇线端点\",\n" +
+                "                \"maxRate\": null,\n" +
+                "                \"realtimeRate\": 72\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 2,\n" +
+                "                \"id\": null,\n" +
+                "                \"devName\": \"平仇线端点\",\n" +
+                "                \"maxRate\": null,\n" +
+                "                \"realtimeRate\": 71\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 3,\n" +
+                "                \"id\": null,\n" +
+                "                \"devName\": \"河北.剧村站/10kV.剧村A1-I线线端\",\n" +
+                "                \"maxRate\": 24.41,\n" +
+                "                \"realtimeRate\": 70\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 4,\n" +
+                "                \"id\": null,\n" +
+                "                \"devName\": \"瀛武Ⅱ线端点\",\n" +
+                "                \"maxRate\": null,\n" +
+                "                \"realtimeRate\": 68\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 5,\n" +
+                "                \"id\": null,\n" +
+                "                \"devName\": \"河北.剧村站/10kV.剧剧Ⅰ线线端\",\n" +
+                "                \"maxRate\": 5.46,\n" +
+                "                \"realtimeRate\": 67\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

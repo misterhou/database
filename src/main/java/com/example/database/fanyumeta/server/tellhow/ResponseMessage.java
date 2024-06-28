@@ -193,6 +193,11 @@ public class ResponseMessage {
         TRANS_LOAD_RATE("zbfzlb"),
 
         /**
+         * 线路负载率
+         */
+        LINE_LOAD_RATE("zbfzlv"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

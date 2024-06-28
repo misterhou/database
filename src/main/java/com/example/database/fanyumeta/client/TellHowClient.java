@@ -2,7 +2,9 @@ package com.example.database.fanyumeta.client;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
@@ -160,6 +162,17 @@ public class TellHowClient {
         return tellHowTransLoadRateVO;
     }
 
+    public TellHowLineLoadRateVO lineLoadRate() {
+        TellHowLineLoadRateVO tellHowLineLoadRateVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/lineLoadRate";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowLineLoadRateVO = this.parserLineLoadRateData(res);
+        return tellHowLineLoadRateVO;
+    }
+
     private JSONObject sendMessage(String url, Map<String, String> params) {
         JSONObject data = null;
         try {
@@ -237,6 +250,40 @@ public class TellHowClient {
             }
         }
         return tellHowTransLoadRateVO;
+    }
+
+    /**
+     * 解析线路负载率
+     *
+     * @param res 泰豪接口返回数据
+     * @return 线路负载率
+     */
+    private TellHowLineLoadRateVO parserLineLoadRateData(JSONObject res) {
+        TellHowLineLoadRateVO tellHowLineLoadRateVO = null;
+        if (null != res) {
+            tellHowLineLoadRateVO = new TellHowLineLoadRateVO();
+            JSONArray resData = res.getJSONArray("resData");
+            if (null != resData) {
+                List<LineLoadRate> lineLoadRateList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject lineLoadRateItem = resData.getJSONObject(i);
+                    if (null != lineLoadRateItem) {
+                        LineLoadRate lineLoadRate = new LineLoadRate();
+                        lineLoadRate.setLineName(lineLoadRateItem.getString("devName"));
+                        lineLoadRate.setMaxRate(lineLoadRateItem.getString("maxRate"));
+                        lineLoadRate.setRealtimeRate(lineLoadRateItem.getString("realtimeRate"));;
+                        lineLoadRateList.add(lineLoadRate);
+                    }
+                }
+                tellHowLineLoadRateVO.setLineLoadRateList(lineLoadRateList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (null != actionData) {
+                String poseId = actionData.getString("poseId");
+                tellHowLineLoadRateVO.setPoseId(poseId);
+            }
+        }
+        return tellHowLineLoadRateVO;
     }
 
     /**

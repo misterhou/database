@@ -13,7 +13,9 @@ import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
+import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
@@ -66,6 +68,11 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
     private RiskAnalysisService riskAnalysisService;
     @Autowired
     private TransformerService transformerService;
+
+    /**
+     * 相似度阈值
+     */
+    private static final double SIMILARITY_THRESHOLD = 0.8;
 
     /**
      * 中控系统客户端
@@ -188,10 +195,13 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                             if (StringUtils.isNotBlank(fullName)) {
                                 double similarity = SimilarityUtil.getSimilarity(fullName, text);
                                 log.info("【相似度】【{}】与【{}】的为：{}", fullName, text, similarity);
-                                if (similarity > 0.8) {
+                                if (similarity > SIMILARITY_THRESHOLD) {
                                     StringBuilder rate = new StringBuilder();
-                                    rate.append(transLoadRate.getRealtimeRate())
-                                            .append(", 最大负载率是").append(transLoadRate.getMaxRate());
+                                    String maxRate = transLoadRate.getMaxRate();
+                                    rate.append(transLoadRate.getRealtimeRate());
+                                    if (StringUtils.isNotBlank(maxRate)) {
+                                        rate.append(", 最大负载率是").append(maxRate);
+                                    }
                                     String result = message.replaceAll("多少", rate.toString());
                                     returnVo.setResults(result);
                                     String poseId = tellHowTransLoadRateVO.getPoseId();
@@ -199,6 +209,37 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                         returnVo.setPoseId(poseId);
                                     }
                                     noticeTellHowAction(ResponseMessage.TellHowMenu.TRANS_LOAD_RATE);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else if (serialNum == 308) {
+                String text = message.replaceAll("(负载率|是多少)", "");
+                TellHowLineLoadRateVO tellHowLineLoadRateVO = this.tellHowClient.lineLoadRate();
+                if (null != tellHowLineLoadRateVO) {
+                    List<LineLoadRate> lineLoadRateList = tellHowLineLoadRateVO.getLineLoadRateList();
+                    if (ObjectUtils.isNotEmpty(lineLoadRateList)) {
+                        for (LineLoadRate lineLoadRate : lineLoadRateList) {
+                            String lineName = lineLoadRate.getLineName();
+                            if (StringUtils.isNotBlank(lineName)) {
+                                double similarity = SimilarityUtil.getSimilarity(lineName, text);
+                                log.info("【相似度】【{}】与【{}】的为：{}", lineName, text, similarity);
+                                if (similarity > SIMILARITY_THRESHOLD) {
+                                    StringBuilder rate = new StringBuilder();
+                                    rate.append(lineLoadRate.getRealtimeRate());
+                                    String lineMaxRate = lineLoadRate.getMaxRate();
+                                    if (StringUtils.isNotBlank(lineMaxRate)) {
+                                        rate.append(", 最大负载率是").append(lineMaxRate);
+                                    }
+                                    String result = message.replaceAll("多少", rate.toString());
+                                    returnVo.setResults(result);
+                                    String poseId = tellHowLineLoadRateVO.getPoseId();
+                                    if (StringUtils.isNotBlank(poseId)) {
+                                        returnVo.setPoseId(poseId);
+                                    }
+                                    noticeTellHowAction(ResponseMessage.TellHowMenu.LINE_LOAD_RATE);
                                     break;
                                 }
                             }
