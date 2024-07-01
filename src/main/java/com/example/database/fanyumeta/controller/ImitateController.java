@@ -481,6 +481,33 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/overhaulWorkList")
+    public String overhaulWorkList(@RequestParam("dateTime") String dateTime,
+            @RequestParam("actionType") String actionType, @RequestParam("status") String status) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": {\n" +
+                "            \"executingList\": [\n" +
+                "                {\n" +
+                "                    \"startTime\": \"2024-04-20 08:00\",\n" +
+                "                    \"endTime\": \"2024-04-20 20:00\",\n" +
+                "                    \"status\": \"执行中\",\n" +
+                "                    \"powercutType\": \"紧急停电\",\n" +
+                "                    \"workContent\": \"工作要求：测试缺陷提票0418-0\"\n" +
+                "                }\n" +
+                "            ]\n" +
+                "        },\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

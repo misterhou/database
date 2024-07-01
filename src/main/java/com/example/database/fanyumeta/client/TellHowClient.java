@@ -5,12 +5,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
+import com.example.database.fanyumeta.client.vo.OverhaulWorkList;
 import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
+import com.example.database.fanyumeta.client.vo.TellHowOverhaulWorkListVO;
 import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -251,6 +254,28 @@ public class TellHowClient {
         JSONObject res = sendMessage(url, params);
         tellHowPowerSupplyInfoVO = this.parserPowerSupplyInfoData(res);
         return tellHowPowerSupplyInfoVO;
+    }
+
+    /**
+     * 获取检修工作列表
+     *
+     * @param date 日期
+     * @param status 检修状态
+     * @return 检修工作列表
+     */
+    public TellHowOverhaulWorkListVO overhaulWorkList(LocalDate date, OverhaulWorkListStatus status) {
+        TellHowOverhaulWorkListVO tellHowOverhaulWorkListVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/overhaulWorkList";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        if (null != date) {
+            params.put("dateTime", date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " 00:00:00");
+        }
+        params.put("status", status.getValue());
+        JSONObject res = sendMessage(url, params);
+        tellHowOverhaulWorkListVO = this.parserOverhaulWorkListData(res);
+        return tellHowOverhaulWorkListVO;
     }
 
     /**
@@ -520,6 +545,54 @@ public class TellHowClient {
     }
 
     /**
+     * 解析检修工作列表
+     *
+     * @param res 泰豪接口返回数据
+     * @return 检修工作列表
+     */
+    private TellHowOverhaulWorkListVO parserOverhaulWorkListData(JSONObject res) {
+        TellHowOverhaulWorkListVO tellHowOverhaulWorkListVO = null;
+        if (res != null) {
+            JSONObject resData = res.getJSONObject("resData");
+            if (resData != null) {
+                tellHowOverhaulWorkListVO = new TellHowOverhaulWorkListVO();
+                List<OverhaulWorkList> overhaulWorkListList = new ArrayList<>();
+                JSONArray executingList = resData.getJSONArray("executingList");
+                this.parserOverhaulWorkList(overhaulWorkListList, executingList);
+                JSONArray toBeExecuteList = resData.getJSONArray("toBeExecuteList");
+                this.parserOverhaulWorkList(overhaulWorkListList, toBeExecuteList);
+                tellHowOverhaulWorkListVO.setOverhaulWorkListList(overhaulWorkListList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (actionData != null) {
+                tellHowOverhaulWorkListVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowOverhaulWorkListVO;
+    }
+
+    /**
+     * 解析检修工作列表
+     *
+     * @param overhaulWorkListList 解析后检修工作列表
+     * @param items 待解析的检修工作列表
+     */
+    private void parserOverhaulWorkList(List<OverhaulWorkList> overhaulWorkListList, JSONArray items) {
+        if (items != null && items.size() > 0) {
+            for (int i = 0; i < items.size(); i++) {
+                JSONObject jsonObject = items.getJSONObject(i);
+                OverhaulWorkList overhaulWorkList = new OverhaulWorkList();
+                overhaulWorkList.setWorkContent(jsonObject.getString("workContent"));
+                overhaulWorkList.setPowercutType(jsonObject.getString("powercutType"));
+                overhaulWorkList.setStatus(jsonObject.getString("status"));
+                overhaulWorkList.setStartTime(jsonObject.getString("startTime"));
+                overhaulWorkList.setEndTime(jsonObject.getString("endTime"));
+                overhaulWorkListList.add(overhaulWorkList);
+            }
+        }
+    }
+
+    /**
      * 动作类型
      */
     private enum ActionType {
@@ -596,6 +669,32 @@ public class TellHowClient {
 
         Area(Integer value) {
             this.value = value == null ? "" : value.toString();
+        }
+
+        private String value;
+
+        public String getValue() {
+            return this.value;
+        }
+    }
+
+    /**
+     * 检修工单状态
+     */
+    public enum OverhaulWorkListStatus {
+
+        /**
+         * 待开工
+         */
+        WAIT_FOR_START("1"),
+
+        /**
+         * 执行中
+         */
+        EXECUTING("2");
+
+        OverhaulWorkListStatus(String value) {
+            this.value = value;
         }
 
         private String value;

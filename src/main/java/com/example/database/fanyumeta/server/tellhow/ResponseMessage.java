@@ -218,9 +218,19 @@ public class ResponseMessage {
         POWER_SUPPLY_INFO("bdxxzs"),
 
         /**
+         * 检修作业列表(执行中)
+         */
+        OVERHAUL_WORK_LIST_EXECUTING("jxgzzxz"),
+
+        /**
+         * 检修作业列表(待执行)
+         */
+        OVERHAUL_WORK_LIST_WAIT_FOR_START("jxgzdzx"),
+
+        /**
          * 负荷走势预测
          */
-        FORECAST_LOAD_TREND("fhzsyc_zw");
+        FORECAST_LOAD_TREND("fhzsyc_zw"), ;
 
         private String code;
 

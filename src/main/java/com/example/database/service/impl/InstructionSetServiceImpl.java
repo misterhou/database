@@ -16,12 +16,14 @@ import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
+import com.example.database.fanyumeta.client.vo.OverhaulWorkList;
 import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
+import com.example.database.fanyumeta.client.vo.TellHowOverhaulWorkListVO;
 import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
@@ -339,6 +341,36 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
                 returnVo.setResults(result);
                 noticeTellHowAction(ResponseMessage.TellHowMenu.POWER_SUPPLY_INFO);
+            } else if (serialNum == 313) {  // 展示检修工作清单
+                String result = null;
+                List<OverhaulWorkList> overhaulWorkLists = new ArrayList<>();
+                TellHowOverhaulWorkListVO tellHowOverhaulWorkListVO = this.tellHowClient.overhaulWorkList(
+                        LocalDate.now(),
+                        TellHowClient.OverhaulWorkListStatus.WAIT_FOR_START);
+                if (null != tellHowOverhaulWorkListVO) {
+                    List<OverhaulWorkList> workLists = tellHowOverhaulWorkListVO.getOverhaulWorkListList();
+                    if (ObjectUtils.isNotEmpty(workLists)) {
+                        overhaulWorkLists.addAll(workLists);
+                        noticeTellHowAction(ResponseMessage.TellHowMenu.OVERHAUL_WORK_LIST_WAIT_FOR_START);
+                    }
+                }
+                TellHowOverhaulWorkListVO tellHowOverhaulWorkListVOEXECUTION = this.tellHowClient.overhaulWorkList(
+                        LocalDate.now(),
+                        TellHowClient.OverhaulWorkListStatus.EXECUTING);
+                if (null != tellHowOverhaulWorkListVOEXECUTION) {
+                    List<OverhaulWorkList> workLists = tellHowOverhaulWorkListVOEXECUTION.getOverhaulWorkListList();
+                    if (ObjectUtils.isNotEmpty(workLists)) {
+                        overhaulWorkLists.addAll(workLists);
+                        noticeTellHowAction(ResponseMessage.TellHowMenu.OVERHAUL_WORK_LIST_EXECUTING);
+                    }
+                }
+                if (ObjectUtils.isNotEmpty(overhaulWorkLists)) {
+                    result = "好的，已展示";
+                    System.out.println(overhaulWorkLists);
+                } else {
+                    result = "当前没有检修任务";
+                }
+                returnVo.setResults(result);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);
