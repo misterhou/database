@@ -86,7 +86,7 @@ public class TellHowClient {
         }
         String dutyDateStr = StringUtils.getDateStr(dutyDate) + " 00:00:00";
         noticeDate = StringUtils.getDateChinaStr(dutyDate);
-        String url = this.tellHowProperties.getServiceAddr() + "/admin/data/dutyPersonnelInfo";
+        String url = this.tellHowProperties.getServiceAddr() + "/data/dutyPersonnelInfo";
         Map<String, String> params = new HashMap<>();
         params.put("dateTime", dutyDateStr);
         if (StringUtils.hasText(dutyOrder)) {
@@ -104,7 +104,11 @@ public class TellHowClient {
                     JSONArray dutyPersons = data.getJSONArray("resData");
                     if (dutyPersons != null && dutyPersons.size() > 0) {
                         StringBuilder dutyInfo = new StringBuilder();
-                        dutyInfo.append(noticeDate).append(dutyOrder).append("值班人员为：");
+                        dutyInfo.append(noticeDate);
+                        if (StringUtils.hasText(dutyOrder)) {
+                            dutyInfo.append(dutyOrder);
+                        }
+                        dutyInfo.append("值班人员为：");
                         for (int i = 0; i < dutyPersons.size(); i++) {
                             String personnelName = dutyPersons.getJSONObject(i).getString("personnelName");
                             dutyInfo.append(personnelName).append(",");

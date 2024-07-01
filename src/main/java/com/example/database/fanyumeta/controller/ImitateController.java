@@ -68,9 +68,9 @@ public class ImitateController {
         return "success";
     }
 
-    @GetMapping("/tell-how/admin/data/dutyPersonnelInfo")
+    @GetMapping("/tell-how/data/dutyPersonnelInfo")
     public String dutyPersonnelInfo(@RequestParam("dateTime") String dateTime,
-            @RequestParam("dutyOrderName") String dutyOrderName, @RequestParam("actionType") String actionType) {
+            String dutyOrderName, @RequestParam("actionType") String actionType) {
         String data = "{\n" +
                 "    \"code\": 0,\n" +
                 "    \"bizCode\": null,\n" +

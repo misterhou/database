@@ -430,8 +430,6 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         returnVo.setPoseId(result.getPoseId());
                     }
                     noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
-                } else {
-                    returnVo.setResults("没有查询到值班人员信息");
                 }
             } else {
                 //获取数据库中信息
