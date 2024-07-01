@@ -89,7 +89,9 @@ public class TellHowClient {
         String url = this.tellHowProperties.getServiceAddr() + "/admin/data/dutyPersonnelInfo";
         Map<String, String> params = new HashMap<>();
         params.put("dateTime", dutyDateStr);
-        params.put("dutyOrderName", dutyOrder);
+        if (StringUtils.hasText(dutyOrder)) {
+            params.put("dutyOrderName", dutyOrder);
+        }
         params.put("actionType", "3");
         log.info("调用泰豪接口：{}，请求参数：{}", url, params);
         try {

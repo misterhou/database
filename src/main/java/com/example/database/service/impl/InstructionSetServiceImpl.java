@@ -133,17 +133,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
         //数据库指令
         if (MyContants.SJK_ZL.equals(directiveType)) {
             if (serialNum == 35 || serialNum == 103) {  // 雄安总负荷/分片区负荷
-                if (regexIsFind("值班", message)) {
-                    TellHowVO result = this.tellHowClient.dutyPersonnelInfo(null, "夜班");
-                    if (null != result) {
-                        String voiceContent = result.getVoiceContent();
-                        if (StringUtils.isNotBlank(voiceContent)) {
-                            returnVo.setResults(voiceContent);
-                            returnVo.setPoseId(result.getPoseId());
-                        }
-                        noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
-                    }
-                } else if (regexIsFind("负荷", message)) {
+                if (regexIsFind("负荷", message)) {
                     if (regexIsFind("今日|今天", message)) {
                         TellHowClient.Area area = null;
                         ResponseMessage.TellHowMenu menu = null;
@@ -201,6 +191,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             } else if (serialNum == 307) {  // 主变负载率
                 String text = message.replaceAll("(负载率|是多少)", "");
                 TellHowTransLoadRateVO tellHowTransLoadRateVO = this.tellHowClient.transLoadRate();
+                String result = null;
                 if (null != tellHowTransLoadRateVO) {
                     List<TransLoadRate> transLoadRateList = tellHowTransLoadRateVO.getTransLoadRateList();
                     if (ObjectUtils.isNotEmpty(transLoadRateList)) {
@@ -216,8 +207,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                     if (StringUtils.isNotBlank(maxRate)) {
                                         rate.append(", 最大负载率是").append(maxRate);
                                     }
-                                    String result = message.replaceAll("多少", rate.toString());
-                                    returnVo.setResults(result);
+                                    result = message.replaceAll("多少", rate.toString());
                                     String poseId = tellHowTransLoadRateVO.getPoseId();
                                     if (StringUtils.isNotBlank(poseId)) {
                                         returnVo.setPoseId(poseId);
@@ -229,6 +219,10 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                     }
                 }
+//                if (StringUtils.isNotBlank(result)) {
+//                    result = "未查询到相关信息";
+//                }
+                returnVo.setResults(result);
             } else if (serialNum == 308) {  // 线路负载率
                 String text = message.replaceAll("(负载率|是多少)", "");
                 TellHowLineLoadRateVO tellHowLineLoadRateVO = this.tellHowClient.lineLoadRate();
@@ -260,7 +254,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                     }
                 }
-            } else if (serialNum == 309) {  // N-1 风险
+            } else if (serialNum == 309) {  // n-1明细
                 String notice = null;
                 TellHowNumMinusOneDetailsVO tellHowNumMinusOneDetailsVO = this.tellHowClient.numMinusOneDetails();
                 if (null != tellHowNumMinusOneDetailsVO) {
@@ -275,15 +269,15 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                         if (ObjectUtils.isNotEmpty(deviceNameList)) {
                            notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在 N-1 风险";
+                           returnVo.setPoseId(tellHowNumMinusOneDetailsVO.getPoseId());
+                           noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
                         }
                     }
-                    returnVo.setPoseId(tellHowNumMinusOneDetailsVO.getPoseId());
                 }
                 if (StringUtils.isBlank(notice)) {
                     notice = "当前没有 N-1 风险";
                 }
                 returnVo.setResults(notice);
-                noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
             } else if (serialNum == 310) {  // 重要用户统计
                 String result = null;
                 TellHowImportantUserVO tellHowImportantUserVO = this.tellHowClient.importantUser();
@@ -291,11 +285,11 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     String total = tellHowImportantUserVO.getTotal();
                     if (StringUtils.isNotBlank(total)) {
                         result = "重要用户总数是" + total;
+                        returnVo.setPoseId(tellHowImportantUserVO.getPoseId());
+                        noticeTellHowAction(ResponseMessage.TellHowMenu.IMPORTANT_USER);
                     }
-                    returnVo.setPoseId(tellHowImportantUserVO.getPoseId());
                 }
                 returnVo.setResults(result);
-                noticeTellHowAction(ResponseMessage.TellHowMenu.IMPORTANT_USER);
             } else if (serialNum == 311) {  // 当前电网故障事件
                 String result = null;
                 TellHowCurrentGridFailureVO tellHowCurrentGridFailureVO = this.tellHowClient.currentGridFailure();
@@ -312,6 +306,8 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                         if (ObjectUtils.isNotEmpty(faultDescribeList)) {
                             result = "当前" + StringUtils.join(faultDescribeList, ",");
+                            returnVo.setPoseId(tellHowCurrentGridFailureVO.getPoseId());
+                            noticeTellHowAction(ResponseMessage.TellHowMenu.CURRENT_GRID_FAILURE);
                         }
                     }
                 }
@@ -319,7 +315,6 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     result = "当前没有电网故障事件";
                 }
                 returnVo.setResults(result);
-                noticeTellHowAction(ResponseMessage.TellHowMenu.CURRENT_GRID_FAILURE);
             } else if (serialNum == 312) {  // 保电信息查询
                 String result = null;
                 TellHowPowerSupplyInfoVO tellHowPowerSupplyInfoVO = this.tellHowClient.powerSupplyInfo(
@@ -336,16 +331,16 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                         if (ObjectUtils.isNotEmpty(taskNameList)) {
                             result = "当前保电任务有：" + StringUtils.join(taskNameList, ",");
+                            returnVo.setPoseId(tellHowPowerSupplyInfoVO.getPoseId());
+                            noticeTellHowAction(ResponseMessage.TellHowMenu.POWER_SUPPLY_INFO);
                         }
                     }
-                    returnVo.setPoseId(tellHowPowerSupplyInfoVO.getPoseId());
                 }
                 if (StringUtils.isBlank(result)) {
                     result = "当前没有保电任务";
                 }
                 returnVo.setResults(result);
-                noticeTellHowAction(ResponseMessage.TellHowMenu.POWER_SUPPLY_INFO);
-            } else if (serialNum == 313) {  // 展示检修工作清单
+            } else if (serialNum == 313) {  // 检修工作清单
                 String result = null;
                 List<OverhaulWorkList> overhaulWorkLists = new ArrayList<>();
                 TellHowOverhaulWorkListVO tellHowOverhaulWorkListVO = this.tellHowClient.overhaulWorkList(
@@ -370,12 +365,13 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
                 if (ObjectUtils.isNotEmpty(overhaulWorkLists)) {
                     result = "好的，已展示";
+                    returnVo.setPoseId(tellHowOverhaulWorkListVO.getPoseId());
                     System.out.println(overhaulWorkLists);
                 } else {
                     result = "当前没有检修任务";
                 }
                 returnVo.setResults(result);
-            } else if (serialNum == 314) {
+            } else if (serialNum == 314) {  // 电网风险查询
                 String result = null;
                 TellHowGridRiskVO tellHowGridRiskVO = this.tellHowClient.gridRisk();
                 if (null != tellHowGridRiskVO) {
@@ -388,6 +384,8 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                         if (ObjectUtils.isNotEmpty(gridRiskListStr)) {
                             result = StringUtils.join(gridRiskListStr, ",");
+                            returnVo.setPoseId(tellHowGridRiskVO.getPoseId());
+                            noticeTellHowAction(ResponseMessage.TellHowMenu.GRID_RISK);
                         }
                     }
                 }
@@ -395,8 +393,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     result = "当前没有电网风险";
                 }
                 returnVo.setResults(result);
-                noticeTellHowAction(ResponseMessage.TellHowMenu.GRID_RISK);
-            } else if (serialNum == 315) {
+            } else if (serialNum == 315) {  // 获取地线
                 String result = null;
                 TellHowGroundWireVO tellHowGroundWireVO = this.tellHowClient.groundWire();
                 if (null != tellHowGroundWireVO) {
@@ -409,6 +406,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         if (ObjectUtils.isNotEmpty(groundWireListStr)) {
                             result = "存在地线：" + StringUtils.join(groundWireListStr, ",");
                             returnVo.setPoseId(tellHowGroundWireVO.getPoseId());
+                            noticeTellHowAction(ResponseMessage.TellHowMenu.GROUND_WIRE);
                         }
                     }
                 }
@@ -416,7 +414,25 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     result = "当前没有地线";
                 }
                 returnVo.setResults(result);
-                noticeTellHowAction(ResponseMessage.TellHowMenu.GROUND_WIRE);
+            } else if (serialNum == 316) {  // 值班人员信息
+                TellHowVO result = null;
+                if (regexIsFind("今天|今日", message)) {
+                    result = this.tellHowClient.dutyPersonnelInfo(null, null);
+                } else if (regexIsFind("昨天|昨日", message)) {
+                    result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().minusDays(1), null);
+                } else if (regexIsFind("明天|明日", message)) {
+                    result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().plusDays(1), null);
+                }
+                if (null != result) {
+                    String voiceContent = result.getVoiceContent();
+                    if (StringUtils.isNotBlank(voiceContent)) {
+                        returnVo.setResults(voiceContent);
+                        returnVo.setPoseId(result.getPoseId());
+                    }
+                    noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
+                } else {
+                    returnVo.setResults("没有查询到值班人员信息");
+                }
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);
