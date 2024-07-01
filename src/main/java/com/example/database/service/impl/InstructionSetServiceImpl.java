@@ -14,12 +14,14 @@ import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
+import com.example.database.fanyumeta.client.vo.GridRisk;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.OverhaulWorkList;
 import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowGridRiskVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
@@ -371,6 +373,27 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     result = "当前没有检修任务";
                 }
                 returnVo.setResults(result);
+            } else if (serialNum == 314) {
+                String result = null;
+                TellHowGridRiskVO tellHowGridRiskVO = this.tellHowClient.gridRisk();
+                if (null != tellHowGridRiskVO) {
+                    List<GridRisk> gridRiskList = tellHowGridRiskVO.getGridRiskList();
+                    if (ObjectUtils.isNotEmpty(gridRiskList)) {
+                        List<String> gridRiskListStr = new ArrayList<>();
+                        for (GridRisk gridRisk : gridRiskList) {
+                            String gridRiskStr = gridRisk.getStationName() + "存在" + gridRisk.getEventLevel() + "电网风险";
+                           gridRiskListStr.add(gridRiskStr);
+                        }
+                        if (ObjectUtils.isNotEmpty(gridRiskListStr)) {
+                            result = StringUtils.join(gridRiskListStr, ",");
+                        }
+                    }
+                }
+                if (StringUtils.isBlank(result)) {
+                    result = "当前没有电网风险";
+                }
+                returnVo.setResults(result);
+                noticeTellHowAction(ResponseMessage.TellHowMenu.GRID_RISK);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);

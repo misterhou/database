@@ -228,9 +228,14 @@ public class ResponseMessage {
         OVERHAUL_WORK_LIST_WAIT_FOR_START("jxgzdzx"),
 
         /**
+         * 电网风险
+         */
+        GRID_RISK("dqdwfx"),
+
+        /**
          * 负荷走势预测
          */
-        FORECAST_LOAD_TREND("fhzsyc_zw"), ;
+        FORECAST_LOAD_TREND("fhzsyc_zw");
 
         private String code;
 

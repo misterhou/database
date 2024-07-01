@@ -3,12 +3,14 @@ package com.example.database.fanyumeta.client;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
+import com.example.database.fanyumeta.client.vo.GridRisk;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.OverhaulWorkList;
 import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
+import com.example.database.fanyumeta.client.vo.TellHowGridRiskVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
@@ -276,6 +278,22 @@ public class TellHowClient {
         JSONObject res = sendMessage(url, params);
         tellHowOverhaulWorkListVO = this.parserOverhaulWorkListData(res);
         return tellHowOverhaulWorkListVO;
+    }
+
+    /**
+     * 获取电网风险
+     *
+     * @return 电网风险
+     */
+    public TellHowGridRiskVO gridRisk() {
+        TellHowGridRiskVO tellHowGridRiskVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/gridRisk";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowGridRiskVO = this.parserGridRiskData(res);
+        return tellHowGridRiskVO;
     }
 
     /**
@@ -590,6 +608,37 @@ public class TellHowClient {
                 overhaulWorkListList.add(overhaulWorkList);
             }
         }
+    }
+
+    /**
+     * 解析电网风险数据
+     *
+     * @param res 泰豪接口返回数据
+     * @return 电网风险数据
+     */
+    private TellHowGridRiskVO parserGridRiskData(JSONObject res) {
+        TellHowGridRiskVO tellHowGridRiskVO = null;
+        if (null != res) {
+            tellHowGridRiskVO = new TellHowGridRiskVO();
+            JSONArray resData = res.getJSONArray("resData");
+            if (null != resData && resData.size() > 0) {
+                List<GridRisk> gridRiskList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject jsonObject = resData.getJSONObject(i);
+                    GridRisk gridRisk = new GridRisk();
+                    gridRisk.setNumber(jsonObject.getString("number"));
+                    gridRisk.setStationName(jsonObject.getString("stationName"));
+                    gridRisk.setEventLevel(jsonObject.getString("eventLevel"));
+                    gridRiskList.add(gridRisk);
+                }
+                tellHowGridRiskVO.setGridRiskList(gridRiskList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (null != actionData) {
+                tellHowGridRiskVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowGridRiskVO;
     }
 
     /**

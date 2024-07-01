@@ -508,6 +508,38 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/gridRisk")
+    public String gridRisk(@RequestParam("actionType") String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"number\": 1,\n" +
+                "                \"eventLevel\": \"八级\",\n" +
+                "                \"stationName\": \"驿马岭风电场\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 2,\n" +
+                "                \"eventLevel\": \"四级\",\n" +
+                "                \"stationName\": \"驿马岭风电场\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 3,\n" +
+                "                \"eventLevel\": \"四级\",\n" +
+                "                \"stationName\": \"剧村站\"\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);
