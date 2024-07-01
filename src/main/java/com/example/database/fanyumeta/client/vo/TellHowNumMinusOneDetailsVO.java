@@ -6,7 +6,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * N-1 明细值对象
+ * 泰豪N-1 明细值对象
  */
 @Data
 @ToString

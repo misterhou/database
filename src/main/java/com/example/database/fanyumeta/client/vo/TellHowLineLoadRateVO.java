@@ -6,7 +6,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * 线路负载率
+ * 泰豪线路负载率值对象
  */
 @Data
 @ToString
