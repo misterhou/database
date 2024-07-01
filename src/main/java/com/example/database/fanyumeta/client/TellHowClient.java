@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.GridRisk;
+import com.example.database.fanyumeta.client.vo.GroundWire;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.OverhaulWorkList;
@@ -11,6 +12,7 @@ import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowGridRiskVO;
+import com.example.database.fanyumeta.client.vo.TellHowGroundWireVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
@@ -294,6 +296,22 @@ public class TellHowClient {
         JSONObject res = sendMessage(url, params);
         tellHowGridRiskVO = this.parserGridRiskData(res);
         return tellHowGridRiskVO;
+    }
+
+    /**
+     * 获取地线数据
+     *
+     * @return 地线数据
+     */
+    public TellHowGroundWireVO groundWire() {
+        TellHowGroundWireVO tellHowGroundWireVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/groundWire";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowGroundWireVO = this.parserGroundWireData(res);
+        return tellHowGroundWireVO;
     }
 
     /**
@@ -639,6 +657,40 @@ public class TellHowClient {
             }
         }
         return tellHowGridRiskVO;
+    }
+
+    /**
+     * 解析地线数据
+     *
+     * @param res 泰豪接口返回数据
+     * @return 地线数据
+     */
+    private TellHowGroundWireVO parserGroundWireData(JSONObject res) {
+        TellHowGroundWireVO tellHowGroundWireVO = null;
+        if (null != res) {
+            tellHowGroundWireVO = new TellHowGroundWireVO();
+            JSONArray resData = res.getJSONArray("resData");
+            if (null != resData) {
+                List<GroundWire> groundWireList = new ArrayList<>();
+                for (int i = 0; i < resData.size(); i++) {
+                    JSONObject jsonObject = resData.getJSONObject(i);
+                    GroundWire groundWire = new GroundWire();
+                    groundWire.setNumber(jsonObject.getString("number"));
+                    groundWire.setGroundWireName(jsonObject.getString("groundWireName"));
+                    groundWire.setGroundWireCreateTime(jsonObject.getString("groundWireCreateTime"));
+                    groundWire.setDevicePosition(jsonObject.getString("devicePosition"));
+                    groundWire.setGroundWireSuspensionCreateUser(jsonObject.getString("groundWireSuspensionCreateUser"));
+                    groundWire.setGroundWireSuspensionCreateTime(jsonObject.getString("groundWireSuspensionCreateTime"));
+                    groundWireList.add(groundWire);
+                }
+                tellHowGroundWireVO.setGroundWireList(groundWireList);
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (null != actionData) {
+                tellHowGroundWireVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowGroundWireVO;
     }
 
     /**

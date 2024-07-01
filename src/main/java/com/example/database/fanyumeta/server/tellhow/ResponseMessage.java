@@ -233,6 +233,11 @@ public class ResponseMessage {
         GRID_RISK("dqdwfx"),
 
         /**
+         * 地线
+         */
+        GROUND_WIRE("dqdx"),
+
+        /**
          * 负荷走势预测
          */
         FORECAST_LOAD_TREND("fhzsyc_zw");

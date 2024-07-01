@@ -540,6 +540,47 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/groundWire")
+    public String groundWire(@RequestParam("actionType") String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": [\n" +
+                "            {\n" +
+                "                \"number\": 1,\n" +
+                "                \"groundWireName\": \"aaaaa\",\n" +
+                "                \"groundWireCreateTime\": \"2023-10-18 15:40\",\n" +
+                "                \"devicePosition\": \"111111\",\n" +
+                "                \"groundWireSuspensionCreateUser\": \"韩松原\",\n" +
+                "                \"groundWireSuspensionCreateTime\": \"2023-10-18 15:41\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 2,\n" +
+                "                \"groundWireName\": \"aaaaa\",\n" +
+                "                \"groundWireCreateTime\": \"2023-10-18 15:40\",\n" +
+                "                \"devicePosition\": \"22222\",\n" +
+                "                \"groundWireSuspensionCreateUser\": \"邱林涛\",\n" +
+                "                \"groundWireSuspensionCreateTime\": \"2023-11-15 15:19\"\n" +
+                "            },\n" +
+                "            {\n" +
+                "                \"number\": 3,\n" +
+                "                \"groundWireName\": \"地线1698135392994\",\n" +
+                "                \"groundWireCreateTime\": \"2023-10-24 16:16\",\n" +
+                "                \"devicePosition\": \"sadfds\",\n" +
+                "                \"groundWireSuspensionCreateUser\": \"康奇豹\",\n" +
+                "                \"groundWireSuspensionCreateTime\": \"2023-10-24 16:18\"\n" +
+                "            }\n" +
+                "        ],\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"3\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

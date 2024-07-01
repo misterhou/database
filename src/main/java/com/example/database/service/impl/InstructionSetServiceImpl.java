@@ -15,6 +15,7 @@ import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.GridRisk;
+import com.example.database.fanyumeta.client.vo.GroundWire;
 import com.example.database.fanyumeta.client.vo.LineLoadRate;
 import com.example.database.fanyumeta.client.vo.NumMinusOneDetails;
 import com.example.database.fanyumeta.client.vo.OverhaulWorkList;
@@ -22,6 +23,7 @@ import com.example.database.fanyumeta.client.vo.PowerSupplyInfo;
 import com.example.database.fanyumeta.client.vo.TellHowCurrentGridFailureVO;
 import com.example.database.fanyumeta.client.vo.TellHowCurveVO;
 import com.example.database.fanyumeta.client.vo.TellHowGridRiskVO;
+import com.example.database.fanyumeta.client.vo.TellHowGroundWireVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
@@ -394,6 +396,27 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
                 returnVo.setResults(result);
                 noticeTellHowAction(ResponseMessage.TellHowMenu.GRID_RISK);
+            } else if (serialNum == 315) {
+                String result = null;
+                TellHowGroundWireVO tellHowGroundWireVO = this.tellHowClient.groundWire();
+                if (null != tellHowGroundWireVO) {
+                    List<GroundWire> groundWireList = tellHowGroundWireVO.getGroundWireList();
+                    if (ObjectUtils.isNotEmpty(groundWireList)) {
+                        List<String> groundWireListStr = new ArrayList<>();
+                        for (GroundWire groundWire : groundWireList) {
+                            groundWireListStr.add(groundWire.getGroundWireName());
+                        }
+                        if (ObjectUtils.isNotEmpty(groundWireListStr)) {
+                            result = "存在地线：" + StringUtils.join(groundWireListStr, ",");
+                            returnVo.setPoseId(tellHowGroundWireVO.getPoseId());
+                        }
+                    }
+                }
+                if (StringUtils.isBlank(result)) {
+                    result = "当前没有地线";
+                }
+                returnVo.setResults(result);
+                noticeTellHowAction(ResponseMessage.TellHowMenu.GROUND_WIRE);
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);
