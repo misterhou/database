@@ -12,6 +12,7 @@ import com.example.database.entity.Generatrix3;
 import com.example.database.entity.InterlocutionResult;
 import com.example.database.entity.ReturnVo;
 import com.example.database.fanyumeta.client.HardwareControlClient;
+import com.example.database.fanyumeta.client.NanRuiClient;
 import com.example.database.fanyumeta.client.TellHowClient;
 import com.example.database.fanyumeta.client.vo.CurrentGridFailure;
 import com.example.database.fanyumeta.client.vo.GridRisk;
@@ -99,6 +100,12 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
      */
     @Resource
     private TellHowClient tellHowClient;
+
+    /**
+     * 南瑞客户端
+     */
+    @Resource
+    private NanRuiClient nanRuiClient;
 
     @Value("${fan-yu.error-message}")
     private String errorMessage;
@@ -430,6 +437,11 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         returnVo.setPoseId(result.getPoseId());
                     }
                     noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
+                }
+            } else if (serialNum == 317) {
+                String deviceInfo = this.nanRuiClient.getHeavyDevice();
+                if (StringUtils.isNotBlank(deviceInfo)) {
+                    returnVo.setResults(deviceInfo);
                 }
             } else {
                 //获取数据库中信息
