@@ -207,7 +207,9 @@ public class WebSocketServer {
         if (weatherPattern.matcher(message).find()) {
             String cityName = message.substring(0, message.indexOf("天气")).substring(message.indexOf("今") + 1);
             String weatherInfo = WebSocketServer.nanRuiClient.getWeather(cityName);
-            returnVo.setResults(weatherInfo);
+            if (StringUtils.isNotBlank(weatherInfo)) {
+                returnVo.setResults(weatherInfo);
+            }
         } else if (closePicPattern.matcher(message).find()) {
             returnVo.setResults(MyContants.YX_ZL_ANS);
             ResponseMessage responseMessage = new ResponseMessage(null,
