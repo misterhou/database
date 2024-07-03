@@ -33,6 +33,11 @@ public class NanRuiClient {
     private static final String HEAVY_DEVICE_URL = "/heavy-device";
 
     /**
+     * N -1 过载设备请求地址
+     */
+    private static final String OVER_DEVICE_URL = "/heavy-device-n1";
+
+    /**
      * 获取天气信息
      * @param cityName 城市名称
      * @return 天气信息
@@ -50,6 +55,11 @@ public class NanRuiClient {
     }
 
 
+    /**
+     * 获取重过载设备信息
+     *
+     * @return 重过载设备信息
+     */
     public String getHeavyDevice() {
         String url = this.serviceAddr + HEAVY_DEVICE_URL;
         JSONObject heavyDeviceResData = getDataNr(url);
@@ -94,6 +104,44 @@ public class NanRuiClient {
         return result;
     }
 
+    /**
+     * 获取N-1过载设备信息
+     *
+     * @return N-1过载设备信息
+     */
+    public String getN1OverDevice() {
+        String url = this.serviceAddr + OVER_DEVICE_URL;
+        JSONObject overDeviceResData = getDataNr(url);
+        String result = null;
+        if (null != overDeviceResData) {
+            JSONArray data = overDeviceResData.getJSONArray("data");
+            if (null != data && data.size() > 0) {
+                List<String> overDeviceList = new ArrayList<>();
+                for (int i = 0; i < data.size(); i++) {
+                    JSONObject overDevice = data.getJSONObject(i);
+                    if (null != overDevice) {
+                        String name = overDevice.getString("name");
+                        if (StringUtils.hasText(name)) {
+                            overDeviceList.add(name);
+                        }
+                    }
+                }
+                result = "电网N-1过载的设备共有" + overDeviceList.size() + "项，分别是" +
+                        String.join("，", overDeviceList);
+            }
+        }
+        if(!StringUtils.hasText(result)) {
+            result = "当前电网没有N-1过载设备,电网运行良好";
+        }
+        return result;
+    }
+
+    /**
+     * 调用南瑞接口
+     *
+     * @param url 请求地址
+     * @return 响应数据
+     */
     @Nullable
     private static JSONObject getDataNr(String url) {
         JSONObject resData = null;

@@ -438,8 +438,13 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     }
                     noticeTellHowAction(ResponseMessage.TellHowMenu.DUTY_PERSONNEL_INFO);
                 }
-            } else if (serialNum == 317) {
+            } else if (serialNum == 317) {  // 当前的重过载设备情况
                 String deviceInfo = this.nanRuiClient.getHeavyDevice();
+                if (StringUtils.isNotBlank(deviceInfo)) {
+                    returnVo.setResults(deviceInfo);
+                }
+            } else if (serialNum == 318) {  // 当前方式下是否有N-1过载设备
+                String deviceInfo = this.nanRuiClient.getN1OverDevice();
                 if (StringUtils.isNotBlank(deviceInfo)) {
                     returnVo.setResults(deviceInfo);
                 }
