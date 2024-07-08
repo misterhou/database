@@ -5,8 +5,12 @@ import com.example.database.fanyumeta.mapper.ZoneLoadMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * @deprecated 该功能由 {@link com.example.database.fanyumeta.component.AppInit } AppInit 完成
+ */
 @Slf4j
 @Component
+@Deprecated
 public class DBCheck {
 
     private TotalLoadMapper totalLoadMapper;

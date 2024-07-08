@@ -1,8 +1,6 @@
 package com.example.database;
 
 import com.alibaba.fastjson.JSONObject;
-import com.example.database.fanyumeta.component.DBCheck;
-import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import com.example.database.fanyumeta.utils.PicDataUtil;
 import com.example.database.fanyumeta.utils.StringUtils;
 import org.apache.ibatis.ognl.Ognl;
@@ -10,8 +8,6 @@ import org.apache.ibatis.ognl.OgnlException;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.env.Environment;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -24,16 +20,7 @@ import java.util.regex.Pattern;
 public class DatabaseApplication {
 
     public static void main(String[] args) {
-        ApplicationContext ctx = SpringApplication.run(DatabaseApplication.class, args);
-        Environment environment = ctx.getEnvironment();
-        HardwareControlCommandUtil.initCache(
-                environment.getProperty("fan-yu.hardware-control.request-command-config-file"),
-                environment.getProperty("fan-yu.hardware-control.receive-command-config-file"));
-        PicDataUtil.initPicData(environment.getProperty("fan-yu.tell-how.pic-config-file"));
-        PicDataUtil.initSubstationData(environment.getProperty("fan-yu.tell-how.substation-config-file"));
-        PicDataUtil.initSourcePicData(environment.getProperty("fan-yu.tell-how.source-config-file"));
-        DBCheck dbCheck = ctx.getBean(DBCheck.class);
-        dbCheck.checkTableExist();
+        SpringApplication.run(DatabaseApplication.class, args);
 //        testOgnl();
 //        generateCacheFile();
 //        testPattern();
