@@ -29,4 +29,14 @@ public class TellHowCurveVO {
      * 数智人挥手动作
      */
     private String poseId;
+
+    /**
+     * 与昨天比较
+     */
+    private String compareYesterday;
+
+    /**
+     * 与去年比较
+     */
+    private String compareLastYear;
 }

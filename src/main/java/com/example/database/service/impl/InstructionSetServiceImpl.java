@@ -33,9 +33,11 @@ import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
+import com.example.database.fanyumeta.entity.MaxLoad;
 import com.example.database.fanyumeta.server.ServiceType;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.server.tellhow.ResponseMessage;
+import com.example.database.fanyumeta.service.LoadService;
 import com.example.database.fanyumeta.utils.SimilarityUtil;
 import com.example.database.mapper.InstructionSetMapper;
 import com.example.database.service.AnnualElectricityConsumptionService;
@@ -55,10 +57,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -106,6 +109,10 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
      */
     @Resource
     private NanRuiClient nanRuiClient;
+
+
+    @Resource
+    private LoadService loadService;
 
     @Value("${fan-yu.error-message}")
     private String errorMessage;
@@ -178,14 +185,25 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         TellHowCurveVO tellHowCurveVO = null;
                         if (null != area) {
                             tellHowCurveVO = this.tellHowClient.zoneLoadCurve(LocalDate.now(), area);
+                            this.setCompareValue(tellHowCurveVO, area);
                         } else {
                             tellHowCurveVO = this.tellHowClient.totalLoadCurve(LocalDate.now());
+                            this.setCompareValue(tellHowCurveVO, null);
                             menu = ResponseMessage.TellHowMenu.TOTAL_LOAD_CURVE;
                         }
                         if (null != tellHowCurveVO) {
                             String maxValue = tellHowCurveVO.getDateMaxValue();
                             if (StringUtils.isNotBlank(maxValue)) {
-                                returnVo.setResults(message.replace("多少", maxValue + "MW"));
+                                String resultContent = message.replace("多少", maxValue + "MW");
+                                String compareYesterday = tellHowCurveVO.getCompareYesterday();
+                                if (StringUtils.isNotBlank(compareYesterday)) {
+                                    resultContent += "，较昨日增长" + compareYesterday + "%";
+                                }
+                                String compareLastYear = tellHowCurveVO.getCompareLastYear();
+                                if (StringUtils.isNotBlank(compareLastYear)) {
+                                    resultContent += "，较去年增长" + compareLastYear + "%";
+                                }
+                                returnVo.setResults(resultContent);
                                 String poseId = tellHowCurveVO.getPoseId();
                                 if (StringUtils.isNotBlank(poseId)) {
                                     returnVo.setPoseId(poseId);
@@ -684,6 +702,58 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
      */
     private Boolean regexIsFind(String regex, String text) {
         return com.example.database.fanyumeta.utils.StringUtils.regexIsFind(regex, text);
+    }
+
+    /**
+     * 设置比较值
+     *
+     * @param tellHowCurveVO 泰豪负荷曲线值对象
+     * @param area 区域
+     */
+    private void setCompareValue(TellHowCurveVO tellHowCurveVO, TellHowClient.Area area) {
+        LocalDate yesterdayDate = LocalDate.now().minusDays(1);
+        LocalDate lastYearDate = LocalDate.now().minusYears(1);
+        List<MaxLoad> maxLoadList = null;
+        if (area == null) {
+            maxLoadList = this.loadService.getTotalLoadByRecordDate(yesterdayDate, lastYearDate);
+        } else {
+            maxLoadList = this.loadService.getZoneLoadByRecordDate(area.getValue(), yesterdayDate, lastYearDate);
+        }
+        if (ObjectUtils.isNotEmpty(maxLoadList)) {
+            String currentMaxValue = tellHowCurveVO.getDateMaxValue();
+            for (MaxLoad totalLoad : maxLoadList) {
+                String historyMaxValue = totalLoad.getDateMaxValue();
+                String compareValue = this.calcCompare(currentMaxValue, historyMaxValue);
+                if (StringUtils.isNotBlank(compareValue)) {
+                    if (totalLoad.getRecordDate().equals(yesterdayDate)) {
+                        tellHowCurveVO.setCompareYesterday(compareValue);
+                    } else if (totalLoad.getRecordDate().equals(lastYearDate)) {
+                        tellHowCurveVO.setCompareLastYear(compareValue);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 计算比较值
+     *
+     * @param currentMaxValue 当前最大值
+     * @param historyMaxValue 历史最大值
+     * @return 比较结果（%）
+     */
+    private String calcCompare(String currentMaxValue, String historyMaxValue) {
+        String result = null;
+        try {
+            BigDecimal currentValue = new BigDecimal(currentMaxValue);
+            BigDecimal historyValue = new BigDecimal(historyMaxValue);
+            BigDecimal compareValue = currentValue.subtract(historyValue).divide(historyValue, 4, RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP);
+            result = compareValue.toString();
+        } catch (Exception e) {
+            log.error("currentMaxValue：{}，historyMaxValue：{}，计算比较值异常", currentMaxValue, historyMaxValue, e);
+        }
+        return result;
     }
 }
 
