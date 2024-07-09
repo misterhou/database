@@ -1,5 +1,6 @@
 package com.example.database.fanyumeta.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.database.fanyumeta.entity.MaxLoad;
 import com.example.database.fanyumeta.entity.TotalLoad;
@@ -63,6 +64,52 @@ public class LoadServiceImpl implements LoadService {
         }
 
         return maxLoadList;
+    }
+
+    @Override
+    public String getYearMaxValue(String area) {
+        String maxValue = null;
+        LocalDate last = LocalDate.of(LocalDate.now().getYear() - 1, 12, 31);
+        if (null == area) {
+            QueryWrapper<TotalLoad> totalLoadQueryWrapper = new QueryWrapper<>();
+            totalLoadQueryWrapper.select("max(date_max_value) as dateMaxValue").ge("record_date", last);
+            TotalLoad totalLoad = this.totalLoadMapper.selectOne(totalLoadQueryWrapper);
+            if (null != totalLoad) {
+                maxValue = totalLoad.getDateMaxValue();
+            }
+        } else {
+            QueryWrapper<ZoneLoad> zoneLoadQueryWrapper = new QueryWrapper<>();
+            zoneLoadQueryWrapper.select("max(date_max_value) as dateMaxValue")
+                    .eq("area_id", area)
+                    .ge("record_date", last);
+            ZoneLoad zoneLoad = this.zoneLoadMapper.selectOne(zoneLoadQueryWrapper);
+            if (null != zoneLoad) {
+                maxValue = zoneLoad.getDateMaxValue();
+            }
+        }
+        return maxValue;
+    }
+
+    @Override
+    public String getHistoryMaxValue(String area) {
+        String maxValue = null;
+        if (null == area) {
+            QueryWrapper<TotalLoad> totalLoadQueryWrapper = new QueryWrapper<>();
+            totalLoadQueryWrapper.select("max(date_max_value) as dateMaxValue");
+            TotalLoad totalLoad = this.totalLoadMapper.selectOne(totalLoadQueryWrapper);
+            if (null != totalLoad) {
+                maxValue = totalLoad.getDateMaxValue();
+            }
+        } else {
+            QueryWrapper<ZoneLoad> zoneLoadQueryWrapper = new QueryWrapper<>();
+            zoneLoadQueryWrapper.select("max(date_max_value) as dateMaxValue")
+                    .eq("area_id", area);
+            ZoneLoad zoneLoad = this.zoneLoadMapper.selectOne(zoneLoadQueryWrapper);
+            if (null != zoneLoad) {
+                maxValue = zoneLoad.getDateMaxValue();
+            }
+        }
+        return maxValue;
     }
 
 

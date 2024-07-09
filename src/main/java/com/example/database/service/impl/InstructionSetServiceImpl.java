@@ -149,37 +149,27 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             if (serialNum == 35 || serialNum == 103) {  // 雄安总负荷/分片区负荷
                 if (regexIsFind("负荷", message)) {
                     if (regexIsFind("今日|今天", message)) {
-                        TellHowClient.Area area = null;
+                        TellHowClient.Area area = this.getArea(message);
                         ResponseMessage.TellHowMenu menu = null;
-                        if (regexIsFind("安新", message)) {
-                            area = TellHowClient.Area.AN_XIN;
+                        if (TellHowClient.Area.AN_XIN == area) {
                             menu = ResponseMessage.TellHowMenu.AN_XIN_LOAD_CURVE;
-                        } else if (regexIsFind("容城", message)) {
-                            area = TellHowClient.Area.RONG_CHENG;
+                        } else if (TellHowClient.Area.RONG_CHENG == area) {
                             menu = ResponseMessage.TellHowMenu.RONG_CHENG_LOAD_CURVE;
-                        } else if (regexIsFind("雄县县城", message)) {
-                            area = TellHowClient.Area.XIONG_XIAN;
+                        } else if (TellHowClient.Area.XIONG_XIAN == area) {
                             menu = ResponseMessage.TellHowMenu.XIONG_XIAN_LOAD_CURVE;
-                        } else if (regexIsFind("沧州片区", message)) {
-                            area = TellHowClient.Area.CANG_ZHOU;
+                        } else if (TellHowClient.Area.CANG_ZHOU == area) {
                             menu = ResponseMessage.TellHowMenu.CANG_ZHOU_LOAD_CURVE;
-                        } else if (regexIsFind("容东", message)) {
-                            area = TellHowClient.Area.RONG_DONG;
+                        } else if (TellHowClient.Area.RONG_DONG == area) {
                             menu = ResponseMessage.TellHowMenu.RONG_DONG_LOAD_CURVE;
-                        } else if (regexIsFind("容西", message)) {
-                            area = TellHowClient.Area.RONG_XI;
+                        } else if (TellHowClient.Area.RONG_XI == area) {
                             menu = ResponseMessage.TellHowMenu.RONG_XI_LOAD_CURVE;
-                        } else if (regexIsFind("雄东", message)) {
-                            area = TellHowClient.Area.XIONG_DONG;
+                        } else if (TellHowClient.Area.XIONG_DONG == area) {
                             menu = ResponseMessage.TellHowMenu.XIONG_DONG_LOAD_CURVE;
-                        } else if (regexIsFind("启动", message)) {
-                            area = TellHowClient.Area.QI_DONG;
+                        } else if (TellHowClient.Area.QI_DONG == area) {
                             menu = ResponseMessage.TellHowMenu.QI_DONG_LOAD_CURVE;
-                        } else if (regexIsFind("目标电网", message)) {
-                            area = TellHowClient.Area.MU_BIAO;
+                        } else if (TellHowClient.Area.MU_BIAO == area) {
                             menu = ResponseMessage.TellHowMenu.MU_BIAO_LOAD_CURVE;
-                        } else if (regexIsFind("雄县.*沧州.*", message)) {
-                            area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
+                        } else if (TellHowClient.Area.XIONG_XIAN_CANG_ZHOU == area) {
                             menu = ResponseMessage.TellHowMenu.XIONG_XIAN_CANG_ZHOU_LOAD_CURVE;
                         }
                         TellHowCurveVO tellHowCurveVO = null;
@@ -211,6 +201,16 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                 noticeTellHowAction(menu);
                             }
                         }
+                    } else if (regexIsFind("历史", message)) {
+                        TellHowClient.Area area = this.getArea(message);
+                        String maxValue = this.loadService.getHistoryMaxValue(null == area ? null : area.getValue());
+                        String resultContent = message.replace("多少", maxValue + "MW");
+                        returnVo.setResults(resultContent);
+                    } else if (regexIsFind("今年", message)) {
+                        TellHowClient.Area area = this.getArea(message);
+                        String maxValue = this.loadService.getYearMaxValue(null == area ? null : area.getValue());
+                        String resultContent = message.replace("多少", maxValue + "MW");
+                        returnVo.setResults(resultContent);
                     }
                 }
             } else if (serialNum == 307) {  // 主变负载率
@@ -754,6 +754,38 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             log.error("currentMaxValue：{}，historyMaxValue：{}，计算比较值异常", currentMaxValue, historyMaxValue, e);
         }
         return result;
+    }
+
+    /**
+     * 获取区域
+     *
+     * @param question 问题文本
+     * @return 区域
+     */
+    private TellHowClient.Area getArea(String question) {
+        TellHowClient.Area area = null;
+        if (regexIsFind("安新", question)) {
+            area = TellHowClient.Area.AN_XIN;
+        } else if (regexIsFind("容城", question)) {
+            area = TellHowClient.Area.RONG_CHENG;
+        } else if (regexIsFind("雄县县城", question)) {
+            area = TellHowClient.Area.XIONG_XIAN;
+        } else if (regexIsFind("沧州片区", question)) {
+            area = TellHowClient.Area.CANG_ZHOU;
+        } else if (regexIsFind("容东", question)) {
+            area = TellHowClient.Area.RONG_DONG;
+        } else if (regexIsFind("容西", question)) {
+            area = TellHowClient.Area.RONG_XI;
+        } else if (regexIsFind("雄东", question)) {
+            area = TellHowClient.Area.XIONG_DONG;
+        } else if (regexIsFind("启动", question)) {
+            area = TellHowClient.Area.QI_DONG;
+        } else if (regexIsFind("目标电网", question)) {
+            area = TellHowClient.Area.MU_BIAO;
+        } else if (regexIsFind("雄县.*沧州.*", question)) {
+            area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
+        }
+        return area;
     }
 }
 

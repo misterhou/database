@@ -24,4 +24,20 @@ public interface LoadService {
      * @return 区域负荷信息
      */
     List<MaxLoad> getZoneLoadByRecordDate(String area, LocalDate... recordDate);
+
+    /**
+     * 获取年度最大负荷
+     *
+     * @param area 区域
+     * @return 年度最大负荷
+     */
+    String getYearMaxValue(String area);
+
+    /**
+     * 获取历史最大负荷
+     *
+     * @param area 区域
+     * @return 历史最大负荷
+     */
+    String getHistoryMaxValue(String area);
 }
