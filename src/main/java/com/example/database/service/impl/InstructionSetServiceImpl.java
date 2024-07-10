@@ -28,6 +28,7 @@ import com.example.database.fanyumeta.client.vo.TellHowGroundWireVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowLoadMovementMainNetVO;
+import com.example.database.fanyumeta.client.vo.TellHowLoadMovementNewEnergyVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowOverhaulWorkListVO;
 import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
@@ -469,6 +470,12 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 }
             } else if (serialNum == 319) {  // 负荷走势预测
                 if (regexIsFind("新能源", message)) {  // 新能源
+                    TellHowLoadMovementNewEnergyVO tellHowLoadMovementNewEnergyVO = this.tellHowClient.loadMovementNewEnergy();
+                    if (null != tellHowLoadMovementNewEnergyVO) {
+                        returnVo.setResults("好的，已展示");
+                        returnVo.setPoseId(tellHowLoadMovementNewEnergyVO.getPoseId());
+                    }
+                    noticeTellHowAction(ResponseMessage.TellHowMenu.LOAD_MOVEMENT_NEW_ENERGY);
                 } else {    // 主网
                     TellHowLoadMovementMainNetVO tellHowLoadMovementMainNetVO = this.tellHowClient.loadMovementMainNet();
                     if (null != tellHowLoadMovementMainNetVO) {

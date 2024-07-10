@@ -16,6 +16,7 @@ import com.example.database.fanyumeta.client.vo.TellHowGroundWireVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowLoadMovementMainNetVO;
+import com.example.database.fanyumeta.client.vo.TellHowLoadMovementNewEnergyVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowOverhaulWorkListVO;
 import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
@@ -336,6 +337,22 @@ public class TellHowClient {
         JSONObject res = sendMessage(url, params);
         tellHowLoadMovementMainNetVO = this.parserLoadMovementMainNetData(res);
         return tellHowLoadMovementMainNetVO;
+    }
+
+    /**
+     * 获取负荷走势预测-新能源
+     *
+     * @return 负荷走势预测-新能源
+     */
+    public TellHowLoadMovementNewEnergyVO loadMovementNewEnergy() {
+        TellHowLoadMovementNewEnergyVO tellHowLoadMovementNewEnergyVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/loadMovementNewEnergy";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        JSONObject res = sendMessage(url, params);
+        tellHowLoadMovementNewEnergyVO = this.parserLoadMovementNewEnergyData(res);
+        return tellHowLoadMovementNewEnergyVO;
     }
 
     /**
@@ -718,7 +735,7 @@ public class TellHowClient {
     }
 
     /**
-     * 解析负荷走势预测-主网数据
+     * 解析负荷走势预测-主网数据数据
      *
      * @param res 响应结果
      * @return 负荷走势预测-主网数据
@@ -726,9 +743,9 @@ public class TellHowClient {
     private TellHowLoadMovementMainNetVO parserLoadMovementMainNetData(JSONObject res) {
         TellHowLoadMovementMainNetVO tellHowLoadMovementMainNetVO = null;
         if (null != res) {
+            tellHowLoadMovementMainNetVO = new TellHowLoadMovementMainNetVO();
             JSONObject resData = res.getJSONObject("resData");
             if (null != resData) {
-                tellHowLoadMovementMainNetVO = new TellHowLoadMovementMainNetVO();
                 tellHowLoadMovementMainNetVO.setDateTime(resData.getJSONArray("dateTime"));
                 tellHowLoadMovementMainNetVO.setPredictLoad(resData.getJSONArray("predictLoad"));
                 tellHowLoadMovementMainNetVO.setTodayActualLoad(resData.getJSONArray("todayActualLoad"));
@@ -740,6 +757,31 @@ public class TellHowClient {
             }
         }
         return tellHowLoadMovementMainNetVO;
+    }
+
+    /**
+     * 解析负荷走势预测-新能源数据
+     *
+     * @param res 响应结果
+     * @return 负荷走势预测-新能源数据
+     */
+    private TellHowLoadMovementNewEnergyVO parserLoadMovementNewEnergyData(JSONObject res) {
+        TellHowLoadMovementNewEnergyVO tellHowLoadMovementNewEnergyVO = null;
+        if (null != res) {
+            tellHowLoadMovementNewEnergyVO = new TellHowLoadMovementNewEnergyVO();
+            JSONObject resData = res.getJSONObject("resData");
+            if (null != resData) {
+                tellHowLoadMovementNewEnergyVO.setDateTime(resData.getJSONArray("dateTime"));
+                tellHowLoadMovementNewEnergyVO.setTodayActualLoad(resData.getJSONArray("todayActualLoad"));
+                tellHowLoadMovementNewEnergyVO.setYesterdayActualLoad(resData.getJSONArray("yesterdayActualLoad"));
+                tellHowLoadMovementNewEnergyVO.setPredictLoad(resData.getJSONArray("predictLoad"));
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (null != actionData) {
+                tellHowLoadMovementNewEnergyVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowLoadMovementNewEnergyVO;
     }
 
     /**

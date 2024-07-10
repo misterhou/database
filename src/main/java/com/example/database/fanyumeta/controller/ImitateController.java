@@ -622,6 +622,49 @@ public class ImitateController {
                 "    }\n" +
                 "}";
     }
+
+    @GetMapping("/tell-how/data/loadMovementNewEnergy")
+    public String loadMovementNewEnergy(@RequestParam("actionType") String actionType) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": {\n" +
+                "            \"dateTime\": [\n" +
+                "                \"2024-06-18 00:00\",\n" +
+                "                \"2024-06-18 00:15\",\n" +
+                "                \"2024-06-18 23:30\",\n" +
+                "                \"2024-06-18 23:45\"\n" +
+                "            ],\n" +
+                "            \"todayActualLoad\": [\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null\n" +
+                "            ],\n" +
+                "            \"minValue\": null,\n" +
+                "            \"predictLoad\": [\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null\n" +
+                "            ],\n" +
+                "            \"yesterdayActualLoad\": [\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null\n" +
+                "            ]\n" +
+                "        },\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"1\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
+
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

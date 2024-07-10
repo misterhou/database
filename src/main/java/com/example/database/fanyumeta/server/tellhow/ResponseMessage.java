@@ -245,7 +245,12 @@ public class ResponseMessage {
         /**
          * 负荷走势预测-主网
          */
-        LOAD_MOVEMENT_MAIN_NET("fhzsyc_zw");
+        LOAD_MOVEMENT_MAIN_NET("fhzsyc_zw"),
+
+        /**
+         * 负荷走势预测-新能源
+         */
+        LOAD_MOVEMENT_NEW_ENERGY("fhzsyc_xny");
 
         private String code;
 
