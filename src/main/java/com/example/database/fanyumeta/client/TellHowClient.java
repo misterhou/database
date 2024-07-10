@@ -15,6 +15,7 @@ import com.example.database.fanyumeta.client.vo.TellHowGridRiskVO;
 import com.example.database.fanyumeta.client.vo.TellHowGroundWireVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
+import com.example.database.fanyumeta.client.vo.TellHowLoadMovementMainNetVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowOverhaulWorkListVO;
 import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
@@ -318,6 +319,23 @@ public class TellHowClient {
         JSONObject res = sendMessage(url, params);
         tellHowGroundWireVO = this.parserGroundWireData(res);
         return tellHowGroundWireVO;
+    }
+
+    /**
+     * 获取负荷走势预测-主网
+     *
+     * @return 负荷走势预测-主网
+     */
+    public TellHowLoadMovementMainNetVO loadMovementMainNet() {
+        TellHowLoadMovementMainNetVO tellHowLoadMovementMainNetVO = null;
+        String url = this.tellHowProperties.getServiceAddr() + "/data/loadMovementMainNet";
+        String actionType = ActionType.THREE.value;
+        Map<String, String> params = new HashMap<>();
+        params.put("actionType", actionType);
+        params.put("dateTime", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + " 00:00:00");
+        JSONObject res = sendMessage(url, params);
+        tellHowLoadMovementMainNetVO = this.parserLoadMovementMainNetData(res);
+        return tellHowLoadMovementMainNetVO;
     }
 
     /**
@@ -697,6 +715,31 @@ public class TellHowClient {
             }
         }
         return tellHowGroundWireVO;
+    }
+
+    /**
+     * 解析负荷走势预测-主网数据
+     *
+     * @param res 响应结果
+     * @return 负荷走势预测-主网数据
+     */
+    private TellHowLoadMovementMainNetVO parserLoadMovementMainNetData(JSONObject res) {
+        TellHowLoadMovementMainNetVO tellHowLoadMovementMainNetVO = null;
+        if (null != res) {
+            JSONObject resData = res.getJSONObject("resData");
+            if (null != resData) {
+                tellHowLoadMovementMainNetVO = new TellHowLoadMovementMainNetVO();
+                tellHowLoadMovementMainNetVO.setDateTime(resData.getJSONArray("dateTime"));
+                tellHowLoadMovementMainNetVO.setPredictLoad(resData.getJSONArray("predictLoad"));
+                tellHowLoadMovementMainNetVO.setTodayActualLoad(resData.getJSONArray("todayActualLoad"));
+                tellHowLoadMovementMainNetVO.setYesterdayActualLoad(resData.getJSONArray("yesterdayActualLoad"));
+            }
+            JSONObject actionData = res.getJSONObject("actionData");
+            if (null != actionData) {
+                tellHowLoadMovementMainNetVO.setPoseId(actionData.getString("poseId"));
+            }
+        }
+        return tellHowLoadMovementMainNetVO;
     }
 
     /**

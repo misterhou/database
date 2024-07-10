@@ -240,7 +240,12 @@ public class ResponseMessage {
         /**
          * 负荷走势预测
          */
-        FORECAST_LOAD_TREND("fhzsyc_zw");
+        FORECAST_LOAD_TREND("fhzsyc_zw"),
+
+        /**
+         * 负荷走势预测-主网
+         */
+        LOAD_MOVEMENT_MAIN_NET("fhzsyc_zw");
 
         private String code;
 

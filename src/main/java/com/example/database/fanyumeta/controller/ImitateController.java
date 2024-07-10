@@ -581,6 +581,47 @@ public class ImitateController {
                 "}";
     }
 
+    @GetMapping("/tell-how/data/loadMovementMainNet")
+    public String loadMovementMainNet(@RequestParam("actionType") String actionType, @RequestParam("dateTime") String dateTime) {
+        return "{\n" +
+                "    \"code\": 0,\n" +
+                "    \"bizCode\": null,\n" +
+                "    \"msg\": null,\n" +
+                "    \"data\": {\n" +
+                "        \"resData\": {\n" +
+                "            \"dateTime\": [\n" +
+                "                \"2024-06-05 00:00\",\n" +
+                "                \"2024-06-05 00:15\",\n" +
+                "                \"2024-06-05 23:30\",\n" +
+                "                \"2024-06-05 23:45\"\n" +
+                "            ],\n" +
+                "            \"todayActualLoad\": [\n" +
+                "                497.54,\n" +
+                "                486.76,\n" +
+                "                503.47,\n" +
+                "                492.1\n" +
+                "            ],\n" +
+                "            \"minValue\": 404.92,\n" +
+                "            \"predictLoad\": [\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null,\n" +
+                "                null\n" +
+                "            ],\n" +
+                "            \"yesterdayActualLoad\": [\n" +
+                "                488.16,\n" +
+                "                478.81,\n" +
+                "                522.33,\n" +
+                "                511.83\n" +
+                "            ]\n" +
+                "        },\n" +
+                "        \"actionData\": {\n" +
+                "            \"poseId\": \"1\",\n" +
+                "            \"actionType\": \"3\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+    }
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);

@@ -27,6 +27,7 @@ import com.example.database.fanyumeta.client.vo.TellHowGridRiskVO;
 import com.example.database.fanyumeta.client.vo.TellHowGroundWireVO;
 import com.example.database.fanyumeta.client.vo.TellHowImportantUserVO;
 import com.example.database.fanyumeta.client.vo.TellHowLineLoadRateVO;
+import com.example.database.fanyumeta.client.vo.TellHowLoadMovementMainNetVO;
 import com.example.database.fanyumeta.client.vo.TellHowNumMinusOneDetailsVO;
 import com.example.database.fanyumeta.client.vo.TellHowOverhaulWorkListVO;
 import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
@@ -465,6 +466,16 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 String deviceInfo = this.nanRuiClient.getN1OverDevice();
                 if (StringUtils.isNotBlank(deviceInfo)) {
                     returnVo.setResults(deviceInfo);
+                }
+            } else if (serialNum == 319) {  // 负荷走势预测
+                if (regexIsFind("新能源", message)) {  // 新能源
+                } else {    // 主网
+                    TellHowLoadMovementMainNetVO tellHowLoadMovementMainNetVO = this.tellHowClient.loadMovementMainNet();
+                    if (null != tellHowLoadMovementMainNetVO) {
+                        returnVo.setResults("好的，已展示");
+                        returnVo.setPoseId(tellHowLoadMovementMainNetVO.getPoseId());
+                    }
+                    noticeTellHowAction(ResponseMessage.TellHowMenu.LOAD_MOVEMENT_MAIN_NET);
                 }
             } else {
                 //获取数据库中信息
