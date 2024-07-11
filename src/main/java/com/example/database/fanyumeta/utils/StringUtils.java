@@ -134,6 +134,15 @@ public class StringUtils extends org.springframework.util.StringUtils {
         text = text.replaceAll("#3|3#", "3号");
         text = text.replaceAll("#4|4#", "4号");
         text = text.replaceAll("#5|5#", "5号");
+        text = text.replaceAll("Ⅰ", "1");
+        text = text.replaceAll("Ⅱ", "2");
+        text = text.replaceAll("Ⅲ", "3");
+        text = text.replaceAll("Ⅳ", "4");
+        text = text.replaceAll("Ⅴ", "5");
+        text = text.replace("Ⅵ" , "6");
+        text = text.replace("Ⅶ" , "7");
+        text = text.replace("Ⅷ" , "8");
+        text = text.replace("Ⅸ" , "9");
         return text;
     }
 
