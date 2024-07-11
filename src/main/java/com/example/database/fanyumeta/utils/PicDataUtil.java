@@ -243,8 +243,12 @@ public class PicDataUtil {
     public static void generateSourcePicDataCacheFile(List<String> excelFileList, String cacheFile) throws Exception {
         List<Map<String, String>> data = new ArrayList<>(20000);
         for (String excelFile : excelFileList) {
+            List<Integer> keyColumnList = Arrays.asList(3, 2, 1);
+            if (excelFile.contains("rt_dev_dmsbs") || excelFile.contains("rt_dev_dmstr")) {
+                keyColumnList = Arrays.asList(2, 1);
+            }
             List<Map<String, String>> subData = ExcelUtils.getData2(excelFile, 0,
-                    "id", Arrays.asList(3, 2, 1));
+                    "id", keyColumnList);
             data.addAll(subData);
         }
         writeObject2File(data, cacheFile);

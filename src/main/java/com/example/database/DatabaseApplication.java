@@ -40,8 +40,13 @@ public class DatabaseApplication {
 //            PicDataUtil.generateStationPicDataCacheFile("src/main/resources/厂站信息.xlsx",
 //                    "SubstationDataCache");
             PicDataUtil.generateSourcePicDataCacheFile(Arrays.asList(
-                    "src/main/resources/v_rt_dev_transfmwd.xlsx",
-                            "src/main/resources/v_rt_dev_dmsbreaker.xlsx"),
+                    "src/main/resources/v_rt_dev_transfmwd.xlsx",   // 主变
+                            "src/main/resources/v_rt_dev_breaker.xlsx", // 开关
+                            "src/main/resources/v_rt_dev_busbar.xlsx",  // 母线
+                            "src/main/resources/v_rt_dev_dmsbreaker.xlsx",  // 开关站-开关
+                            "src/main/resources/v_rt_dev_dmsbs.xlsx",   // 开关站-母线
+                            "src/main/resources/v_rt_dev_dmstr.xlsx"    // 开关站-变压器
+                    ),
                     "SourceDataCache");
         } catch (Exception e) {
             throw new RuntimeException(e);
