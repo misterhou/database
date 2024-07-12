@@ -100,7 +100,7 @@ public class StringUtils extends org.springframework.util.StringUtils {
         IKSegmenter ik = new IKSegmenter(re,true);
         Lexeme lex;
         while((lex = ik.next())!=null){
-            keyword.add(lex.getLexemeText());
+            keyword.add(getNumberReg(lex.getLexemeText()));
         }
         return keyword;
     }
@@ -144,6 +144,38 @@ public class StringUtils extends org.springframework.util.StringUtils {
         text = text.replace("Ⅷ" , "8");
         text = text.replace("Ⅸ" , "9");
         return text;
+    }
+
+    /**
+     * 获取数字正则表达式
+     *
+     * @param text 待处理文本
+     * @return 正则表达式
+     */
+    public static String getNumberReg(String text) {
+        String reg = text;
+        if (hasText(text)) {
+            if (text.contains("一")) {
+                reg = reg.replaceAll("一", "(1|一)");
+            } else if (text.contains("二")) {
+                reg = reg.replaceAll("二", "(2|二)");
+            } else if (text.contains("三")) {
+                reg = reg.replaceAll("三", "(3|三)");
+            } else if (text.contains("四")) {
+                reg = reg.replaceAll("四", "(4|四)");
+            } else if (text.contains("五")) {
+                reg = reg.replaceAll("五", "(5|五)");
+            } else if (text.contains("六")) {
+                reg = reg.replaceAll("六", "(6|六)");
+            } else if (text.contains("七")) {
+                reg = reg.replaceAll("七", "(7|七)");
+            } else if (text.contains("八")) {
+                reg = reg.replaceAll("八", "(8|八)");
+            } else if (text.contains("九")) {
+                reg = reg.replaceAll("九", "(9|九)");
+            }
+        }
+        return reg;
     }
 
     private static class SpringbootResourceIOAdapter implements IIOAdapter {
