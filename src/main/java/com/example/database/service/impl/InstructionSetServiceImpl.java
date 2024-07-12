@@ -206,12 +206,22 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     } else if (regexIsFind("历史", message)) {
                         TellHowClient.Area area = this.getArea(message);
                         String maxValue = this.loadService.getHistoryMaxValue(null == area ? null : area.getValue());
-                        String resultContent = message.replace("多少", maxValue + "MW");
+                        String resultContent = null;
+                        if (StringUtils.isNotBlank(maxValue)) {
+                            resultContent = message.replace("多少", maxValue + "MW");
+                        } else {
+                            resultContent = MyContants.RESULT_FAIL2;
+                        }
                         returnVo.setResults(resultContent);
                     } else if (regexIsFind("今年", message)) {
                         TellHowClient.Area area = this.getArea(message);
                         String maxValue = this.loadService.getYearMaxValue(null == area ? null : area.getValue());
-                        String resultContent = message.replace("多少", maxValue + "MW");
+                        String resultContent = null;
+                        if (!StringUtils.isBlank(maxValue)) {
+                            resultContent = message.replace("多少", maxValue + "MW");
+                        } else {
+                            resultContent = MyContants.RESULT_FAIL2;
+                        }
                         returnVo.setResults(resultContent);
                     }
                 }
