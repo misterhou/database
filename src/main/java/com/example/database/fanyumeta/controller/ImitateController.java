@@ -600,6 +600,12 @@ public class ImitateController {
             data = stringBuilder.toString();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                inputStreamReader.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return data;
     }
