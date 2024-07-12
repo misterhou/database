@@ -1,2 +1,4 @@
+/opt/phenomhuman/qa_docker/SimCSE/SimCSE-main
+docker restart qa_docker-SimCSE-1
 /opt/phenomhuman/qa_docker/java_backend
 docker restart qa_docker-java-backend-1
