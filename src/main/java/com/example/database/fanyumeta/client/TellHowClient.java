@@ -23,6 +23,7 @@ import com.example.database.fanyumeta.client.vo.TellHowPowerSupplyInfoVO;
 import com.example.database.fanyumeta.client.vo.TellHowTransLoadRateVO;
 import com.example.database.fanyumeta.client.vo.TellHowVO;
 import com.example.database.fanyumeta.client.vo.TransLoadRate;
+import com.example.database.fanyumeta.comparator.NumberDescComparator;
 import com.example.database.fanyumeta.utils.StringUtils;
 import com.example.database.utils.HttpClientUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +31,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -396,6 +397,14 @@ public class TellHowClient {
                     String maxValue = todayCurve.getString("max");
                     if (StringUtils.hasText(maxValue)) {
                         tellHowCurveVO.setDateMaxValue(maxValue);
+                    }
+                    JSONArray yData = todayCurve.getJSONArray("yData");
+                    if (null != yData) {
+                        // 1 分钟一个值
+                        if (yData.size() == 1440) {
+                            tellHowCurveVO.setMorningMaxValue(this.getMorningMaxValue(yData));
+                            tellHowCurveVO.setEveningMaxValue(this.getEveningMaxValue(yData));
+                        }
                     }
                 }
             }
@@ -782,6 +791,46 @@ public class TellHowClient {
             }
         }
         return tellHowLoadMovementNewEnergyVO;
+    }
+
+    /**
+     * 获取早峰最大负荷
+     *
+     * @param data 负荷数据
+     * @return 早峰最大负荷
+     */
+    private String getMorningMaxValue(JSONArray data) {
+        String maxValue = null;
+        // 早峰 8-12
+        int morningStartIndex = 8 * 60;
+        int morningEndIndex = 12 * 60;
+        List<Number> morningList = data.subList(morningStartIndex, morningEndIndex);
+        Collections.sort(morningList, new NumberDescComparator());
+        Number morningMaxValue = morningList.get(0);
+        if (null != morningMaxValue) {
+            maxValue = morningMaxValue.toString();
+        }
+        return maxValue;
+    }
+
+    /**
+     * 获取晚峰最大负荷
+     *
+     * @param data 负荷数据
+     * @return 晚峰最大负荷
+     */
+    private String getEveningMaxValue(JSONArray data) {
+        String maxValue = null;
+        // 晚峰 12-20
+        int eveningStartIndex = 12 * 60;
+        int eveningEndIndex = 20 * 60;
+        List<Number> eveningList = data.subList(eveningStartIndex, eveningEndIndex);
+        Collections.sort(eveningList, new NumberDescComparator());
+        Number eveningMaxValue = eveningList.get(0);
+        if (null != eveningMaxValue) {
+            maxValue = eveningMaxValue.toString();
+        }
+        return maxValue;
     }
 
     /**

@@ -174,17 +174,30 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         } else if (TellHowClient.Area.XIONG_XIAN_CANG_ZHOU == area) {
                             menu = ResponseMessage.TellHowMenu.XIONG_XIAN_CANG_ZHOU_LOAD_CURVE;
                         }
+                        TimeSlot timeSlot = TimeSlot.DAY;
+                        if (regexIsFind("早峰", message)) {
+                            timeSlot = TimeSlot.MORNING;
+                        } else if (regexIsFind("晚峰", message)) {
+                            timeSlot = TimeSlot.EVENING;
+                        }
                         TellHowCurveVO tellHowCurveVO = null;
                         if (null != area) {
                             tellHowCurveVO = this.tellHowClient.zoneLoadCurve(LocalDate.now(), area);
-                            this.setCompareValue(tellHowCurveVO, area);
+                            this.setCompareValue(tellHowCurveVO, area, timeSlot);
                         } else {
                             tellHowCurveVO = this.tellHowClient.totalLoadCurve(LocalDate.now());
-                            this.setCompareValue(tellHowCurveVO, null);
+                            this.setCompareValue(tellHowCurveVO, null, timeSlot);
                             menu = ResponseMessage.TellHowMenu.TOTAL_LOAD_CURVE;
                         }
                         if (null != tellHowCurveVO) {
-                            String maxValue = tellHowCurveVO.getDateMaxValue();
+                            String maxValue = null;
+                            if (TimeSlot.MORNING == timeSlot) {
+                                maxValue = tellHowCurveVO.getMorningMaxValue();
+                            } else if (TimeSlot.EVENING == timeSlot) {
+                                maxValue = tellHowCurveVO.getEveningMaxValue();
+                            } else {
+                                maxValue = tellHowCurveVO.getDateMaxValue();
+                            }
                             if (StringUtils.isNotBlank(maxValue)) {
                                 String resultContent = message.replace("多少", maxValue + "MW");
                                 String compareYesterday = tellHowCurveVO.getCompareYesterday();
@@ -738,7 +751,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
      * @param tellHowCurveVO 泰豪负荷曲线值对象
      * @param area 区域
      */
-    private void setCompareValue(TellHowCurveVO tellHowCurveVO, TellHowClient.Area area) {
+    private void setCompareValue(TellHowCurveVO tellHowCurveVO, TellHowClient.Area area, TimeSlot timeSlot) {
         LocalDate yesterdayDate = LocalDate.now().minusDays(1);
         LocalDate lastYearDate = LocalDate.now().minusYears(1);
         List<MaxLoad> maxLoadList = null;
@@ -748,9 +761,19 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             maxLoadList = this.loadService.getZoneLoadByRecordDate(area.getValue(), yesterdayDate, lastYearDate);
         }
         if (ObjectUtils.isNotEmpty(maxLoadList)) {
-            String currentMaxValue = tellHowCurveVO.getDateMaxValue();
             for (MaxLoad totalLoad : maxLoadList) {
-                String historyMaxValue = totalLoad.getDateMaxValue();
+                String currentMaxValue = null;
+                String historyMaxValue = null;
+                if (TimeSlot.MORNING == timeSlot) {
+                    currentMaxValue = tellHowCurveVO.getMorningMaxValue();
+                    historyMaxValue = totalLoad.getMorningMaxValue();
+                } else if (TimeSlot.EVENING == timeSlot) {
+                    currentMaxValue = tellHowCurveVO.getEveningMaxValue();
+                    historyMaxValue = totalLoad.getEveningMaxValue();
+                } else {
+                    currentMaxValue = tellHowCurveVO.getDateMaxValue();
+                    historyMaxValue = totalLoad.getDateMaxValue();
+                }
                 String compareValue = this.calcCompare(currentMaxValue, historyMaxValue);
                 if (StringUtils.isNotBlank(compareValue)) {
                     if (totalLoad.getRecordDate().equals(yesterdayDate)) {
@@ -814,6 +837,25 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
         }
         return area;
+    }
+
+    /**
+     * 获取时间段
+     */
+    private enum TimeSlot {
+        MORNING("早峰"),
+        EVENING("晚峰"),
+        DAY("日峰");
+
+        private String value;
+
+        TimeSlot(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 }
 

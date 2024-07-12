@@ -30,40 +30,29 @@ public class LoadServiceImpl implements LoadService {
 
     @Override
     public List<MaxLoad> getTotalLoadByRecordDate(LocalDate... recordDate) {
-        List<MaxLoad> maxLoadList = null;
+        List<MaxLoad> maxLoads = null;
         List<TotalLoad> totalLoads = this.totalLoadMapper.selectList(
                 Wrappers.<TotalLoad>lambdaQuery()
                         .in(TotalLoad::getRecordDate, recordDate)
         );
         if (!ObjectUtils.isEmpty(totalLoads)) {
-            maxLoadList = totalLoads.stream().map(totalLoad -> {
-                MaxLoad maxLoad = new MaxLoad();
-                maxLoad.setRecordDate(totalLoad.getRecordDate());
-                maxLoad.setDateMaxValue(totalLoad.getDateMaxValue());
-                return maxLoad;
-            }).collect(Collectors.toList());
+            maxLoads = totalLoads.stream().map(MaxLoad.class::cast).collect(Collectors.toList());
         }
-        return maxLoadList;
+        return maxLoads;
     }
 
     @Override
     public List<MaxLoad> getZoneLoadByRecordDate(String area, LocalDate... recordDate) {
-        List<MaxLoad> maxLoadList = null;
+        List<MaxLoad> maxLoads = null;
         List<ZoneLoad> zoneLoads = this.zoneLoadMapper.selectList(
                 Wrappers.<ZoneLoad>lambdaQuery()
                         .eq(ZoneLoad::getAreaId, area)
                         .in(ZoneLoad::getRecordDate, recordDate)
         );
         if (!ObjectUtils.isEmpty(zoneLoads)) {
-            maxLoadList = zoneLoads.stream().map(zoneLoad -> {
-                MaxLoad maxLoad = new MaxLoad();
-                maxLoad.setRecordDate(zoneLoad.getRecordDate());
-                maxLoad.setDateMaxValue(zoneLoad.getDateMaxValue());
-                return maxLoad;
-            }).collect(Collectors.toList());
+            maxLoads = zoneLoads.stream().map(MaxLoad.class::cast).collect(Collectors.toList());
         }
-
-        return maxLoadList;
+        return maxLoads;
     }
 
     @Override

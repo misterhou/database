@@ -10,20 +10,18 @@ import java.time.LocalDateTime;
 
 @TableName("t_total_load")
 @Data
-public class TotalLoad {
+public class TotalLoad extends MaxLoad {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String morningMaxValue;
-
-    private String eveningMaxValue;
-
-    private String dateMaxValue;
-
-    private LocalDate recordDate;
-
+    /**
+     * 创建日期
+     */
     private LocalDateTime createTime;
 
+    /**
+     * 更新日期
+     */
     private LocalDateTime updateTime;
 }

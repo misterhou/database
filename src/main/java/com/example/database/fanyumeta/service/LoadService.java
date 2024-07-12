@@ -1,7 +1,6 @@
 package com.example.database.fanyumeta.service;
 
 import com.example.database.fanyumeta.entity.MaxLoad;
-import com.example.database.fanyumeta.entity.TotalLoad;
 
 import java.time.LocalDate;
 import java.util.List;
