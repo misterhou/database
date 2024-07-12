@@ -4,7 +4,6 @@ import com.example.database.fanyumeta.client.HardwareControlClient;
 import com.example.database.fanyumeta.server.TellHowServer;
 import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import com.example.database.fanyumeta.utils.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 @RestController
 @RequestMapping("/imitate")
@@ -109,50 +111,7 @@ public class ImitateController {
 
     @GetMapping("/tell-how/data/totalLoadCurve")
     public String totalLoadCurve(@RequestParam("dateTime") String dateTime, @RequestParam("actionType") String actionType) {
-        return "{\n" +
-                "    \"code\": 0,\n" +
-                "    \"bizCode\": null,\n" +
-                "    \"msg\": null,\n" +
-                "    \"data\": {\n" +
-                "        \"resData\": {\n" +
-                "            \"minValue\": 405.06,\n" +
-                "            \"yesterdayCurve\": {\n" +
-                "                \"xData\": [\n" +
-                "                    \"2024-06-04 00:00\",\n" +
-                "                    \"2024-06-04 00:01\",\n" +
-                "                    \"2024-06-04 23:58\",\n" +
-                "                    \"2024-06-04 23:59\"\n" +
-                "                ],\n" +
-                "                \"yData\": [\n" +
-                "                    476.4,\n" +
-                "                    474.12,\n" +
-                "                    488.06,\n" +
-                "                    487.14\n" +
-                "                ]\n" +
-                "            },\n" +
-                "            \"todayCurve\": {\n" +
-                "                \"min\": 405.06,\n" +
-                "                \"max\": 785.02,\n" +
-                "                \"xData\": [\n" +
-                "                    \"2024-06-05 00:00\",\n" +
-                "                    \"2024-06-05 00:01\",\n" +
-                "                    \"2024-06-05 23:58\",\n" +
-                "                    \"2024-06-05 23:59\"\n" +
-                "                ],\n" +
-                "                \"yData\": [\n" +
-                "                    486.71,\n" +
-                "                    484.02,\n" +
-                "                    482.88,\n" +
-                "                    482.87\n" +
-                "                ]\n" +
-                "            }\n" +
-                "        },\n" +
-                "        \"actionData\": {\n" +
-                "            \"poseId\": \"1\",\n" +
-                "            \"actionType\": \"3\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
+        return getResponseData("totalLoadCurve.json");
     }
 
     /**
@@ -164,50 +123,7 @@ public class ImitateController {
      */
     @GetMapping("/tell-how/data/zoneLoadCurve")
     public String zoneLoadCurve(@RequestParam("dateTime") String dateTime, @RequestParam("actionType") String actionType, @RequestParam("area") Integer area) {
-        return "{\n" +
-                "    \"code\": 0,\n" +
-                "    \"bizCode\": null,\n" +
-                "    \"msg\": null,\n" +
-                "    \"data\": {\n" +
-                "        \"resData\": {\n" +
-                "            \"minValue\": 12.84,\n" +
-                "            \"yesterdayCurve\": {\n" +
-                "                \"xData\": [\n" +
-                "                    \"2024-06-04 00:00\",\n" +
-                "                    \"2024-06-04 00:05\",\n" +
-                "                    \"2024-06-04 23:50\",\n" +
-                "                    \"2024-06-04 23:55\"\n" +
-                "                ],\n" +
-                "                \"yData\": [\n" +
-                "                    16.98,\n" +
-                "                    16.31,\n" +
-                "                    18.26,\n" +
-                "                    18.16\n" +
-                "                ]\n" +
-                "            },\n" +
-                "            \"todayCurve\": {\n" +
-                "                \"min\": 12.84,\n" +
-                "                \"max\": 52.78,\n" +
-                "                \"xData\": [\n" +
-                "                    \"2024-06-05 00:00\",\n" +
-                "                    \"2024-06-05 00:05\",\n" +
-                "                    \"2024-06-05 23:50\",\n" +
-                "                    \"2024-06-05 23:55\"\n" +
-                "                ],\n" +
-                "                \"yData\": [\n" +
-                "                    18.16,\n" +
-                "                    17.36,\n" +
-                "                    17.21,\n" +
-                "                    17.36\n" +
-                "                ]\n" +
-                "            }\n" +
-                "        },\n" +
-                "        \"actionData\": {\n" +
-                "            \"poseId\": \"1\",\n" +
-                "            \"actionType\": \"3\"\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
+        return getResponseData("zoneLoadCurve.json");
     }
 
     @GetMapping("/tell-how/data/transLoadRate")
@@ -668,6 +584,24 @@ public class ImitateController {
     @GetMapping("/pinyin/{text}")
     public String pinyin(@PathVariable("text") String text) {
         return StringUtils.getPinyin(text);
+    }
+
+    private static String getResponseData(String jsonFileName) {
+        String data = "";
+        InputStreamReader inputStreamReader = new InputStreamReader(ImitateController.class.getResourceAsStream(
+                "/json/" + jsonFileName));
+        try {
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            data = stringBuilder.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 }
