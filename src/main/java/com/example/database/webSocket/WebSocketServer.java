@@ -205,7 +205,10 @@ public class WebSocketServer {
         Pattern openContactPicPattern = Pattern.compile("^打开.*联络图$");
         Pattern openSourcePicPattern = Pattern.compile("^打开.*溯源图$");
         if (weatherPattern.matcher(message).find()) {
-            String cityName = message.substring(0, message.indexOf("天气")).substring(message.indexOf("今") + 1);
+            String cityName = message.substring(0, message.indexOf("天气"));
+            if (cityName.contains("今天") || cityName.contains("今日")) {
+                cityName = cityName.replaceAll("(今天|今日)", "");
+            }
             String weatherInfo = WebSocketServer.nanRuiClient.getWeather(cityName);
             if (StringUtils.isNotBlank(weatherInfo)) {
                 returnVo.setResults(weatherInfo);
