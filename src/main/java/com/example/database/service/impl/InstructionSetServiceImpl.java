@@ -199,7 +199,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                 maxValue = tellHowCurveVO.getDateMaxValue();
                             }
                             if (StringUtils.isNotBlank(maxValue)) {
-                                String resultContent = message.replace("多少", maxValue + "MW");
+                                String resultContent = message.replace("多少", maxValue + "兆瓦");
                                 String compareYesterday = tellHowCurveVO.getCompareYesterday();
                                 if (StringUtils.isNotBlank(compareYesterday)) {
                                     resultContent += "，较昨日增长" + compareYesterday + "%";
@@ -221,7 +221,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         String maxValue = this.loadService.getHistoryMaxValue(null == area ? null : area.getValue());
                         String resultContent = null;
                         if (StringUtils.isNotBlank(maxValue)) {
-                            resultContent = message.replace("多少", maxValue + "MW");
+                            resultContent = message.replace("多少", maxValue + "兆瓦");
                         } else {
                             resultContent = MyContants.RESULT_FAIL2;
                         }
@@ -231,7 +231,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         String maxValue = this.loadService.getYearMaxValue(null == area ? null : area.getValue());
                         String resultContent = null;
                         if (!StringUtils.isBlank(maxValue)) {
-                            resultContent = message.replace("多少", maxValue + "MW");
+                            resultContent = message.replace("多少", maxValue + "兆瓦");
                         } else {
                             resultContent = MyContants.RESULT_FAIL2;
                         }
