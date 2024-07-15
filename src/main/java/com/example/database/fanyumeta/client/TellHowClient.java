@@ -147,7 +147,7 @@ public class TellHowClient {
         params.put("actionType", actionType);
         String url = this.tellHowProperties.getServiceAddr() + "/data/totalLoadCurve";
         JSONObject res = sendMessage(url, params);
-        TellHowCurveVO tellHowCurveVO = this.parserLoadCurveData(res);
+        TellHowCurveVO tellHowCurveVO = this.parserLoadCurveData(res, false);
         return tellHowCurveVO;
     }
 
@@ -166,7 +166,7 @@ public class TellHowClient {
         params.put("area", area.value);
         String url = this.tellHowProperties.getServiceAddr() + "/data/zoneLoadCurve";
         JSONObject res = sendMessage(url, params);
-        TellHowCurveVO tellHowCurveVO = this.parserLoadCurveData(res);
+        TellHowCurveVO tellHowCurveVO = this.parserLoadCurveData(res, true);
         return tellHowCurveVO;
     }
 
@@ -384,9 +384,10 @@ public class TellHowClient {
      * 解析负荷曲线曲线数据
      *
      * @param data 泰豪接口返回数据
+     * @param isZone 是否是区域数据
      * @return 负荷曲线曲线数据
      */
-    private TellHowCurveVO parserLoadCurveData(JSONObject data) {
+    private TellHowCurveVO parserLoadCurveData(JSONObject data, Boolean isZone) {
         TellHowCurveVO tellHowCurveVO = null;
         if (null != data) {
             JSONObject resData = data.getJSONObject("resData");
@@ -400,10 +401,11 @@ public class TellHowClient {
                     }
                     JSONArray yData = todayCurve.getJSONArray("yData");
                     if (null != yData) {
-                        // 1 分钟一个值
-                        if (yData.size() == 1440) {
-                            tellHowCurveVO.setMorningMaxValue(this.getMorningMaxValue(yData));
-                            tellHowCurveVO.setEveningMaxValue(this.getEveningMaxValue(yData));
+                        int countOfHour = this.getCountOfHour(isZone);
+                        int maxSize = 24 * countOfHour;
+                        if (yData.size() == maxSize) {
+                            tellHowCurveVO.setMorningMaxValue(this.getMorningMaxValue(yData, isZone));
+                            tellHowCurveVO.setEveningMaxValue(this.getEveningMaxValue(yData, isZone));
                         }
                     }
                 }
@@ -797,13 +799,15 @@ public class TellHowClient {
      * 获取早峰最大负荷
      *
      * @param data 负荷数据
+     * @param isZone 是否是区域数据
      * @return 早峰最大负荷
      */
-    private String getMorningMaxValue(JSONArray data) {
+    private String getMorningMaxValue(JSONArray data, Boolean isZone) {
         String maxValue = null;
+        int countOfHour = this.getCountOfHour(isZone);
         // 早峰 8-12
-        int morningStartIndex = 8 * 60;
-        int morningEndIndex = 12 * 60;
+        int morningStartIndex = 8 * countOfHour;
+        int morningEndIndex = 12 * countOfHour;
         List<Number> morningList = data.subList(morningStartIndex, morningEndIndex);
         Collections.sort(morningList, new NumberDescComparator());
         Number morningMaxValue = morningList.get(0);
@@ -817,13 +821,15 @@ public class TellHowClient {
      * 获取晚峰最大负荷
      *
      * @param data 负荷数据
+     * @param isZone 是否是区域数据
      * @return 晚峰最大负荷
      */
-    private String getEveningMaxValue(JSONArray data) {
+    private String getEveningMaxValue(JSONArray data, Boolean isZone) {
         String maxValue = null;
+        int countOfHour = this.getCountOfHour(isZone);
         // 晚峰 12-20
-        int eveningStartIndex = 12 * 60;
-        int eveningEndIndex = 20 * 60;
+        int eveningStartIndex = 12 * countOfHour;
+        int eveningEndIndex = 20 * countOfHour;
         List<Number> eveningList = data.subList(eveningStartIndex, eveningEndIndex);
         Collections.sort(eveningList, new NumberDescComparator());
         Number eveningMaxValue = eveningList.get(0);
@@ -831,6 +837,22 @@ public class TellHowClient {
             maxValue = eveningMaxValue.toString();
         }
         return maxValue;
+    }
+
+    /**
+     * 获取小时数据个数
+     *
+     * @param isZone 是否是区域数据
+     * @return 小时数据个数
+     */
+    private int getCountOfHour(Boolean isZone) {
+        // 1 分钟一个值
+        int countOfHour = 60;
+        if (isZone) {
+            // 5 分钟一个值
+            countOfHour = 12;
+        }
+        return countOfHour;
     }
 
     /**
