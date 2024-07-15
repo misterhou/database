@@ -39,4 +39,14 @@ public interface LoadService {
      * @return 历史最大负荷
      */
     String getHistoryMaxValue(String area);
+
+    /**
+     * 获取区域负荷最大负荷
+     *
+     * @param area 区域
+     * @param startRecordDate 开始记录日期
+     * @param endRecordDate 结束记录日期
+     * @return 区域负荷最大负荷
+     */
+    String getHistoryMaxValue(String area, LocalDate startRecordDate, LocalDate endRecordDate);
 }

@@ -236,6 +236,30 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                             resultContent = MyContants.RESULT_FAIL2;
                         }
                         returnVo.setResults(resultContent);
+                    } else if (regexIsFind("度冬", message) || regexIsFind("度夏", message)) {
+                        LocalDate currentDate = LocalDate.now();
+                        LocalDate startRecordDate = null;
+                        LocalDate endRecordDate = null;
+                        if (regexIsFind("度冬", message)) {
+                            // 度冬：12/1/2
+                            startRecordDate = LocalDate.of(currentDate.getYear(), 12, 1);
+                            // 由于 2 月天数不固定，故取 3 月 1 日
+                            endRecordDate = LocalDate.of(currentDate.getYear() + 1, 3, 1);
+                        } else if (regexIsFind("度夏", message)) {
+                            // 度夏：6/7/8
+                            startRecordDate = LocalDate.of(currentDate.getYear(), 6, 1);
+                            endRecordDate = LocalDate.of(currentDate.getYear(), 8, 31);
+                        }
+                        TellHowClient.Area area = this.getArea(message);
+                        String maxValue = this.loadService.getHistoryMaxValue(null == area ? null : area.getValue(),
+                                startRecordDate, endRecordDate);
+                        String resultContent = null;
+                        if (!StringUtils.isBlank(maxValue)) {
+                            resultContent = message.replace("多少", maxValue + "兆瓦");
+                        } else {
+                            resultContent = MyContants.RESULT_FAIL2;
+                        }
+                        returnVo.setResults(resultContent);
                     }
                 }
             } else if (serialNum == 307) {  // 主变负载率

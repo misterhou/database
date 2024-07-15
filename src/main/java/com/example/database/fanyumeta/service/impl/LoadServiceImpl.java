@@ -101,5 +101,31 @@ public class LoadServiceImpl implements LoadService {
         return maxValue;
     }
 
+    @Override
+    public String getHistoryMaxValue(String area, LocalDate startRecordDate, LocalDate endRecordDate) {
+        String maxValue = null;
+        if (null == area) {
+            QueryWrapper<TotalLoad> totalLoadQueryWrapper = new QueryWrapper<>();
+            totalLoadQueryWrapper.select("max(date_max_value) as dateMaxValue")
+                    .ge("record_date", startRecordDate)
+                    .lt("record_date", endRecordDate);
+            TotalLoad totalLoad = this.totalLoadMapper.selectOne(totalLoadQueryWrapper);
+            if (null != totalLoad) {
+                maxValue = totalLoad.getDateMaxValue();
+            }
+        } else {
+            QueryWrapper<ZoneLoad> zoneLoadQueryWrapper = new QueryWrapper<>();
+            zoneLoadQueryWrapper.select("max(date_max_value) as dateMaxValue")
+                    .eq("area_id", area)
+                    .and(wrapper -> wrapper.ge("record_date", startRecordDate)
+                            .lt("record_date", endRecordDate)
+                    );
+            ZoneLoad zoneLoad = this.zoneLoadMapper.selectOne(zoneLoadQueryWrapper);
+            if (null != zoneLoad) {
+                maxValue = zoneLoad.getDateMaxValue();
+            }
+        }
+        return maxValue;
+    }
 
 }
