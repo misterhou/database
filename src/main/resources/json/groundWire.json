@@ -1,0 +1,53 @@
+{
+  "code": 0,
+  "bizCode": null,
+  "msg": null,
+  "data": {
+    "resData": [
+      {
+        "number": 1,
+        "groundWireName": "剧河E4云舒Ⅰ线",
+        "groundWireCreateTime": "2024-07-02 15:15",
+        "devicePosition": "剧河E4云舒Ⅰ线591-5刀闸",
+        "groundWireSuspensionCreateUser": "赵学良",
+        "groundWireSuspensionCreateTime": "2024-07-02 15:10"
+      },
+      {
+        "number": 2,
+        "groundWireName": "剧河E4云舒Ⅰ线",
+        "groundWireCreateTime": "2024-07-02 15:15",
+        "devicePosition": "剧河E4云舒I线001-1kd",
+        "groundWireSuspensionCreateUser": "杨博超",
+        "groundWireSuspensionCreateTime": "2024-07-02 22:03"
+      },
+      {
+        "number": 3,
+        "groundWireName": "荷露站雄昝A1-I线",
+        "groundWireCreateTime": "2024-07-09 10:06",
+        "devicePosition": "荷露站5201间隔线路侧",
+        "groundWireSuspensionCreateUser": "杨博超",
+        "groundWireSuspensionCreateTime": "2024-07-09 10:01"
+      },
+      {
+        "number": 4,
+        "groundWireName": "荷露站雄昝A1-II线",
+        "groundWireCreateTime": "2024-07-09 10:09",
+        "devicePosition": "荷露站5224间隔线路侧",
+        "groundWireSuspensionCreateUser": "杨博超",
+        "groundWireSuspensionCreateTime": "2024-07-09 10:04"
+      },
+      {
+        "number": 5,
+        "groundWireName": "剧河B4开关站",
+        "groundWireCreateTime": "2024-07-11 17:31",
+        "devicePosition": "地热施工临电线006-1kd",
+        "groundWireSuspensionCreateUser": "李昊桐",
+        "groundWireSuspensionCreateTime": "2024-07-11 17:29"
+      }
+    ],
+    "actionData": {
+      "poseId": "3",
+      "actionType": "3"
+    }
+  }
+}
