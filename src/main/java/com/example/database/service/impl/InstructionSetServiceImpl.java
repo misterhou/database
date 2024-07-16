@@ -531,6 +531,14 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     }
                     noticeTellHowAction(ResponseMessage.TellHowMenu.LOAD_MOVEMENT_MAIN_NET);
                 }
+            } else if (serialNum == 320) {  // XX线路电流限值是多少
+                String lineName = message.substring(0, message.indexOf("电流限值"));
+                String lineLimit = this.nanRuiClient.getLineLimit(lineName);
+                if (StringUtils.isNotBlank(lineLimit)) {
+                    returnVo.setResults(message.replace("多少", lineLimit + "千安"));
+                } else {
+                    returnVo.setResults(MyContants.RESULT_FAIL2);
+                }
             } else {
                 //获取数据库中信息
                 InstructionSet issInformation = this.getById(serialNum);

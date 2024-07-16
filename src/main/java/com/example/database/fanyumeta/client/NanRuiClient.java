@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,12 @@ public class NanRuiClient {
     /**
      * N -1 过载设备请求地址
      */
-    private static final String OVER_DEVICE_URL = "/heavy-device-n1";
+    private static final String N1_OVER_DEVICE_URL = "/n1-over-device";
+
+    /**
+     * 线路限流请求地址
+     */
+    private static final String LINE_LIMIT_URL = "/line-limit";
 
     /**
      * 获取天气信息
@@ -110,7 +117,7 @@ public class NanRuiClient {
      * @return N-1过载设备信息
      */
     public String getN1OverDevice() {
-        String url = this.serviceAddr + OVER_DEVICE_URL;
+        String url = this.serviceAddr + N1_OVER_DEVICE_URL;
         JSONObject overDeviceResData = getDataNr(url);
         String result = null;
         if (null != overDeviceResData) {
@@ -132,6 +139,33 @@ public class NanRuiClient {
         }
         if(!StringUtils.hasText(result)) {
             result = "当前电网没有N-1过载设备,电网运行良好";
+        }
+        return result;
+    }
+
+    /**
+     * 获取线路限流值
+     *
+     * @param lineName 问题文本
+     * @return 线路限流值
+     */
+    public String getLineLimit(String lineName) {
+        String result = null;
+        if (StringUtils.hasText(lineName)) {
+            String url = this.serviceAddr + LINE_LIMIT_URL + "/" + lineName;
+            JSONObject lineLimitResData = getDataNr(url);
+            if (null != lineLimitResData) {
+                String data = lineLimitResData.getString("data");
+                if (StringUtils.hasText(data)) {
+                    try {
+                        BigDecimal imax = new BigDecimal(data);
+                        imax = imax.divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP);
+                        result = imax.toString();
+                    } catch (Exception e) {
+                        log.error("线路限流值【{}】单位换算出错", data, e);
+                    }
+                }
+           }
         }
         return result;
     }
