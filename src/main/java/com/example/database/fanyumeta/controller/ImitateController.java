@@ -550,6 +550,49 @@ public class ImitateController {
         return StringUtils.getPinyin(text);
     }
 
+    @GetMapping("/nr/weather/{cityName}")
+    public String nrWeather(@PathVariable("cityName") String cityName) {
+        return "{\"description\":\"晴\",\"temperature\":\"23.5\",\"wind\":\"东南风 1-2 级\"}";
+    }
+
+    @GetMapping("/nr/heavy-device")
+    public String nrHeavyDevice() {
+        return "{\"data\":[{\"name\":\"剧村站#3主变-高\",\"rate\":\"90\"},{\"name\":\"保北1#主变-中\",\"rate\":\"110\"}]}";
+    }
+
+    @GetMapping("/nr/n1-over-device")
+    public String nrN1OverDevice() {
+        return "{\"data\":[{\"name\":\"剧村站#3主变-高\",\"rate\":\"90\"},{\"name\":\"保北1#主变-中\",\"rate\":\"110\"}]}";
+    }
+
+    @GetMapping("/nr/line-limit/{lineName}")
+    public String nrLineLimit(@PathVariable("lineName") String lineName) {
+        return "{\"data\":\"3000.000000\"}";
+    }
+
+    @GetMapping("/nr/unit-agc/{deviceName}")
+    public String nrUnitAgc(@PathVariable("deviceName") String deviceName) {
+        return "{\n" +
+                "    \"data\": {\n" +
+                "        \"idPlc\": null,\n" +
+                "        \"idGn\": null,\n" +
+                "        \"shortennmUnit\": null,\n" +
+                "        \"curcapUnit\": \"200\",\n" +
+                "        \"lfcmxUnit\": null,\n" +
+                "        \"lfcmnUnit\": null,\n" +
+                "        \"genUnit\": \"100\",\n" +
+                "        \"ugenStatus\": null,\n" +
+                "        \"capUnit\": null,\n" +
+                "        \"lmxUnit\": null,\n" +
+                "        \"lmn_unit\": null,\n" +
+                "        \"lmxtlmUnit\": null,\n" +
+                "        \"lmntlmUnit\": null,\n" +
+                "        \"yccapUnit\": null,\n" +
+                "        \"stocapUnit\": null\n" +
+                "    }\n" +
+                "}";
+    }
+
     private static String getResponseData(String jsonFileName) {
         String data = "";
         InputStreamReader inputStreamReader = new InputStreamReader(ImitateController.class.getResourceAsStream(
