@@ -45,6 +45,11 @@ public class NanRuiClient {
     private static final String LINE_LIMIT_URL = "/line-limit";
 
     /**
+     * AGC机组请求地址
+     */
+    private static final String UNIT_AGC_URL = "/unit-agc";
+
+    /**
      * 获取天气信息
      * @param cityName 城市名称
      * @return 天气信息
@@ -166,6 +171,40 @@ public class NanRuiClient {
                     }
                 }
            }
+        }
+        return result;
+    }
+
+    /**
+     * 获取AGC机组
+     *
+     * @param deviceName 设备名称
+     * @return AGC机组信息
+     */
+    public String getUnitAgc(String deviceName) {
+        String result = null;
+        if (StringUtils.hasText(deviceName)) {
+            String url = this.serviceAddr + UNIT_AGC_URL + "/" + deviceName;
+            JSONObject unitAgcResData = getDataNr(url);
+            if (null != unitAgcResData) {
+                JSONObject data = unitAgcResData.getJSONObject("data");
+                if (null != data) {
+                    List<String> infoList = new ArrayList<>();
+                    // 装机容量 curcapUnit
+                    String curcapUnit = data.getString("curcapUnit");
+                    if (StringUtils.hasText(curcapUnit)) {
+                        infoList.add("装机容量为" + curcapUnit + "兆瓦");
+                    }
+                    // 当前出力 genUnit
+                    String genUnit = data.getString("genUnit");
+                    if (StringUtils.hasText(genUnit)) {
+                        infoList.add("现在出力为" + genUnit + "兆瓦");
+                    }
+                    if (infoList.size() > 0) {
+                        result = deviceName + String.join("，", infoList);
+                    }
+                }
+            }
         }
         return result;
     }

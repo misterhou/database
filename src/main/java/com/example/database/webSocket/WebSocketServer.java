@@ -204,6 +204,7 @@ public class WebSocketServer {
         Pattern closePicPattern = Pattern.compile("^关闭.*图$");
         Pattern openContactPicPattern = Pattern.compile("^打开.*联络图$");
         Pattern openSourcePicPattern = Pattern.compile("^打开.*溯源图$");
+        Pattern operationPattern = Pattern.compile("^介绍.*运行情况$");
         if (weatherPattern.matcher(message).find()) {
             String cityName = message.substring(0, message.indexOf("天气"));
             if (cityName.contains("今天") || cityName.contains("今日")) {
@@ -233,6 +234,15 @@ public class WebSocketServer {
                 // 通知数智人往右挥手
                 returnVo.setPoseId("3");
                 TellHowServer.noticeClient(substationRtKeyId, PicType.SOURCE, null);
+            }
+        } else if (operationPattern.matcher(message).find()) {
+            String deviceName = message.replace("介绍", "").replace("运行情况", "");
+            deviceName = deviceName.replace("的", "");
+            String unitAgcInfo = nanRuiClient.getUnitAgc(deviceName);
+            if (StringUtils.isNotBlank(unitAgcInfo)) {
+                returnVo.setResults(unitAgcInfo);
+            } else {
+                returnVo.setResults(MyContants.RESULT_FAIL2);
             }
         } else {
             InterlocutionResult ilr = httpHaveInterlocutionResult(message);
