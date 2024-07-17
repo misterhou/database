@@ -202,6 +202,7 @@ public class WebSocketServer {
         returnVo.setTabData("无");
         Pattern weatherPattern = Pattern.compile("天气.*(怎么样|如何)");
         Pattern closePicPattern = Pattern.compile("^关闭.*图$");
+        Pattern openIntervalPicPattern = Pattern.compile("^打开.*间隔图$");
         Pattern openContactPicPattern = Pattern.compile("^打开.*联络图$");
         Pattern openSourcePicPattern = Pattern.compile("^打开.*溯源图$");
         Pattern operationPattern = Pattern.compile("^介绍.*运行情况$");
@@ -226,6 +227,16 @@ public class WebSocketServer {
                 // 通知数智人往右挥手
                 returnVo.setPoseId("3");
                 TellHowServer.noticeClient(substationRtKeyId, PicType.CONTACT, null);
+            }
+        } else if (openIntervalPicPattern.matcher(message).find()) { // 打开间隔图
+            String picName = PicDataUtil.getIntervalPicName(message);
+            if (StringUtils.isNotBlank(picName)) {
+                returnVo.setResults(this.getOpenPicNotice(message));
+                // 通知数智人往右挥手
+                returnVo.setPoseId("3");
+                TellHowServer.noticeClient(picName, null);
+            } else {
+                log.warn("【开间隔图指令】没有获取到对应的间隔图片数据，开图指令：{}，对应的间隔图片名称：{}", message, picName);
             }
         } else if (openSourcePicPattern.matcher(message).find()) { // 打开溯源图
             String substationRtKeyId = PicDataUtil.getSourcePicRtKeyId(message);

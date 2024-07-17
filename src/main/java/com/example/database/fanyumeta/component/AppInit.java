@@ -119,5 +119,6 @@ public class AppInit implements ApplicationListener<ApplicationReadyEvent> {
         PicDataUtil.initPicData(environment.getProperty("fan-yu.tell-how.pic-config-file"));
         PicDataUtil.initSubstationData(environment.getProperty("fan-yu.tell-how.substation-config-file"));
         PicDataUtil.initSourcePicData(environment.getProperty("fan-yu.tell-how.source-config-file"));
+        PicDataUtil.initIntervalPicData(environment.getProperty("fan-yu.tell-how.interval-config-file"));
     }
 }

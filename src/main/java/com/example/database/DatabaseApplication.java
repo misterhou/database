@@ -1,6 +1,7 @@
 package com.example.database;
 
 import com.alibaba.fastjson.JSONObject;
+import com.example.database.fanyumeta.utils.HardwareControlCommandUtil;
 import com.example.database.fanyumeta.utils.PicDataUtil;
 import com.example.database.fanyumeta.utils.StringUtils;
 import org.apache.ibatis.ognl.Ognl;
@@ -29,16 +30,16 @@ public class DatabaseApplication {
 
     private static void generateCacheFile() {
         try {
-//            HardwareControlCommandUtil.generateRequestCommandCacheFile("src/main/resources/中控指令集.xlsx",
-//                    "RequestCommandCache");
-//            HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
-//                    "ReceiveCommandCache");
-//            HardwareControlCommandUtil.generateRequestReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
-//                    "RequestReceiveCommandCache");
-//            PicDataUtil.generatePicDataCacheFile("src/main/resources/开图清单.xlsx",
-//                    "PicDataCache");
-//            PicDataUtil.generateStationPicDataCacheFile("src/main/resources/厂站信息.xlsx",
-//                    "SubstationDataCache");
+            HardwareControlCommandUtil.generateRequestCommandCacheFile("src/main/resources/中控指令集.xlsx",
+                    "RequestCommandCache");
+            HardwareControlCommandUtil.generateReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
+                    "ReceiveCommandCache");
+            HardwareControlCommandUtil.generateRequestReceiveCommandCacheFile("src/main/resources/中控指令集.xlsx",
+                    "RequestReceiveCommandCache");
+            PicDataUtil.generatePicDataCacheFile("src/main/resources/开图清单.xlsx",
+                    "PicDataCache");
+            PicDataUtil.generateStationPicDataCacheFile("src/main/resources/厂站信息.xlsx",
+                    "SubstationDataCache");
             PicDataUtil.generateSourcePicDataCacheFile(Arrays.asList(
                     "src/main/resources/v_rt_dev_transfmwd.xlsx",   // 主变
                             "src/main/resources/v_rt_dev_breaker.xlsx", // 开关
@@ -48,6 +49,8 @@ public class DatabaseApplication {
                             "src/main/resources/v_rt_dev_dmstr.xlsx"    // 开关站-变压器
                     ),
                     "SourceDataCache");
+            PicDataUtil.generateIntervalPicDataCacheFile("src/main/resources/realtime-scada-121-org.xlsx",
+                    "IntervalPicDataCache");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

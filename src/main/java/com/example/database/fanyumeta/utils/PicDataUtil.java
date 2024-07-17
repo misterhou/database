@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -27,9 +28,14 @@ import java.util.regex.Pattern;
 public class PicDataUtil {
 
     /**
-     * 图片数据缓存（南瑞开发的接线图/间隔图）
+     * 图片数据缓存（南瑞开发的接线图）
      */
     private static List<Map<String, String>> picDataCache = new ArrayList<>(256);
+
+    /**
+     * 间隔图数据缓存（南瑞）
+     */
+    private static Map<String, String> intervalPicDataCache = new TreeMap<>(new DeviceNameComparator());
 
     /**
      * 厂站图片数据缓存（东方电子开发的厂站联络图）
@@ -78,11 +84,23 @@ public class PicDataUtil {
      * @param transformerDataFile 数据缓存文件
      */
     public static void initSourcePicData(String transformerDataFile) {
-        sourcePicDataCache.clear();
         try {
             loadExcelData2Map(transformerDataFile, sourcePicDataCache);
         } catch (Exception e) {
             log.error("加载溯源图缓存文件出错", e);
+        }
+    }
+
+    /**
+     * 初始化间隔图数据缓存
+     *
+     * @param intervalPicDataFile 数据缓存文件
+     */
+    public static void initIntervalPicData(String intervalPicDataFile) {
+        try {
+            loadExcelData2Map(intervalPicDataFile, intervalPicDataCache);
+        } catch (Exception e) {
+            log.error("加载间隔图缓存文件出错", e);
         }
     }
 
@@ -178,44 +196,71 @@ public class PicDataUtil {
         String rtKeyId = null;
         text = text.replaceAll("打开", "");
         text = text.replaceAll("溯源图", "");
-        List<String> keywordList = null;
-        try {
-            keywordList = StringUtils.segment(text);
-        } catch (IOException e) {
-            log.error("分词出错", e);
+//        List<String> keywordList = null;
+//        try {
+//            keywordList = StringUtils.segment(text);
+//        } catch (IOException e) {
+//            log.error("分词出错", e);
+//        }
+//        for (String key : sourcePicDataCache.keySet()) {
+//            int count = 0;
+//            for (String keyword : keywordList) {
+//                if (StringUtils.regexIsFind(keyword, key.toLowerCase())) {
+//                    count++;
+//                }
+//            }
+//            BigDecimal score = BigDecimal.valueOf(count).divide(
+//                    BigDecimal.valueOf(keywordList.size()),
+//                    4, RoundingMode.HALF_UP);
+//            if (log.isDebugEnabled()) {
+//                log.debug("匹配度：{}", score);
+//            }
+//            if (score.doubleValue() > 0.8) {
+//                log.info("【溯源图匹配结果】开图指令：{}, 匹配到的设备：{}, 匹配度：{}", text, key, score);
+//                rtKeyId = sourcePicDataCache.get(key);
+//                if (StringUtils.hasText(rtKeyId)) {
+//                    // 去掉前 4 位
+//                    rtKeyId = rtKeyId.substring(0, 4) + "_" + rtKeyId.substring(4);
+//                }
+//                if (StringUtils.hasText(rtKeyId)) {
+//                    // 溯源图需补 4 个 0
+//                    rtKeyId = rtKeyId + "0000";
+//                }
+//                if (StringUtils.hasText(rtKeyId)) {
+//                    // 去掉开头的 0
+//                    rtKeyId = rtKeyId.replaceAll("^0", "");
+//                }
+//                break;
+//            }
+//        }
+        rtKeyId = getPicNameFromCache(text, sourcePicDataCache);
+        if (StringUtils.hasText(rtKeyId)) {
+            // 去掉前 4 位
+            rtKeyId = rtKeyId.substring(0, 4) + "_" + rtKeyId.substring(4);
         }
-        for (String key : sourcePicDataCache.keySet()) {
-            int count = 0;
-            for (String keyword : keywordList) {
-                if (StringUtils.regexIsFind(keyword, key.toLowerCase())) {
-                    count++;
-                }
-            }
-            BigDecimal score = BigDecimal.valueOf(count).divide(
-                    BigDecimal.valueOf(keywordList.size()),
-                    4, RoundingMode.HALF_UP);
-            if (log.isDebugEnabled()) {
-                log.debug("匹配度：{}", score);
-            }
-            if (score.doubleValue() > 0.8) {
-                log.info("【溯源图匹配结果】开图指令：{}, 匹配到的设备：{}, 匹配度：{}", text, key, score);
-                rtKeyId = sourcePicDataCache.get(key);
-                if (StringUtils.hasText(rtKeyId)) {
-                    // 去掉前 4 位
-                    rtKeyId = rtKeyId.substring(0, 4) + "_" + rtKeyId.substring(4);
-                }
-                if (StringUtils.hasText(rtKeyId)) {
-                    // 溯源图需补 4 个 0
-                    rtKeyId = rtKeyId + "0000";
-                }
-                if (StringUtils.hasText(rtKeyId)) {
-                    // 去掉开头的 0
-                    rtKeyId = rtKeyId.replaceAll("^0", "");
-                }
-                break;
-            }
+        if (StringUtils.hasText(rtKeyId)) {
+            // 溯源图需补 4 个 0
+            rtKeyId = rtKeyId + "0000";
+        }
+        if (StringUtils.hasText(rtKeyId)) {
+            // 去掉开头的 0
+            rtKeyId = rtKeyId.replaceAll("^0", "");
         }
         return rtKeyId;
+    }
+
+    /**
+     * 获取间隔图名称
+     *
+     * @param message 开图文本
+     * @return 间隔图名称
+     */
+    public static String getIntervalPicName(String message) {
+        String picName = null;
+        String temp = message.replaceAll("打开", "");
+        temp = temp.replaceAll("间隔图", "");
+        picName = getPicNameFromCache(temp, intervalPicDataCache);
+        return picName;
     }
 
     /**
@@ -240,6 +285,52 @@ public class PicDataUtil {
         writeObject2File(data, cacheFile);
     }
 
+    /**
+     * 生成溯源图数据缓存文件
+     *
+     * @param excelFile excel 文件
+     * @param cacheFile 缓存文件
+     * @throws Exception 当读取 excel 数据报错时，会抛出此异常
+     */
+    public static void generateIntervalPicDataCacheFile(String excelFile, String cacheFile) throws Exception {
+        List<Map<String, String>> data = ExcelUtils.getData(excelFile, 0, "间隔ID", 1);
+        List<Map<String, String>> data2 = ExcelUtils.getData(excelFile, 0, "间隔ID", 12);
+        Iterator<Map<String, String>> iterator = data.iterator();
+        int i = 0;
+        while (iterator.hasNext()) {
+            Map<String, String> map = iterator.next();
+            for (String key : map.keySet()) {
+                String value = map.get(key);
+                Map<String, String> map2 = data2.get(i);
+                for (String key2 : map2.keySet()) {
+                    String value2 = map2.get(key2);
+                    if (StringUtils.hasText(value2)) {
+                        if (value.equals(value2)) {
+                            if (StringUtils.hasText(key2)) {
+                                map.put(key, key2 + "." + value + ".fac.pic.g");
+                            } else {
+                                map.remove(key);
+                            }
+                            if (map.isEmpty()) {
+                                iterator.remove();
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        writeObject2File(data, cacheFile);
+    }
+
+    /**
+     * 生成溯源图数据缓存文件
+     *
+     * @param excelFileList excel 文件列表
+     * @param cacheFile 缓存文件
+     * @throws Exception 当读取 excel 数据报错时，会抛出此异常
+     */
     public static void generateSourcePicDataCacheFile(List<String> excelFileList, String cacheFile) throws Exception {
         List<Map<String, String>> data = new ArrayList<>(20000);
         for (String excelFile : excelFileList) {
@@ -253,6 +344,7 @@ public class PicDataUtil {
         }
         writeObject2File(data, cacheFile);
     }
+
 
     /**
      * 将对象写入文件
@@ -348,5 +440,41 @@ public class PicDataUtil {
                 dataCache.put(key, picData.get(key));
             }
         }
+    }
+
+    /**
+     * 获取图片名称
+     *
+     * @param message 开图文本
+     * @return 图片名称
+     */
+    private static String getPicNameFromCache(String message, Map<String, String> picCache) {
+        String picName = null;
+        List<String> keywordList = null;
+        try {
+            keywordList = StringUtils.segment(message);
+        } catch (IOException e) {
+            log.error("分词出错", e);
+        }
+        for (String key : picCache.keySet()) {
+            int count = 0;
+            for (String keyword : keywordList) {
+                if (StringUtils.regexIsFind(keyword, key.toLowerCase())) {
+                    count++;
+                }
+            }
+            BigDecimal score = BigDecimal.valueOf(count).divide(
+                    BigDecimal.valueOf(keywordList.size()),
+                    4, RoundingMode.HALF_UP);
+            if (log.isDebugEnabled()) {
+                log.debug("匹配度：{}", score);
+            }
+            if (score.doubleValue() > 0.8) {
+                log.info("开图指令：{}, 匹配到的：{}, 匹配度：{}", message, key, score);
+                picName = picCache.get(key);
+                break;
+            }
+        }
+        return picName;
     }
 }
