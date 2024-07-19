@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -176,6 +178,20 @@ public class StringUtils extends org.springframework.util.StringUtils {
             }
         }
         return reg;
+    }
+
+    /**
+     * URL 编码
+     *
+     * @param text 待编码文本
+     * @return 编码后的文本
+     */
+    public static String urlEncode(String text) {
+        try {
+            return URLEncoder.encode(text, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static class SpringbootResourceIOAdapter implements IIOAdapter {
