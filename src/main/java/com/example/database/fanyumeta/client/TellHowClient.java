@@ -411,7 +411,7 @@ public class TellHowClient {
                 }
             }
             JSONObject actionData = data.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowCurveVO) {
                 String poseId = actionData.getString("poseId");
                 if (StringUtils.hasText(poseId)) {
                     tellHowCurveVO.setPoseId(poseId);
@@ -450,7 +450,7 @@ public class TellHowClient {
                 tellHowTransLoadRateVO.setTransLoadRateList(transLoadRateList);
             }
             JSONObject actionData = data.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowTransLoadRateVO) {
                 String poseId = actionData.getString("poseId");
                 tellHowTransLoadRateVO.setPoseId(poseId);
             }
@@ -484,7 +484,7 @@ public class TellHowClient {
                 tellHowLineLoadRateVO.setLineLoadRateList(lineLoadRateList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowLineLoadRateVO) {
                 String poseId = actionData.getString("poseId");
                 tellHowLineLoadRateVO.setPoseId(poseId);
             }
@@ -526,7 +526,7 @@ public class TellHowClient {
                 tellHowNumMinusOneDetailsVO.setNumMinusOneDetailsList(numMinusOneDetailsList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowNumMinusOneDetailsVO) {
                 String poseId = actionData.getString("poseId");
                 tellHowNumMinusOneDetailsVO.setPoseId(poseId);
             }
@@ -550,7 +550,7 @@ public class TellHowClient {
                 tellHowImportantUserVO.setTotal(total);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (actionData != null) {
+            if (null != actionData && null != tellHowImportantUserVO) {
                 String poseId = actionData.getString("poseId");
                 if (StringUtils.hasText(poseId)) {
                     tellHowImportantUserVO.setPoseId(poseId);
@@ -587,7 +587,7 @@ public class TellHowClient {
                 tellHowCurrentGridFailureVO.setCurrentGridFailureList(currentGridFailureList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (actionData != null) {
+            if (null != actionData && null != tellHowCurrentGridFailureVO) {
                 tellHowCurrentGridFailureVO.setPoseId(actionData.getString("poseId"));
             }
         }
@@ -625,7 +625,7 @@ public class TellHowClient {
                 tellHowPowerSupplyInfoVO.setPowerSupplyInfoList(powerSupplyInfoList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (actionData != null) {
+            if (null != actionData && null != tellHowPowerSupplyInfoVO) {
                 tellHowPowerSupplyInfoVO.setPoseId(actionData.getString("poseId"));
             }
         }
@@ -652,7 +652,7 @@ public class TellHowClient {
                 tellHowOverhaulWorkListVO.setOverhaulWorkListList(overhaulWorkListList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (actionData != null) {
+            if (null != actionData && null != tellHowOverhaulWorkListVO) {
                 tellHowOverhaulWorkListVO.setPoseId(actionData.getString("poseId"));
             }
         }
@@ -704,7 +704,7 @@ public class TellHowClient {
                 tellHowGridRiskVO.setGridRiskList(gridRiskList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowGridRiskVO) {
                 tellHowGridRiskVO.setPoseId(actionData.getString("poseId"));
             }
         }
@@ -738,7 +738,7 @@ public class TellHowClient {
                 tellHowGroundWireVO.setGroundWireList(groundWireList);
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowGroundWireVO) {
                 tellHowGroundWireVO.setPoseId(actionData.getString("poseId"));
             }
         }
@@ -763,7 +763,7 @@ public class TellHowClient {
                 tellHowLoadMovementMainNetVO.setYesterdayActualLoad(resData.getJSONArray("yesterdayActualLoad"));
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowLoadMovementMainNetVO) {
                 tellHowLoadMovementMainNetVO.setPoseId(actionData.getString("poseId"));
             }
         }
@@ -788,7 +788,7 @@ public class TellHowClient {
                 tellHowLoadMovementNewEnergyVO.setPredictLoad(resData.getJSONArray("predictLoad"));
             }
             JSONObject actionData = res.getJSONObject("actionData");
-            if (null != actionData) {
+            if (null != actionData && null != tellHowLoadMovementNewEnergyVO) {
                 tellHowLoadMovementNewEnergyVO.setPoseId(actionData.getString("poseId"));
             }
         }
