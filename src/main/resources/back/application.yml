@@ -65,6 +65,8 @@ fan-yu:
     substation-config-file: /home/config/SubstationDataCache
     # 溯源配置文件
     source-config-file: /home/config/SourceDataCache
+    # 间隔配置文件
+    interval-config-file: /home/config/IntervalPicDataCache
     # 联络图访问地址
     contact-pic-addr: http://graphic.xa.he.dc.sgcc.com.cn/osp/Graph/Navigator.html?graph=dfe_test_cl.sys.pic.g;rtkeyId=
     # 溯源图访问地址
