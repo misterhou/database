@@ -129,6 +129,10 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
 
     @Override
     public void haveReturnVo(InterlocutionResult ilResult, ReturnVo returnVo, String message) {
+        // 修改默认错误提示信息
+        if (null != returnVo) {
+            returnVo.setResults(MyContants.RESULT_FAIL2);
+        }
         int serialNum = Integer.valueOf(ilResult.getId());
         String directive = ilResult.getDirective();
         String directiveType = ilResult.getDirectiveType();
@@ -293,10 +297,9 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         }
                     }
                 }
-//                if (StringUtils.isNotBlank(result)) {
-//                    result = "未查询到相关信息";
-//                }
-                returnVo.setResults(result);
+                if (StringUtils.isNotBlank(result)) {
+                    returnVo.setResults(result);
+                }
             } else if (serialNum == 308) {  // 线路负载率
                 String text = message.replaceAll("(负载率|是多少)", "");
                 TellHowLineLoadRateVO tellHowLineLoadRateVO = this.tellHowClient.lineLoadRate();
@@ -490,12 +493,22 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                 returnVo.setResults(result);
             } else if (serialNum == 316) {  // 值班人员信息
                 TellHowVO result = null;
-                if (regexIsFind("今天|今日", message)) {
+                String dutyOrder = null;
+                if (regexIsFind("白班", message)) {
+                    dutyOrder = "白班";
+                } else if (regexIsFind("夜班", message)) {
+                    dutyOrder = "夜班";
+                }
+                if (StringUtils.isNotBlank(dutyOrder)) {
+                    if (regexIsFind("今天|今日", message)) {
+                        result = this.tellHowClient.dutyPersonnelInfo(null, dutyOrder);
+                    } else if (regexIsFind("昨天|昨日", message)) {
+                        result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().minusDays(1), dutyOrder);
+                    } else if (regexIsFind("明天|明日", message)) {
+                        result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().plusDays(1), dutyOrder);
+                    }
+                } else if (regexIsFind("当前|现在", message)) {
                     result = this.tellHowClient.dutyPersonnelInfo(null, null);
-                } else if (regexIsFind("昨天|昨日", message)) {
-                    result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().minusDays(1), null);
-                } else if (regexIsFind("明天|明日", message)) {
-                    result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().plusDays(1), null);
                 }
                 if (null != result) {
                     String voiceContent = result.getVoiceContent();
