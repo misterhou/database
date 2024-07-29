@@ -91,8 +91,8 @@ public class TellHowClient {
         noticeDate = StringUtils.getDateChinaStr(dutyDate);
         String url = this.tellHowProperties.getServiceAddr() + "/data/dutyPersonnelInfo";
         Map<String, String> params = new HashMap<>();
-        params.put("dateTime", dutyDateStr);
         if (StringUtils.hasText(dutyOrder)) {
+            params.put("dateTime", dutyDateStr);
             params.put("dutyOrderName", dutyOrder);
         }
         params.put("actionType", "3");
