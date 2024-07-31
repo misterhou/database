@@ -206,11 +206,11 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                 String resultContent = message.replace("多少", maxValue + "兆瓦");
                                 String compareYesterday = tellHowCurveVO.getCompareYesterday();
                                 if (StringUtils.isNotBlank(compareYesterday)) {
-                                    resultContent += "，较昨日增长" + compareYesterday + "%";
+                                    resultContent += "，较昨日" + this.getCompareInfo(compareYesterday);
                                 }
                                 String compareLastYear = tellHowCurveVO.getCompareLastYear();
                                 if (StringUtils.isNotBlank(compareLastYear)) {
-                                    resultContent += "，较去年增长" + compareLastYear + "%";
+                                    resultContent += "，较去年" + this.getCompareInfo(compareLastYear);
                                 }
                                 returnVo.setResults(resultContent);
                                 String poseId = tellHowCurveVO.getPoseId();
@@ -882,6 +882,21 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
         }
         return area;
+    }
+
+    /**
+     * 获取比较信息
+     * @param value 比较值
+     * @return 比较信息
+     */
+    private String getCompareInfo(String value) {
+        String compareInfo = null;
+        if (value.startsWith("-")) {
+            compareInfo = "减少" + value.substring(1) + "%";
+        } else {
+            compareInfo = "增长" + value + "%";
+        }
+        return compareInfo;
     }
 
     /**
