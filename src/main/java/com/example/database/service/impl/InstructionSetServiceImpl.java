@@ -507,7 +507,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     } else if (regexIsFind("明天|明日", message)) {
                         result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().plusDays(1), dutyOrder);
                     }
-                } else if (regexIsFind("当前|现在", message)) {
+                } else if (regexIsFind("当前|现在", message) || "值班人员是谁".equals(message)) {
                     result = this.tellHowClient.dutyPersonnelInfo(null, null);
                 }
                 if (null != result) {
