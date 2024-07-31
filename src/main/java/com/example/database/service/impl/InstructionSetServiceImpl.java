@@ -345,14 +345,14 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                             }
                         }
                         if (ObjectUtils.isNotEmpty(deviceNameList)) {
-                           notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在 N-1 风险";
+                           notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在N减1风险";
                            returnVo.setPoseId(tellHowNumMinusOneDetailsVO.getPoseId());
                            noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
                         }
                     }
                 }
                 if (StringUtils.isBlank(notice)) {
-                    notice = "当前没有 N-1 风险";
+                    notice = "当前没有N减1风险";
                 }
                 returnVo.setResults(notice);
             } else if (serialNum == 310) {  // 重要用户统计
