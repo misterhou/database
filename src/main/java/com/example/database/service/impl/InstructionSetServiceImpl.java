@@ -206,11 +206,11 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                                 String resultContent = message.replace("多少", maxValue + "兆瓦");
                                 String compareYesterday = tellHowCurveVO.getCompareYesterday();
                                 if (StringUtils.isNotBlank(compareYesterday)) {
-                                    resultContent += "，较昨日增长" + compareYesterday + "%";
+                                    resultContent += "，较昨日" + this.getCompareInfo(compareYesterday);
                                 }
                                 String compareLastYear = tellHowCurveVO.getCompareLastYear();
                                 if (StringUtils.isNotBlank(compareLastYear)) {
-                                    resultContent += "，较去年增长" + compareLastYear + "%";
+                                    resultContent += "，较去年" + this.getCompareInfo(compareLastYear);
                                 }
                                 returnVo.setResults(resultContent);
                                 String poseId = tellHowCurveVO.getPoseId();
@@ -345,14 +345,14 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                             }
                         }
                         if (ObjectUtils.isNotEmpty(deviceNameList)) {
-                           notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在 N-1 风险";
+                           notice = "当前" + StringUtils.join(deviceNameList, ",") + "设备存在N减1风险";
                            returnVo.setPoseId(tellHowNumMinusOneDetailsVO.getPoseId());
                            noticeTellHowAction(ResponseMessage.TellHowMenu.NUM_MINUS_ONE);
                         }
                     }
                 }
                 if (StringUtils.isBlank(notice)) {
-                    notice = "当前没有 N-1 风险";
+                    notice = "当前没有N减1风险";
                 }
                 returnVo.setResults(notice);
             } else if (serialNum == 310) {  // 重要用户统计
@@ -507,7 +507,7 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                     } else if (regexIsFind("明天|明日", message)) {
                         result = this.tellHowClient.dutyPersonnelInfo(LocalDate.now().plusDays(1), dutyOrder);
                     }
-                } else if (regexIsFind("当前|现在", message)) {
+                } else if (regexIsFind("当前|现在", message) || "值班人员是谁".equals(message)) {
                     result = this.tellHowClient.dutyPersonnelInfo(null, null);
                 }
                 if (null != result) {
@@ -882,6 +882,21 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
             area = TellHowClient.Area.XIONG_XIAN_CANG_ZHOU;
         }
         return area;
+    }
+
+    /**
+     * 获取比较信息
+     * @param value 比较值
+     * @return 比较信息
+     */
+    private String getCompareInfo(String value) {
+        String compareInfo = null;
+        if (value.startsWith("-")) {
+            compareInfo = "减少" + value.substring(1) + "%";
+        } else {
+            compareInfo = "增长" + value + "%";
+        }
+        return compareInfo;
     }
 
     /**
