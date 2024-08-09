@@ -55,7 +55,7 @@ public class SimilarityUtil {
         List<String> result = null;
         try {
             sentence = sentence.replaceAll(" ", "");
-            result = StringUtils.segment(sentence);
+            result = StringUtils.segment(sentence, false);
         } catch (IOException e) {
             e.printStackTrace();
         }

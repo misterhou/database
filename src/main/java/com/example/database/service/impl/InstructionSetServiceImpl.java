@@ -309,7 +309,10 @@ public class InstructionSetServiceImpl extends ServiceImpl<InstructionSetMapper,
                         for (LineLoadRate lineLoadRate : lineLoadRateList) {
                             String lineName = lineLoadRate.getLineName();
                             if (StringUtils.isNotBlank(lineName)) {
-                                double similarity = SimilarityUtil.getSimilarity(lineName, text);
+                                double similarity = SimilarityUtil.getSimilarity(
+                                        com.example.database.fanyumeta.utils.StringUtils.replaceSpecialSymbol(lineName),
+                                        com.example.database.fanyumeta.utils.StringUtils.replaceSpecialSymbol(text)
+                                );
                                 log.info("【相似度】【{}】与【{}】的为：{}", lineName, text, similarity);
                                 if (similarity > SIMILARITY_THRESHOLD) {
                                     StringBuilder rate = new StringBuilder();

@@ -224,7 +224,7 @@ public class NanRuiClient {
             log.info("调用梵钰-南瑞接口：{}，响应结果：{}", url, responseData);
             resData = JSONObject.parseObject(responseData);
         } catch (Exception e) {
-            log.error("通过纳瑞服务获取数据出错", e);
+            log.error("通过梵钰-南瑞服务获取数据出错", e);
         }
         return resData;
     }

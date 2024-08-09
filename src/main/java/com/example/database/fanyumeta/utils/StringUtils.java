@@ -107,6 +107,29 @@ public class StringUtils extends org.springframework.util.StringUtils {
         return keyword;
     }
 
+    /**
+     * 分词
+     *
+     * @param text 文本
+     * @return 分词列表
+     */
+    public static List<String> segment(String text, Boolean isRegChineseNumber) throws IOException {
+//        List<Term> terms = HanLP.segment(text);
+//        return terms.stream().map(term -> term.word).collect(Collectors.toList());
+        List<String> keyword = new ArrayList<>();
+        StringReader re = new StringReader(text.trim());
+        IKSegmenter ik = new IKSegmenter(re,true);
+        Lexeme lex;
+        while((lex = ik.next())!=null){
+            String value = lex.getLexemeText();
+            if (isRegChineseNumber) {
+                value = getNumberReg(value);
+            }
+            keyword.add(value);
+        }
+        return keyword;
+    }
+
     public static String getPinyin(String text) {
         HanLP.Config.IOAdapter = new SpringbootResourceIOAdapter();
         HanLP.Config.PinyinDictionaryPath = "/dictionary/pinyin/pinyin.txt";
@@ -145,6 +168,17 @@ public class StringUtils extends org.springframework.util.StringUtils {
         text = text.replace("Ⅶ" , "7");
         text = text.replace("Ⅷ" , "8");
         text = text.replace("Ⅸ" , "9");
+        text = text.replaceAll("kV|kv|KV" , "千伏");
+        text = text.replaceAll("1线" , "一线");
+        text = text.replaceAll("2线" , "二线");
+        text = text.replaceAll("3线" , "三线");
+        text = text.replaceAll("4线" , "四线");
+        text = text.replaceAll("5线" , "五线");
+        text = text.replaceAll("6线" , "六线");
+        text = text.replaceAll("7线" , "七线");
+        text = text.replaceAll("8线" , "八线");
+        text = text.replaceAll("9线" , "九线");
+
         return text;
     }
 
