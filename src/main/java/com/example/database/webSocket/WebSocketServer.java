@@ -222,43 +222,50 @@ public class WebSocketServer {
             ResponseMessage responseMessage = new ResponseMessage(null,
                     ServiceType.CLOSE_NOTICE, null, null);
             TellHowServer.noticeClient2(responseMessage);
-        } else if (openWiringPicPattern.matcher(message).find()) { // 打开接线图
-            String picName = PicDataUtil.getPicName(message);
-            if (StringUtils.isNotBlank(picName)) {
-                returnVo.setResults(this.getOpenPicNotice(message));
-                // 通知数智人往右挥手
-                returnVo.setPoseId("3");
-                TellHowServer.noticeClient(picName, null);
+        } else if (openPicPattern.matcher(message).find()) { // 开图
+            if (openContactPicPattern.matcher(message).find()) { // 打开联络图
+                String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
+                if (StringUtils.isNotBlank(substationRtKeyId)) {
+                    returnVo.setResults(this.getOpenPicNotice(message));
+                    // 通知数智人往右挥手
+                    returnVo.setPoseId("3");
+                    TellHowServer.noticeClient(substationRtKeyId, PicType.CONTACT, null);
+                }
+            } else if (openIntervalPicPattern.matcher(message).find()) { // 打开间隔图
+                String picName = PicDataUtil.getIntervalPicName(message);
+                if (StringUtils.isNotBlank(picName)) {
+                    returnVo.setResults(this.getOpenPicNotice(message));
+                    // 通知数智人往右挥手
+                    returnVo.setPoseId("3");
+                    TellHowServer.noticeClient(picName, null);
+                } else {
+                    log.warn("【开间隔图指令】没有获取到对应的间隔图片数据，开图指令：{}，对应的间隔图片名称：{}", message, picName);
+                }
+            } else if (openSourcePicPattern.matcher(message).find()) { // 打开溯源图
+                String substationRtKeyId = PicDataUtil.getSourcePicRtKeyId(message);
+                if (StringUtils.isNotBlank(substationRtKeyId)) {
+                    returnVo.setResults(this.getOpenPicNotice(message));
+                    // 通知数智人往右挥手
+                    returnVo.setPoseId("3");
+                    TellHowServer.noticeClient(substationRtKeyId, PicType.SOURCE, null);
+                }
             } else {
-                log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+                String picName = PicDataUtil.getPicName(message);
+                if (StringUtils.isNotBlank(picName)) {
+                    returnVo.setResults(this.getOpenPicNotice(message));
+                    // 通知数智人往右挥手
+                    returnVo.setPoseId("3");
+                    TellHowServer.noticeClient(picName, null);
+                } else {
+                    log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+                }
+                if (openWiringPicPattern.matcher(message).find()) { // 打开接线图
+                    log.info("打开接线图：{}", message);
+                } else {
+                    log.info("打开图：{}", message);
+                }
             }
-        } else if (openContactPicPattern.matcher(message).find()) { // 打开联络图
-            String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
-            if (StringUtils.isNotBlank(substationRtKeyId)) {
-                returnVo.setResults(this.getOpenPicNotice(message));
-                // 通知数智人往右挥手
-                returnVo.setPoseId("3");
-                TellHowServer.noticeClient(substationRtKeyId, PicType.CONTACT, null);
-            }
-        } else if (openIntervalPicPattern.matcher(message).find()) { // 打开间隔图
-            String picName = PicDataUtil.getIntervalPicName(message);
-            if (StringUtils.isNotBlank(picName)) {
-                returnVo.setResults(this.getOpenPicNotice(message));
-                // 通知数智人往右挥手
-                returnVo.setPoseId("3");
-                TellHowServer.noticeClient(picName, null);
-            } else {
-                log.warn("【开间隔图指令】没有获取到对应的间隔图片数据，开图指令：{}，对应的间隔图片名称：{}", message, picName);
-            }
-        } else if (openSourcePicPattern.matcher(message).find()) { // 打开溯源图
-            String substationRtKeyId = PicDataUtil.getSourcePicRtKeyId(message);
-            if (StringUtils.isNotBlank(substationRtKeyId)) {
-                returnVo.setResults(this.getOpenPicNotice(message));
-                // 通知数智人往右挥手
-                returnVo.setPoseId("3");
-                TellHowServer.noticeClient(substationRtKeyId, PicType.SOURCE, null);
-            }
-        } else if (operationPattern.matcher(message).find()) {
+        } else if (operationPattern.matcher(message).find()) {  // 介绍XX运行情况
             String deviceName = message.replace("介绍", "").replace("运行情况", "");
             deviceName = deviceName.replace("的", "");
             String unitAgcInfo = nanRuiClient.getUnitAgc(deviceName);

@@ -24,7 +24,8 @@ public class PicDataUtil {
     /**
      * 图片数据缓存（南瑞开发的接线图）
      */
-    private static List<Map<String, String>> picDataCache = new ArrayList<>(256);
+//    private static List<Map<String, String>> picDataCache = new ArrayList<>(256);
+    private static Map<String, String> picDataCache = new TreeMap<>(new DeviceNameComparator());
 
     /**
      * 间隔图数据缓存（南瑞）
@@ -51,11 +52,16 @@ public class PicDataUtil {
      * @param picDataCacheFile 图片数据缓存文件
      */
     public static void initPicData(String picDataCacheFile) {
-        picDataCache.clear();
+//        picDataCache.clear();
+//        try {
+//            picDataCache.addAll(loadPicDataCacheFile(picDataCacheFile));
+//        } catch (Exception e) {
+//            log.error("加载图片数据缓存文件出错", e);
+//        }
         try {
-            picDataCache.addAll(loadPicDataCacheFile(picDataCacheFile));
+            loadExcelData2Map(picDataCacheFile, picDataCache);
         } catch (Exception e) {
-            log.error("加载图片数据缓存文件出错", e);
+            log.error("加载接线图图片数据缓存文件出错", e);
         }
     }
 
@@ -133,11 +139,17 @@ public class PicDataUtil {
 
     /**
      * 获取图片名称
-     * @param id 图片 id
+     * @param message 问题
      * @return 图片名称
      */
-    public static String getPicName(String id) {
-        return getValue(id, picDataCache);
+    public static String getPicName(String message) {
+//        return getValue(id, picDataCache);
+        String picName = null;
+        String temp = message.replaceAll("打开", "");
+        temp = temp.replaceAll("接线图", "");
+        temp = temp.replaceAll("图", "");
+        picName = getPicNameFromCache(temp, picDataCache);
+        return picName;
     }
 
     /**
