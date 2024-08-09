@@ -11,13 +11,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -270,7 +264,7 @@ public class PicDataUtil {
      * @throws Exception 当读取 excel 数据报错时，会抛出此异常
      */
     public static void generatePicDataCacheFile(String excelFile, String cacheFile) throws Exception {
-        List<Map<String, String>> data = ExcelUtils.getData(excelFile, 0, "图形名称", -3);
+        List<Map<String, String>> data = ExcelUtils.getData(excelFile, 0, "图形名称", -4);
         writeObject2File(data, cacheFile);
     }
 

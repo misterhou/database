@@ -202,11 +202,13 @@ public class WebSocketServer {
         returnVo.setTabData("无");
         Pattern weatherPattern = Pattern.compile("天气.*(怎么样|如何)");
         Pattern closePicPattern = Pattern.compile("^关闭.*图$");
+        Pattern openPicPattern = Pattern.compile("^打开.*图$");
+        Pattern openWiringPicPattern = Pattern.compile("^打开.*接线图$");
         Pattern openIntervalPicPattern = Pattern.compile("^打开.*间隔图$");
         Pattern openContactPicPattern = Pattern.compile("^打开.*联络图$");
         Pattern openSourcePicPattern = Pattern.compile("^打开.*溯源图$");
         Pattern operationPattern = Pattern.compile("^介绍.*运行情况$");
-        if (weatherPattern.matcher(message).find()) {
+        if (weatherPattern.matcher(message).find()) {   // 天气
             String cityName = message.substring(0, message.indexOf("天气"));
             if (cityName.contains("今天") || cityName.contains("今日")) {
                 cityName = cityName.replaceAll("(今天|今日)", "");
@@ -215,11 +217,21 @@ public class WebSocketServer {
             if (StringUtils.isNotBlank(weatherInfo)) {
                 returnVo.setResults(weatherInfo);
             }
-        } else if (closePicPattern.matcher(message).find()) {
+        } else if (closePicPattern.matcher(message).find()) {   // 关图
             returnVo.setResults(MyContants.YX_ZL_ANS);
             ResponseMessage responseMessage = new ResponseMessage(null,
                     ServiceType.CLOSE_NOTICE, null, null);
             TellHowServer.noticeClient2(responseMessage);
+        } else if (openWiringPicPattern.matcher(message).find()) { // 打开接线图
+            String picName = PicDataUtil.getPicName(message);
+            if (StringUtils.isNotBlank(picName)) {
+                returnVo.setResults(this.getOpenPicNotice(message));
+                // 通知数智人往右挥手
+                returnVo.setPoseId("3");
+                TellHowServer.noticeClient(picName, null);
+            } else {
+                log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+            }
         } else if (openContactPicPattern.matcher(message).find()) { // 打开联络图
             String substationRtKeyId = PicDataUtil.getSubstationRtKeyId(message);
             if (StringUtils.isNotBlank(substationRtKeyId)) {
@@ -269,19 +281,19 @@ public class WebSocketServer {
                     }
                 } else {
                     // 开图指令
-                    if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
-                        String picName = PicDataUtil.getPicName(commandId);
-                        if (StringUtils.isNotBlank(picName)) {
-                            returnVo.setResults(this.getOpenPicNotice(message));
-                            // 通知数智人往右挥手
-                            returnVo.setPoseId("3");
-                            TellHowServer.noticeClient(picName, null);
-                        } else {
-                            log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
-                        }
-                    } else {
+//                    if (MyContants.KAI_TU.equals(ilr.getDirectiveType())) {
+//                        String picName = PicDataUtil.getPicName(commandId);
+//                        if (StringUtils.isNotBlank(picName)) {
+//                            returnVo.setResults(this.getOpenPicNotice(message));
+//                            // 通知数智人往右挥手
+//                            returnVo.setPoseId("3");
+//                            TellHowServer.noticeClient(picName, null);
+//                        } else {
+//                            log.warn("【开图指令】没有获取到对应的图片数据，开图指令：{}，对应的图片名称：{}", message, picName);
+//                        }
+//                    } else {
                         instructionSetService.haveReturnVo(ilr, returnVo, message);
-                    }
+//                    }
                 }
             } else {
                 returnVo.setResults(WebSocketServer.errorMessage);

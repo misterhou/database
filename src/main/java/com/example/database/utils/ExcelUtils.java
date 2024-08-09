@@ -1,8 +1,8 @@
 package com.example.database.utils;
 
+import com.example.database.fanyumeta.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
-import com.example.database.fanyumeta.utils.StringUtils;
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class ExcelUtils {
                         Integer keyColumnIndex = commandValueColumnIndex + keyColumnOffset;
                         String key = getColumnValue(sheet, i, keyColumnIndex, minRowIndex);
                         Map<String, String> dataRow = new HashMap<>();
-                        dataRow.put(key, value);
+                        dataRow.put(StringUtils.replaceSpecialSymbol(key), value);
                         data.add(dataRow);
                         if ("306".equals(key)) {
                             System.out.println(key);
